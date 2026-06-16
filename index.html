@@ -1,0 +1,1568 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta id="meta-viewport" name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>SmileFlow by DentiLike powered by Gemini</title>
+    <style>
+        /* PROTECCIÓN Y BASE MOBILE-FIRST */
+        body { -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none; }
+        :root { --primary: #0284c7; --success: #10b981; --warning: #fef08a; --warning-text: #854d0e; --danger: #ef4444; --danger-text: #b91c1c; --bg: #f1f5f9; --card: #ffffff; --text: #1e293b; --text-muted: #64748b; --border: #e2e8f0; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; }
+        body { background: var(--bg); color: var(--text); padding-bottom: 4rem; overflow-x: hidden; transition: width 0.3s; }
+        
+        .top-alert { background: var(--danger-text); color: white; text-align: center; padding: 0.6rem; font-weight: bold; font-size: 0.85rem; display: none; }
+        .path-bar { background: #0f172a; color: #38bdf8; font-size: 0.75rem; padding: 0.5rem; text-align: center; word-break: break-all; font-weight: bold; border-bottom: 1px solid #1e293b; display:flex; justify-content:center; gap:10px; flex-wrap:wrap;}
+        
+        /* CABECERA RESPONSIVA MEJORADA */
+        header { background: linear-gradient(135deg, #0284c7 0%, #004a7c 100%); color: white; padding: 0.8rem; display: flex; flex-direction: column; gap: 0.8rem; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .brand { display: flex; align-items: center; justify-content: center; gap: 0.6rem; text-align: center; flex-wrap: wrap;}
+        #hLogo { max-width: 38px; max-height: 38px; border-radius: 6px; display: none; object-fit: cover; background: white; padding: 2px;}
+        .h-title { font-size: 1.3rem; font-weight: 900; letter-spacing: 0.5px; text-shadow: 1px 1px 2px rgba(0,0,0,0.2); line-height: 1.1;} 
+        .h-title span { font-size: 0.75rem; font-weight: 600; opacity: 0.9; color:#bae6fd; display:block;}
+        .h-sub { font-size: 0.85rem; font-weight: 500; opacity: 0.95; width: 100%; margin-top: 0.4rem;}
+        
+        .header-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem; width: 100%; align-items: center; }
+        
+        .px-wrapper { grid-column: 1 / -1; display:flex; align-items:center; gap:0.5rem; background: rgba(0,0,0,0.15); padding: 0.4rem 0.6rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); }
+        
+        @media(min-width: 768px) { 
+            header { flex-direction: row; justify-content: space-between; padding: 0.6rem 1.5rem; }
+            .brand { justify-content: flex-start; text-align: left; flex-wrap: nowrap;}
+            .h-sub { width: auto; margin-top: 0; border-left: 1px solid rgba(255,255,255,0.3); padding-left: 0.8rem; margin-left: 0.6rem;}
+            .header-actions { display: flex; width: auto; align-items: center; gap: 0.8rem; }
+            .px-wrapper { width: auto; background: transparent; padding: 0; border: none; }
+            #pSelect { width: 220px; }
+            #dSelect { width: 180px; }
+        }
+
+        /* TOUCH TARGETS & BOTONES ANIMADOS */
+        .btn, .input-select, .input-field { min-height: 42px; font-size: 0.95rem; }
+        .btn { padding: 0.5rem 0.8rem; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; transition: all 0.2s ease; text-align: center; display: flex; align-items: center; justify-content: center; gap: 0.4rem;}
+        .btn:hover { filter: brightness(1.1); transform: translateY(-1px); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
+        .btn:active { transform: translateY(1px); box-shadow: none; }
+        
+        .btn-success { background: var(--success); color: white; } 
+        .btn-primary { background: var(--primary); color: white; width: 100%; margin-top: 0.5rem;}
+        .btn-admin { background: #334155; color: white; } 
+        .btn-new { background: #f59e0b; color: white; }
+        .btn-wa { background: #25D366; color: white; border:1px solid #1da851; }
+        .btn-wa:hover { background: #1ebe56; }
+        .btn-toggle-view { background: #6366f1; color: white; border-radius: 20px; grid-column: 1 / -1; font-size: 0.85rem; box-shadow: inset 0 -2px 0 rgba(0,0,0,0.2);}
+        @media(min-width: 768px) { .btn-toggle-view { grid-column: auto; width: auto;} }
+        
+        .input-select { padding: 0.4rem; border-radius: 6px; border: 1px solid var(--border); outline: none; flex-grow: 1; background: white; -webkit-appearance: none; appearance: none; transition: border 0.2s; cursor: pointer; }
+        .input-select:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(2,132,199,0.15); }
+        
+        .container { max-width: 1200px; margin: 1.2rem auto; padding: 0 0.8rem; overflow-x: hidden; }
+        .view { display: none; animation: fadeIn 0.3s ease; } .view.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* CARDS MEJORADAS */
+        .card { background: var(--card); padding: 1.2rem; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -1px rgba(0,0,0,0.03); margin-bottom: 1.2rem; border: none; border-top: 4px solid #cbd5e1; transition: transform 0.2s; }
+        .grid-2 { display: grid; grid-template-columns: 1fr; gap: 1rem; }
+        @media(min-width: 768px) { .grid-2 { grid-template-columns: 1fr 1fr; gap: 1.5rem; } }
+        
+        .input-group { margin-bottom: 0.8rem; width: 100%; }
+        .input-group label { display: block; font-size: 0.75rem; color: var(--text-muted); font-weight: bold; text-transform: uppercase; margin-bottom: 0.3rem; letter-spacing: 0.5px;}
+        .input-field { width: 100%; padding: 0.6rem 0.8rem; border: 1px solid #cbd5e1; border-radius: 6px; outline: none; background: #f8fafc; transition: all 0.2s; }
+        .input-field:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(2,132,199,0.15); background: white; }
+        textarea.input-field { resize: vertical; min-height: 50px; }
+        
+        .alert-box { background: var(--warning); padding: 1rem; border-radius: 8px; border-left: 5px solid var(--warning-text); margin-top: 0.8rem; display: flex; flex-direction: column; gap: 0.4rem; box-shadow: 0 2px 4px rgba(0,0,0,0.05);}
+        .alert-box input { background: rgba(255,255,255,0.5); border: 1px dashed rgba(0,0,0,0.1); border-radius: 4px; padding: 0.5rem; font-weight: bold; color: var(--warning-text); width: 100%; outline: none; font-size: 0.95rem; transition: background 0.2s;}
+        .alert-box input:focus { background: white; }
+        .hidden { display: none !important; }
+
+        .tabs { display: flex; overflow-x: auto; gap: 0.2rem; border-bottom: 3px solid var(--border); margin-bottom: 1.2rem; padding-bottom: 0; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+        .tabs::-webkit-scrollbar { display: none; }
+        .tab-btn { padding: 0.8rem 1.2rem; background: none; border: none; font-weight: bold; color: var(--text-muted); cursor: pointer; border-radius: 8px 8px 0 0; white-space: nowrap; font-size: 0.95rem; transition: all 0.2s; margin-bottom: -3px; border-bottom: 3px solid transparent;}
+        .tab-btn:hover { background: #f1f5f9; color: #334155; }
+        .tab-btn.active { color: var(--primary); background: white; border-bottom: 3px solid var(--primary); }
+        .tab-content { display: none; } .tab-content.active { display: block; animation: fadeIn 0.3s; }
+
+        .treat-grid { display: grid; grid-template-columns: 1fr; gap: 0.8rem; margin-bottom: 1rem;}
+        @media(min-width: 768px) { .treat-grid { grid-template-columns: 1fr 1fr; } }
+        .treat-box { background: #f8fafc; border: 1px solid var(--border); border-radius: 8px; padding: 1rem; box-shadow: inset 0 2px 4px rgba(0,0,0,0.02); }
+        .treat-box h4 { color: var(--primary); font-size: 0.95rem; margin-bottom: 0.8rem; border-bottom: 2px solid var(--border); padding-bottom: 0.4rem; }
+        .treat-item { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; margin-bottom: 0.6rem; font-size: 0.85rem; }
+        .treat-item input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--primary); flex-shrink: 0; cursor: pointer;}
+        .treat-item input[type="text"] { padding: 0.4rem; border: 1px solid var(--border); border-radius: 4px; width: 85px; font-size: 0.8rem; flex-shrink: 0; min-height: 30px;}
+        
+        .treatments-alert { background: #eff6ff; border-left: 4px solid #3b82f6; padding: 0.8rem; border-radius: 6px; margin-top: 1rem; display: none;}
+        .arch-box { background: white; padding: 1rem; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 1rem; box-shadow: 0 1px 3px rgba(0,0,0,0.02);}
+        .arch-title { font-weight: bold; color: #334155; border-bottom: 1px solid var(--border); padding-bottom: 0.5rem; margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center; font-size: 0.95rem;}
+        
+        .pill-wrap { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 1rem; }
+        .pill-wrap input { display: none; }
+        .pill-wrap label { padding: 0.5rem 0.8rem; background: #f1f5f9; border: 1px solid #cbd5e1; border-radius: 20px; font-size: 0.85rem; cursor: pointer; text-align: center; flex-grow: 1; user-select: none; transition: all 0.2s;}
+        .pill-wrap input:checked + label { background: var(--primary); border-color: var(--primary); color: white; font-weight: bold; box-shadow: 0 4px 6px -1px rgba(2,132,199,0.3); transform: translateY(-1px);}
+
+        .timeline { border-left: 3px solid #cbd5e1; padding-left: 1.5rem; margin: 1rem 0 1rem 1rem; }
+        .tl-item { margin-bottom: 1.5rem; position: relative; }
+        .tl-item::before { content: ''; position: absolute; left: -1.95rem; top: 0; width: 16px; height: 16px; background: white; border-radius: 50%; border: 4px solid var(--primary); box-shadow: 0 0 0 2px white;}
+        .tl-date { font-weight: bold; color: var(--primary); font-size: 0.9rem; display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.4rem; flex-wrap:wrap;}
+        .tl-tag { padding: 0.2rem 0.6rem; border-radius: 12px; font-size: 0.7rem; letter-spacing: 0.5px; font-weight:bold; box-shadow: 0 1px 2px rgba(0,0,0,0.05);}
+        .tag-gen { background: #e2e8f0; color: #334155; }
+        .tag-orto { background: #bae6fd; color: #0284c7; }
+        .tag-ali { background: #dcfce7; color: #059669; }
+        .tl-card { background: #ffffff; padding: 1rem; border-radius: 8px; margin-top: 0.3rem; font-size: 0.95rem; border: 1px solid var(--border); box-shadow: 0 2px 4px rgba(0,0,0,0.04); position: relative; line-height: 1.5;}
+        
+        .matrix-container { width: 100%; overflow-x: auto; padding-bottom: 0.5rem; -webkit-overflow-scrolling: touch; }
+        .matrix { display: grid; grid-template-columns: minmax(90px, auto) repeat(8, minmax(45px, 1fr)); gap: 0.4rem; align-items: center; font-size: 0.8rem; text-align: center; }
+        .matrix input { width: 18px; height: 18px; accent-color: var(--primary); cursor: pointer;}
+        
+        .inv-row { display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 0; border-bottom: 1px dashed var(--border); font-size: 0.9rem;}
+        .inv-controls { display: flex; align-items: center; gap: 0.6rem; }
+        .btn-sm { width: 32px; height: 32px; border-radius: 50%; border: none; background: #f1f5f9; color: #334155; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; transition: all 0.2s; box-shadow: 0 1px 2px rgba(0,0,0,0.05);}
+        .btn-sm:hover { background: var(--primary); color: white; }
+        .qty { font-weight: bold; min-width: 25px; text-align: center; font-size: 1rem;}
+        
+        .fin-row { display: flex; justify-content: space-between; margin-bottom: 0.8rem; align-items: center; font-size: 0.95rem; flex-wrap: wrap; gap: 0.5rem; padding-bottom: 0.4rem; border-bottom: 1px solid #f1f5f9;}
+        .fin-row input { width: 100px; text-align: right; background: white; font-weight: bold;}
+        
+        .shop-list { list-style: none; font-size: 0.95rem; }
+        .shop-list li { display: flex; align-items: center; gap: 0.8rem; padding: 0.6rem 0.2rem; border-bottom: 1px solid var(--border); }
+        .shop-list input { width: 20px; height: 20px; accent-color: var(--primary); cursor: pointer;}
+        
+        .pat-info-grid { display: grid; grid-template-columns: 1fr; gap: 0.8rem; align-items: end; }
+        @media(min-width: 768px) { .pat-info-grid { grid-template-columns: 2fr 0.5fr 1fr 1fr; } }
+        
+        .help-box { background: white; padding: 1.5rem; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 1rem; line-height: 1.6; font-size:0.95rem; box-shadow: 0 4px 6px rgba(0,0,0,0.02);}
+        .help-box h3 { color: var(--primary); border-bottom: 2px solid var(--border); padding-bottom: 0.6rem; margin-bottom: 1.2rem; font-size: 1.3rem;}
+        .help-box h4 { color: #0f172a; margin-top: 1.8rem; margin-bottom: 0.5rem; font-size: 1.05rem; border-left: 4px solid var(--success); padding-left: 0.5rem;}
+        .help-box p { color: #475569; margin-bottom: 0.8rem; }
+        .doc-btn-group { display: flex; flex-direction: column; gap: 0.8rem; margin-top: 1rem; }
+    </style>
+
+    <!-- Librerías de Google Cloud (GAPI y GIS) para Drive Sync -->
+    <script async defer src="https://apis.google.com/js/api.js" onload="gapiLoaded()"></script>
+    <script async defer src="https://accounts.google.com/gsi/client" onload="gisLoaded()"></script>
+</head>
+<body>
+
+<div id="topStockAlert" class="top-alert">⚠️ STOCK BAJO: Tienes arcos con 5 piezas o menos. Revisa tu Inventario en la sección Admin.</div>
+<div id="workingPath" class="path-bar">
+    <span id="syncStatus">📍 Modo Offline (Solo este dispositivo)</span> 
+    <span id="pathText"></span>
+</div>
+
+<header>
+    <div class="brand">
+        <img id="hLogo" src="">
+        <div>
+            <div class="h-title">SmileFlow <span>by DentiLike ⚡ powered by Gemini</span></div>
+            <div class="h-sub" id="hClinicDoc">Mi Clínica | Selecciona Doctor</div>
+        </div>
+    </div>
+    <div class="header-actions">
+        <button class="btn btn-toggle-view" id="btnToggleView" onclick="toggleViewMode()" title="Cambiar resolución visual">🖥️ Forzar Vista PC</button>
+        <button id="btnAuthHeader" class="btn" style="background:#0284c7; border:2px solid #bae6fd; color:white; display:none; grid-column: 1 / -1;" onclick="handleAuthClick()">☁️ Conectar Nube de Drive</button>
+        
+        <select id="dSelect" class="input-select" onchange="changeActiveDoc()" style="background:#e0f2fe; color:#0369a1; font-weight:bold; border:2px solid #38bdf8; grid-column: 1 / -1; box-shadow: 0 2px 4px rgba(0,0,0,0.1);"></select>
+        
+        <div class="px-wrapper">
+            <span style="font-weight:900; font-size:1.15rem; color: #bae6fd; text-shadow: 1px 1px 2px rgba(0,0,0,0.2);">Px:</span>
+            <select id="pSelect" class="input-select" onchange="loadPatient()" style="font-weight:bold; border:2px solid transparent;"></select>
+            <button class="btn btn-new" onclick="newPatient()" style="min-height:42px; padding:0 1rem; font-size:1.1rem; box-shadow: 0 2px 4px rgba(0,0,0,0.1);" title="Crear Nuevo Paciente">➕</button>
+        </div>
+        
+        <button class="btn btn-primary" onclick="switchView('clinica')" style="grid-column: 1 / -1; margin-top:0; font-size: 1rem;">👨‍⚕️ Panel Clínico</button>
+        <button class="btn btn-admin" onclick="switchView('admin')" style="grid-column: 1 / -1; font-size: 1rem;">⚙️ Admin y Finanzas</button>
+        <button class="btn btn-success" onclick="abrirAgenda()" style="grid-column: 1 / -1; font-size: 1rem;">📅 Ver Citas del Día</button>
+    </div>
+</header>
+
+<div class="container">
+    <div id="v-clinica" class="view active">
+        <div class="card" style="border-top-color: var(--primary);">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; flex-wrap:wrap; gap:0.5rem;">
+                <div style="display:flex; align-items:center; gap:0.6rem; width:100%;">
+                    <h3 style="color:var(--primary); font-size:1.3rem; margin:0; font-weight:900;" id="lblId">Nuevo Paciente</h3>
+                    <button class="btn" style="background:#f1f5f9; color:#475569; padding:0.3rem 0.6rem; font-size:0.85rem; min-height:auto; box-shadow: 0 1px 2px rgba(0,0,0,0.05);" onclick="copyPatFolder()" title="Copiar ID para usarlo en Drive o Carpetas">📋 Copiar ID</button>
+                </div>
+            </div>
+            
+            <div class="pat-info-grid">
+                <div class="input-group" style="margin:0;"><label>Nombre Completo</label><input type="text" id="pName" class="input-field" placeholder="Ej. Juan Perez"></div>
+                <div class="input-group" style="margin:0;"><label>Edad</label><input type="number" id="pAge" class="input-field" oninput="checkAge()"></div>
+                <div class="input-group" style="margin:0;"><label>Teléfono (WhatsApp)</label><input type="tel" id="pPhone" class="input-field" placeholder="10 dígitos"></div>
+                <div class="input-group hidden" style="margin:0;" id="divGuardian"><label style="color:var(--danger-text);">Tutor Legal (< 18)</label><input type="text" id="pGuardian" class="input-field" style="border-color:var(--danger-text); background:#fef2f2;"></div>
+            </div>
+            
+            <div class="input-group" style="margin-top:1rem; margin-bottom:0;"><label>Resumen Clínico / Diagnóstico Base</label><input type="text" id="pSum" class="input-field" placeholder="Ej. Clase II esquelética, apiñamiento severo..."></div>
+            
+            <div class="grid-2" style="margin-top:1rem; margin-bottom:0;">
+                <div class="input-group" style="margin:0;"><label>Tipo de Brackets Asignados</label><input type="text" id="pBrackets" class="input-field" placeholder="Ej. Metálicos, Autoligado, Estéticos..."></div>
+                <div class="input-group" style="margin:0; display:flex; align-items:flex-end;">
+                    <label style="display:flex; align-items:center; gap:0.6rem; cursor:pointer; height:42px; color:var(--danger-text); font-size:0.95rem; font-weight:bold; background:#fef2f2; padding:0 0.8rem; border-radius:6px; border:1px dashed var(--danger-text);">
+                        <input type="checkbox" id="pRetra" style="width:20px; height:20px; accent-color:var(--danger-text);"> ⚠️ Paciente de Retratamiento
+                    </label>
+                </div>
+            </div>
+
+            <button class="btn btn-success" style="width:100%; margin-top:1.5rem; font-size:1.1rem; padding: 0.8rem; box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.3);" onclick="savePatient()">💾 GUARDAR PERFIL DEL PACIENTE</button>
+            
+            <div id="pPendingTreats" class="treatments-alert"></div>
+
+            <div class="alert-box" id="divAlertBox" style="flex-wrap: wrap;">
+                <div style="width:100%; display:flex; justify-content:space-between; align-items:center;">
+                    <label id="lblAlertTitle" style="font-size:0.85rem; white-space:nowrap; margin-bottom:0; font-weight:900;">📌 AVISO PRÓX. CITA (Recordatorio local):</label>
+                </div>
+                <input type="text" id="pAlert" placeholder="Sin avisos ni pendientes registrados..." onchange="savePatientAlert()" style="margin-bottom:0.5rem;">
+                
+                <div style="width: 100%; border-top: 1px dashed rgba(133, 77, 14, 0.4); padding-top: 1rem; margin-top: 0.2rem;">
+                    <label style="font-size:0.8rem; font-weight:bold; color:var(--warning-text); display:block; margin-bottom:0.6rem;">📱 AGENDAR Y ENVIAR RECORDATORIO:</label>
+                    <div style="display: flex; gap: 0.5rem; flex-wrap:wrap; align-items:center;">
+                        <button class="btn" style="background:#0284c7; color:white; font-size:1.05rem;" onclick="abrirAgenda()" title="Abrir Google Calendar / Confirmafy">📅 Agendar en Calendario Dr.</button>
+                        <input type="date" id="waDate" class="input-field" style="flex:1; background: white; border-color:#fcd34d;">
+                        <input type="time" id="waTime" class="input-field" style="width: 120px; background: white; border-color:#fcd34d;">
+                        <button class="btn btn-wa" style="flex-grow:1; font-size:1.05rem;" onclick="sendApptWA()">Enviar Cita WA</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="tabs">
+            <button class="tab-btn active" onclick="openTab('t-hist', this)">📅 Historial</button>
+            <button class="tab-btn" onclick="openTab('t-gen', this)">🩺 Nota Gen</button>
+            <button class="tab-btn" onclick="openTab('t-evo', this)">🦷 Nota Orto</button>
+            <button class="tab-btn" onclick="openTab('t-ali', this)">🪥 Alineadores</button>
+            <button class="tab-btn" onclick="openTab('t-trat', this)">📋 Tx Pendiente</button>
+            <button class="tab-btn" onclick="openTab('t-estudios', this)">📁 Archivos</button>
+            <button class="tab-btn" onclick="openTab('t-receta', this)" style="color: #059669;">💊 Receta</button>
+            <button class="tab-btn" onclick="openTab('t-docs', this)" style="color: #0284c7;">📄 Docs y Reco</button>
+        </div>
+
+        <div id="t-hist" class="tab-content active">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; flex-wrap:wrap; gap:0.8rem; background:white; padding:1rem; border-radius:8px; border:1px solid var(--border);">
+                <p style="color:var(--text-muted); font-size:0.95rem; margin:0;">Registro cronológico de las consultas pasadas.</p>
+                <button class="btn" style="background:#475569; color:white; width:100%; box-shadow: 0 2px 4px rgba(0,0,0,0.1);" onclick="printHistory()">🖨️ Imprimir Historial Clínico</button>
+            </div>
+            <div class="timeline" id="tlRender"></div>
+        </div>
+
+        <div id="t-gen" class="tab-content">
+            <h3 style="color:#0284c7; font-size:1.2rem; margin-bottom:1.2rem; font-weight:900;">🩺 Nueva Nota General</h3>
+            <div class="input-group"><input type="date" id="nDateGen" class="input-field" style="font-weight:bold;"></div>
+
+            <div class="grid-2">
+                <div class="arch-box" style="margin-bottom:0;">
+                    <div class="arch-title">Signos Vitales (Opcional)</div>
+                    <div style="display:flex; gap:0.6rem; margin-bottom:0.2rem;">
+                        <input type="text" id="gTA" placeholder="T.A." class="input-field">
+                        <input type="number" id="gFC" placeholder="F.C." class="input-field">
+                        <input type="number" id="gTemp" placeholder="T(°C)" class="input-field" step="0.1">
+                    </div>
+                </div>
+                <div class="arch-box" style="margin-bottom:0;">
+                    <div class="arch-title">Módulo de Anestesia</div>
+                    <label style="display:flex; align-items:center; gap:0.6rem; margin-bottom:0.8rem; font-size:0.95rem; cursor:pointer; font-weight:bold;">
+                        <input type="checkbox" id="gAnesChk" onchange="document.getElementById('gAnesBox').classList.toggle('hidden', !this.checked)" style="width:20px; height:20px; accent-color:var(--primary);"> 
+                        Se administró anestésico
+                    </label>
+                    <div id="gAnesBox" class="hidden" style="display:flex; gap:0.6rem; flex-wrap:wrap;">
+                        <select id="gAnesTipo" class="input-select" style="flex:1 1 100%; font-weight:bold;">
+                            <option value="Lidocaína 2% con Epinefrina">Lidocaína 2% c/Epi</option>
+                            <option value="Articaína 4% con Epinefrina">Articaína 4% c/Epi</option>
+                            <option value="Mepivacaína 3% sin Epinefrina">Mepivacaína 3% s/Epi</option>
+                            <option value="Mepivacaína 2% con Epinefrina">Mepivacaína 2% c/Epi</option>
+                            <option value="Prilocaína 3% con Felipresina">Prilocaína 3% c/Feli</option>
+                        </select>
+                        <input type="number" id="gAnesCart" placeholder="Cartuchos usados" class="input-field" style="flex:1;" min="0.5" step="0.5">
+                    </div>
+                </div>
+            </div>
+
+            <div class="arch-box" style="margin-top:1.2rem; border-color: #fcd34d; background: #fffbeb;">
+                <div class="arch-title" style="color:#b45309; border-color:#fde68a;">Insumos Extra Utilizados (Se restará como Inventario Tangible)</div>
+                <div id="renderGenMats" class="pill-wrap"></div>
+            </div>
+
+            <div class="input-group" style="margin-top:1.2rem;">
+                <label>Insertar Tratamientos Rápidos</label>
+                <select class="input-select" style="font-weight:bold; color:#0369a1;" onchange="if(this.value){ document.getElementById('nObsGen').value += (document.getElementById('nObsGen').value?'\n':'') + '• ' + this.value; this.value=''; }">
+                    <option value="">Selecciona para autocompletar...</option>
+                    <option value="Profilaxis y pulido coronal.">Profilaxis Básica</option>
+                    <option value="Eliminación de cálculo (Detartraje).">Detartraje</option>
+                    <option value="Aplicación de blanqueamiento dental en consultorio.">Blanqueamiento Dental</option>
+                    <option value="Resina compuesta en OD: ">Resina Compuesta</option>
+                    <option value="Exodoncia simple de OD: ">Exodoncia Simple</option>
+                    <option value="Apertura y aislamiento absoluto en OD: ">Endodoncia (Apertura)</option>
+                    <option value="Cementación de prótesis/corona en OD: ">Cementación Prótesis</option>
+                </select>
+            </div>
+
+            <div class="input-group"><label>Descripción Detallada e Indicaciones</label><textarea id="nObsGen" class="input-field" placeholder="Escribe los detalles del procedimiento realizado..." style="min-height:100px; font-size:0.95rem; line-height:1.4;"></textarea></div>
+            <div class="input-group" style="background:#fef3c7; padding:1rem; border-radius:8px; margin-bottom:1.5rem; border:1px solid #fde68a; box-shadow: 0 2px 4px rgba(0,0,0,0.02);"><label style="color:#b45309;">Aviso pendiente para Próxima Cita</label><input type="text" id="nFutGen" class="input-field" style="background:white; border-color:#fcd34d;" placeholder="Ej. Retirar puntos, revisar oclusión..."></div>
+            
+            <div style="background:white; padding:1.2rem; border-radius:8px; margin-bottom:1.5rem; border:1px solid #bae6fd; border-left: 5px solid #0284c7; box-shadow: 0 2px 4px rgba(0,0,0,0.02);">
+                <label style="display:flex; align-items:center; gap:0.8rem; cursor:pointer; font-weight:900; color:#0f172a; font-size:1rem;">
+                    <input type="checkbox" id="nCobroGen" checked style="width:24px; height:24px; accent-color:#0284c7;">
+                    💰 Contabilizar Ingreso (Honorarios) y Gasto en reporte financiero
+                </label>
+            </div>
+            <button class="btn-primary" style="font-size:1.15rem; padding:1rem; box-shadow: 0 4px 6px -1px rgba(2, 132, 199, 0.3);" onclick="saveEvolucionGen()">💾 Guardar Evolución General</button>
+        </div>
+
+        <div id="t-evo" class="tab-content">
+            <h3 style="color:var(--success); font-size:1.2rem; margin-bottom:1.2rem; font-weight:900;">🦷 Nueva Nota Ortodoncia</h3>
+            <div class="input-group"><input type="date" id="nDate" class="input-field" style="font-weight:bold;"></div>
+            
+            <div style="background:#fefce8; border:1px solid #fde047; padding:1.2rem; border-radius:8px; margin-bottom:1.2rem; box-shadow: 0 2px 4px rgba(0,0,0,0.02);">
+                <div class="arch-title" style="border:none; margin-bottom:0.8rem; color:#b45309; padding:0;">Colocación de Brackets (Se restará como Inventario Tangible)</div>
+                <div class="grid-2">
+                    <div>
+                        <label style="display:flex; align-items:center; gap:0.6rem; font-size:0.95rem; margin-bottom:0.6rem; font-weight:bold;"><input type="checkbox" id="chkBktSup" onchange="document.getElementById('selBktSup').classList.toggle('hidden', !this.checked)" style="width:20px;height:20px;accent-color:#b45309;"> Arcada Superior</label>
+                        <select id="selBktSup" class="input-select hidden" style="width:100%; font-weight:bold;"></select>
+                    </div>
+                    <div>
+                        <label style="display:flex; align-items:center; gap:0.6rem; font-size:0.95rem; margin-bottom:0.6rem; font-weight:bold;"><input type="checkbox" id="chkBktInf" onchange="document.getElementById('selBktInf').classList.toggle('hidden', !this.checked)" style="width:20px;height:20px;accent-color:#b45309;"> Arcada Inferior</label>
+                        <select id="selBktInf" class="input-select hidden" style="width:100%; font-weight:bold;"></select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid-2">
+                <div class="arch-box" id="rSup"></div>
+                <div class="arch-box" id="rInf"></div>
+            </div>
+
+            <div style="background:#eff6ff; border:1px solid #bfdbfe; padding:1.2rem; border-radius:8px; margin-bottom:1.2rem; box-shadow: 0 2px 4px rgba(0,0,0,0.02);">
+                <div class="arch-title" style="border:none; margin-bottom:0.8rem; padding:0; color:#0369a1;">Módulo Elásticos Intermaxilares</div>
+                <div class="pill-wrap" style="margin-bottom:0.8rem;">
+                    <input type="radio" name="eUse" id="eNo" value="No" checked onchange="toggleElastics()"><label for="eNo">Sin Elásticos</label>
+                    <input type="radio" name="eUse" id="eSi" value="Sí" onchange="toggleElastics()"><label for="eSi" style="background:#bae6fd; color:#0369a1; border-color:#7dd3fc;">Activar Uso de Elásticos</label>
+                </div>
+                <div id="ePanel" class="hidden">
+                    <div class="pill-wrap">
+                        <input type="radio" name="eVec" id="vC2" value="Clase II" onchange="sugElastic()"><label for="vC2">Clase II</label>
+                        <input type="radio" name="eVec" id="vC3" value="Clase III" onchange="sugElastic()"><label for="vC3">Clase III</label>
+                        <input type="radio" name="eVec" id="vLin" value="Línea M" onchange="sugElastic()"><label for="vLin">Línea M</label>
+                        <input type="radio" name="eVec" id="vAsen" value="Asentamiento" onchange="sugElastic()"><label for="vAsen">Asentar</label>
+                    </div>
+                    <div style="background:white; border-left:4px solid var(--primary); padding:0.8rem; font-size:0.95rem; margin-bottom:1rem; border-radius:4px; font-weight:500; color:#0f172a;" id="eSug">Selecciona un vector para ver la sugerencia biomecánica.</div>
+                    <div style="display:flex; gap:0.6rem; margin-bottom:0.8rem;">
+                        <select id="eSize" class="input-select" style="font-weight:bold;"><option>1/8"</option><option selected>3/16"</option><option>1/4"</option><option>5/16"</option></select>
+                        <select id="eForce" class="input-select" style="font-weight:bold;"><option>Ligero</option><option selected>Medio</option><option>Pesado</option></select>
+                    </div>
+                    <input type="text" id="ePos" placeholder="Posición en boca (ej. 13 a 46)..." class="input-field">
+                </div>
+            </div>
+
+            <div class="input-group"><label>Descripción de la Mecánica de Hoy</label><textarea id="nObs" class="input-field" placeholder="Anota los módulos, cadenas, retroligaduras o dobleces realizados..." style="min-height:80px; font-size:0.95rem; line-height:1.4;"></textarea></div>
+            <div class="input-group" style="background:#fef3c7; padding:1rem; border-radius:8px; margin-bottom:1.5rem; border:1px solid #fde68a; box-shadow: 0 2px 4px rgba(0,0,0,0.02);"><label style="color:#b45309;">Aviso pendiente para Próxima Cita</label><input type="text" id="nFut" class="input-field" style="background:white; border-color:#fcd34d;" placeholder="Ej. Retirar brackets, tomar Rx panorámica..."></div>
+            
+            <div style="background:white; padding:1.2rem; border-radius:8px; margin-bottom:1.5rem; border:1px solid #a7f3d0; border-left: 5px solid #059669; box-shadow: 0 2px 4px rgba(0,0,0,0.02);">
+                <label style="display:flex; align-items:center; gap:0.8rem; cursor:pointer; font-weight:900; color:#0f172a; font-size:1rem;">
+                    <input type="checkbox" id="nCobroOrto" checked style="width:24px; height:24px; accent-color:#059669;">
+                    💰 Contabilizar Ingreso (Honorarios) y Gasto en reporte financiero
+                </label>
+            </div>
+            <button class="btn-primary" style="font-size:1.15rem; padding:1rem; box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.3); background:var(--success);" onclick="saveEvolucion()">💾 Guardar Nota Ortodoncia</button>
+        </div>
+
+        <div id="t-ali" class="tab-content">
+            <h3 style="color:#047857; font-size:1.2rem; margin-bottom:1.2rem; font-weight:900;">🪥 Seguimiento de Alineadores</h3>
+            <div class="input-group"><input type="date" id="nDateAli" class="input-field" style="font-weight:bold;"></div>
+            
+            <div class="grid-2">
+                <div class="input-group"><label>Fase / Etapa del Tratamiento</label><input type="text" id="aEtapa" class="input-field" placeholder="Ej. Refinamiento 1..."></div>
+                <div class="input-group"><label>Número de Alineador Entregado</label><input type="number" id="aNum" class="input-field" placeholder="Ej. 12"></div>
+            </div>
+
+            <div class="input-group"><label>Observaciones Clínicas</label><textarea id="aObs" class="input-field" placeholder="Anota si se realizó IPR (Stripping), ataches colocados, etc..." style="min-height:100px; font-size:0.95rem; line-height:1.4;"></textarea></div>
+            <div class="input-group" style="background:#fef3c7; padding:1rem; border-radius:8px; margin-bottom:1.5rem; border:1px solid #fde68a;"><label style="color:#b45309;">Aviso Próxima Cita</label><input type="text" id="aFut" class="input-field" style="background:white; border-color:#fcd34d;" placeholder="Ej. Colocar ataches inferiores..."></div>
+            
+            <div style="background:white; padding:1.2rem; border-radius:8px; margin-bottom:1.5rem; border:1px solid #a7f3d0; border-left: 5px solid #059669;">
+                <label style="display:flex; align-items:center; gap:0.8rem; cursor:pointer; font-weight:900; color:#0f172a; font-size:1rem;">
+                    <input type="checkbox" id="nCobroAli" checked style="width:24px; height:24px; accent-color:#059669;">
+                    💰 Contabilizar Ingreso en reporte de "Ortodoncia"
+                </label>
+            </div>
+            <button class="btn-primary" style="background:#047857; font-size:1.15rem; padding:1rem; box-shadow: 0 4px 6px -1px rgba(4, 120, 87, 0.3);" onclick="saveEvolucionAli()">💾 Guardar Nota de Alineadores</button>
+        </div>
+
+        <div id="t-trat" class="tab-content">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem; flex-wrap:wrap; gap:0.8rem; background:white; padding:1rem; border-radius:8px; border:1px solid var(--border);">
+                <p style="font-size:0.95rem; color:var(--text-muted); margin:0;">Marca las casillas e indica el Órgano Dentario (OD) o Zona para recordarlos en futuras citas.</p>
+                <button class="btn" style="background: var(--success); color:white; width:100%; box-shadow: 0 2px 4px rgba(16, 185, 129, 0.2);" onclick="saveTreatsOnly()">💾 Actualizar Pendientes</button>
+            </div>
+            <div class="treat-grid" id="renderTreats"></div>
+            <button class="btn-primary" style="background: var(--success); margin-top:1.5rem; font-size:1.15rem; padding:1rem; box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.3);" onclick="saveTreatsOnly()">💾 Guardar Plan de Tratamiento</button>
+        </div>
+
+        <div id="t-estudios" class="tab-content">
+            <h3 style="color:#1e40af; font-size:1.2rem; margin-bottom:1.2rem; font-weight:900;">📁 Gestor de Archivos y Radiografías</h3>
+            <div style="background:#eff6ff; border:1px solid #bfdbfe; padding:1.5rem; border-radius:12px; margin-bottom:1.5rem; box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.1);">
+                <h4 style="color:#1e40af; margin-bottom:0.8rem; font-size:1.1rem; border-bottom:2px solid #bfdbfe; padding-bottom:0.5rem;">1. Búsqueda Automática en Google Drive</h4>
+                <p style="font-size:0.95rem; color:#475569; margin-bottom:1.2rem;">Copia el ID del paciente y presiona buscar para localizar su expediente fotográfico y radiográfico en tu nube.</p>
+                <div style="display:grid; grid-template-columns:1fr; gap:0.8rem;">
+                    <button class="btn" style="background:white; border:2px solid #93c5fd; color:#1d4ed8; font-weight:900;" onclick="copyPatFolder()">📋 Copiar ID del Paciente</button>
+                    <button class="btn" style="background:#2563eb; color:white; font-size:1.05rem;" onclick="abrirDriveSearch()">🔍 Buscar en Google Drive</button>
+                </div>
+            </div>
+            <div style="background:white; padding:1.5rem; border-radius:12px; border:1px solid var(--border); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02);">
+                <h4 style="color:#334155; margin-bottom:0.8rem; font-size:1.1rem; border-bottom:2px solid var(--border); padding-bottom:0.5rem;">2. Ruta de PC Local (Directorio)</h4>
+                <p style="font-size:0.9rem; color:var(--text-muted); margin-bottom:1rem;">Si usas un servidor local o disco duro externo, pega aquí la ruta de la carpeta de este paciente.</p>
+                <div class="input-group" style="margin-bottom:1.2rem;">
+                    <input type="text" id="pDrive" class="input-field" placeholder="Ej. C:\Pacientes\JuanPerez..." onchange="savePatient()">
+                </div>
+                <button class="btn" style="background:#475569; color:white; width:100%; padding:0.8rem;" onclick="copiarRutaLocal(document.getElementById('pDrive').value)">📋 Copiar Ruta para Explorador de Windows</button>
+            </div>
+        </div>
+
+        <div id="t-receta" class="tab-content">
+            <h3 style="color:#059669; font-size:1.2rem; margin-bottom:1.2rem; font-weight:900;">💊 Generador de Recetas Médicas</h3>
+            <div class="input-group">
+                <label>Buscador de Medicamentos Frecuentes</label>
+                <select id="selMed" class="input-select" style="font-weight:bold; border-color:#6ee7b7;" onchange="addMedToPrescription()">
+                    <option value="">Selecciona para añadir a la receta...</option>
+                    <optgroup label="Analgésicos y Antiinflamatorios">
+                        <option value="Ketorolaco 10mg - Tomar 1 tableta cada 8 horas por 3 días.">Ketorolaco 10mg</option>
+                        <option value="Ibuprofeno 400mg - Tomar 1 tableta cada 8 horas por 5 días.">Ibuprofeno 400mg</option>
+                        <option value="Paracetamol 500mg - Tomar 1 tableta cada 8 horas por 3 días.">Paracetamol 500mg</option>
+                    </optgroup>
+                    <optgroup label="Antibióticos">
+                        <option value="Amoxicilina 500mg - Tomar 1 cápsula cada 8 horas por 7 días.">Amoxicilina 500mg</option>
+                        <option value="Clindamicina 300mg - Tomar 1 cápsula cada 8 horas por 7 días.">Clindamicina 300mg</option>
+                    </optgroup>
+                    <optgroup label="Blanqueamiento / Sensibilidad">
+                        <option value="Pasta Dental Desensibilizante (ej. Sensodyne / Colgate Sensitive) - Cepillar suavemente 3 veces al día o aplicar localmente.">Pasta Desensibilizante</option>
+                        <option value="Ibuprofeno 400mg - Tomar 1 tableta en caso de sensibilidad aguda post-blanqueamiento por 24 horas.">Ibuprofeno 400mg (Sensibilidad)</option>
+                        <option value="Clorhexidina 0.12% - Realizar enjuagues cada 12 horas por 10 días.">Enjuague Clorhexidina</option>
+                    </optgroup>
+                </select>
+            </div>
+            <div class="input-group"><label>Cuerpo Libre de la Receta</label><textarea id="txtReceta" class="input-field" style="min-height:220px; font-size:1rem; line-height:1.5;"></textarea></div>
+            <div style="background:#fefce8; border:1px solid #fde047; padding:1.2rem; border-radius:8px; margin-bottom:1.5rem; box-shadow: 0 2px 4px rgba(0,0,0,0.02);">
+                <label style="display:flex; align-items:center; gap:0.8rem; cursor:pointer; font-weight:900; color:#b45309; font-size:1rem;">
+                    <input type="checkbox" id="chkAntibiotico" style="width:24px; height:24px; accent-color:#d97706;"> 
+                    Esta receta incluye Antibiótico (Genera copia de retención para farmacia)
+                </label>
+            </div>
+            <button class="btn-primary" style="background:#059669; font-size:1.15rem; padding:1rem; box-shadow: 0 4px 6px -1px rgba(5, 150, 105, 0.3);" onclick="printReceta()">🖨️ Previsualizar e Imprimir Receta</button>
+        </div>
+
+        <div id="t-docs" class="tab-content">
+            <h3 style="color:#0284c7; font-size:1.2rem; margin-bottom:1.2rem; font-weight:900;">📄 Documentos y Recomendaciones</h3>
+            
+            <div class="card" style="border-top-color:#1e6091;">
+                <h4 style="margin-bottom:1rem; color:#1e6091; font-size:1.1rem; border-bottom:2px solid #e0f2fe; padding-bottom:0.5rem;">Recomendaciones Clínicas (Post-Tratamiento)</h4>
+                <div class="grid-2">
+                    <div style="display:flex; gap:0.5rem; width:100%;">
+                        <button class="btn" style="background:white; border:2px solid #1e6091; color:#1e6091; padding:0.8rem; font-weight:900; flex-grow:1; justify-content:flex-start;" onclick="printIndicaciones('extraccion')">🖨️ Post-Extracción</button>
+                        <button class="btn btn-wa" style="width:60px;" onclick="sendIndicacionWA('extraccion')" title="Enviar por WhatsApp">📱</button>
+                    </div>
+                    <div style="display:flex; gap:0.5rem; width:100%;">
+                        <button class="btn" style="background:white; border:2px solid #0284c7; color:#0284c7; padding:0.8rem; font-weight:900; flex-grow:1; justify-content:flex-start;" onclick="printIndicaciones('brackets')">🖨️ Cuidados de Brackets</button>
+                        <button class="btn btn-wa" style="width:60px;" onclick="sendIndicacionWA('brackets')" title="Enviar por WhatsApp">📱</button>
+                    </div>
+                    <div style="display:flex; gap:0.5rem; width:100%;">
+                        <button class="btn" style="background:white; border:2px solid #0ea5e9; color:#0ea5e9; padding:0.8rem; font-weight:900; flex-grow:1; justify-content:flex-start;" onclick="printIndicaciones('blanqueamiento')">🖨️ Post-Blanqueamiento</button>
+                        <button class="btn btn-wa" style="width:60px;" onclick="sendIndicacionWA('blanqueamiento')" title="Enviar por WhatsApp">📱</button>
+                    </div>
+                    <div style="display:flex; gap:0.5rem; width:100%;">
+                        <button class="btn" style="background:white; border:2px solid #10b981; color:#10b981; padding:0.8rem; font-weight:900; flex-grow:1; justify-content:flex-start;" onclick="printIndicaciones('profilaxis')">🖨️ Profilaxis / Limpieza</button>
+                        <button class="btn btn-wa" style="width:60px;" onclick="sendIndicacionWA('profilaxis')" title="Enviar por WhatsApp">📱</button>
+                    </div>
+                    <div style="display:flex; gap:0.5rem; width:100%; grid-column: 1 / -1;">
+                        <button class="btn" style="background:white; border:2px solid #6366f1; color:#6366f1; padding:0.8rem; font-weight:900; flex-grow:1; justify-content:flex-start;" onclick="printIndicaciones('operatoria')">🖨️ Operatoria (Resinas / Empastes)</button>
+                        <button class="btn btn-wa" style="width:60px;" onclick="sendIndicacionWA('operatoria')" title="Enviar por WhatsApp">📱</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card" style="border-top-color:#b45309;">
+                <h4 style="margin-bottom:1rem; color:#b45309; font-size:1.1rem; border-bottom:2px solid #fef3c7; padding-bottom:0.5rem;">Documentos Legales (Consentimientos y Contratos)</h4>
+                
+                <div style="background:#f8fafc; padding:1rem; border-radius:8px; border:1px solid #cbd5e1; margin-bottom:1rem;">
+                    <h5 style="margin-bottom:0.6rem; color:#0f172a; font-size:0.9rem;">Costos para Contrato de Ortodoncia (Auto-llenado)</h5>
+                    <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
+                        <input type="number" id="lEnganche" class="input-field" placeholder="Enganche ($)" style="flex:1; min-width:100px;">
+                        <input type="number" id="lMensual" class="input-field" placeholder="Mensualidad ($)" style="flex:1; min-width:100px;">
+                        <input type="number" id="lRepo" class="input-field" placeholder="Reposición Bkt ($)" style="flex:1; min-width:100px;">
+                        <input type="number" id="lMeses" class="input-field" placeholder="Meses de Tx" style="flex:1; min-width:100px;">
+                    </div>
+                </div>
+
+                <div class="doc-btn-group">
+                    <button class="btn" style="background:#f8fafc; border:1px solid #cbd5e1; color:#334155; text-align:left; padding:1rem; font-size:0.95rem; width:100%; justify-content:flex-start;" onclick="printLegal('contrato_orto')">📝 Contrato de Ortodoncia (Mensualidades)</button>
+                    <button class="btn" style="background:#f8fafc; border:1px solid #cbd5e1; color:#334155; text-align:left; padding:1rem; font-size:0.95rem; width:100%; justify-content:flex-start;" onclick="printLegal('cons_orto')">✍️ Consentimiento Riesgos - Ortodoncia</button>
+                    <button class="btn" style="background:#fef2f2; border:1px solid #fca5a5; color:#dc2626; text-align:left; padding:1rem; font-weight:900; font-size:0.95rem; width:100%; justify-content:flex-start;" onclick="printLegal('cons_retra')">⚠️ Consentimiento Especial - Retratamiento</button>
+                    <button class="btn" style="background:#f8fafc; border:1px solid #cbd5e1; color:#334155; text-align:left; padding:1rem; font-size:0.95rem; width:100%; justify-content:flex-start;" onclick="printLegal('cons_ope')">✍️ Consentimiento - Operatoria (Resinas)</button>
+                    <button class="btn" style="background:#f8fafc; border:1px solid #cbd5e1; color:#334155; text-align:left; padding:1rem; font-size:0.95rem; width:100%; justify-content:flex-start;" onclick="printLegal('cons_cir')">✍️ Consentimiento - Cirugía / Exodoncia</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="v-admin" class="view">
+        <div class="alert-box hidden" id="monthAlert" style="background:var(--danger); border-color:var(--danger-text); display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem; padding:1rem;">
+            <b style="color:var(--danger-text); font-size:1rem;">🔔 Fin de Mes: Genera tu reporte financiero y estadístico.</b>
+            <button class="btn" style="background:#b91c1c; color:white; padding:0.6rem 1rem;" onclick="generarReporteMes()">📊 Generar PDF</button>
+        </div>
+
+        <div class="tabs">
+            <button class="tab-btn active" onclick="openAdminTab('t-cfg', this)">⚙️ Identidad y Docs</button>
+            <button class="tab-btn" onclick="openAdminTab('t-fin', this)">💰 Finanzas</button>
+            <button class="tab-btn" onclick="openAdminTab('t-arc', this)">🔧 Inventario Arcos</button>
+            <button class="tab-btn" onclick="openAdminTab('t-data', this)">💾 Sistema</button>
+            <button class="tab-btn" onclick="openAdminTab('t-help', this)">📖 Ayuda</button>
+        </div>
+
+        <div id="t-cfg" class="tab-content active">
+            <div class="grid-2">
+                <!-- SECCION CLÍNICA -->
+                <div class="card">
+                    <h3 style="font-size:1.2rem; margin-bottom:1rem; color:#0284c7; border-bottom:2px solid #e0f2fe; padding-bottom:0.5rem;">🏢 Identidad de la Clínica</h3>
+                    <div class="input-group"><label>Nombre Comercial</label><input type="text" id="cCli" class="input-field" oninput="applyBranding()"></div>
+                    <div class="input-group"><label>Eslogan o Subtítulo</label><input type="text" id="cSlogan" class="input-field"></div>
+                    <div class="input-group" style="margin-top:1rem; background:#f8fafc; padding:0.8rem; border-radius:6px; border:1px dashed #cbd5e1;"><label>Logo del Consultorio (Marca de Agua)</label><input type="file" id="cLogo" accept="image/*" class="input-field" onchange="uploadLogo(event)" style="padding:0.4rem; background:white;"></div>
+                    <div class="input-group" style="margin-top:1rem;"><label style="color:#dc2626;">Aviso de Funcionamiento COFEPRIS</label><input type="text" id="cCofepris" class="input-field"></div>
+                    
+                    <h4 style="margin-top:1.8rem; font-size:1rem; color:#0f172a; border-bottom:2px solid #e2e8f0; padding-bottom:0.4rem;">Datos de Contacto (Generales / Respaldo)</h4>
+                    <div class="input-group"><label>Dirección Física</label><input type="text" id="cAddress" class="input-field"></div>
+                    <div class="input-group"><label>Teléfono o WhatsApp Gral</label><input type="text" id="cContact" class="input-field"></div>
+                    <div class="input-group"><label>Correo Electrónico Gral</label><input type="email" id="cEmail" class="input-field"></div>
+                    <button class="btn-primary" style="margin-top:1.5rem; font-size:1.15rem; padding:1rem;" onclick="saveCfg()">💾 Guardar Datos Clínicos</button>
+                </div>
+                
+                <!-- SECCION DOCTORES -->
+                <div class="card" style="border-top-color: #0ea5e9;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; border-bottom:2px solid #e0f2fe; padding-bottom:0.5rem;">
+                        <h3 style="font-size:1.2rem; margin:0; color:#0ea5e9;">👨‍⚕️ Perfiles de Doctores</h3>
+                        <button class="btn btn-success" style="padding: 0.4rem 0.8rem; font-size:0.85rem;" onclick="crearNuevoDoctor()">➕ Crear Nuevo</button>
+                    </div>
+                    <div class="input-group">
+                        <label>Selecciona Perfil para Editar</label>
+                        <select id="adminDocSelect" class="input-select" onchange="cargarDoctorAdmin()" style="font-weight:bold; background:#f0f9ff; border-color:#bae6fd;"></select>
+                    </div>
+                    
+                    <div id="docFormBox" style="background:#ffffff; padding:1.2rem; border-radius:8px; border:1px solid #e2e8f0; margin-top:1rem; box-shadow: 0 2px 4px rgba(0,0,0,0.02);">
+                        <input type="hidden" id="dId">
+                        <div class="input-group"><label>Nombre Completo con Título</label><input type="text" id="dName" class="input-field" placeholder="Ej. Dr. Miguel Alvarado"></div>
+                        <div class="input-group"><label>Especialidades (Aparece bajo el nombre)</label><input type="text" id="dSpec" class="input-field" placeholder="Ej. Ortodoncia y Ortopedia Maxilar"></div>
+                        
+                        <h4 style="margin-top:1.5rem; font-size:0.95rem; color:#0f172a; border-bottom:1px solid #e2e8f0; padding-bottom:0.4rem;">Contacto Propio (Se imprimirá en sus recetas)</h4>
+                        <div class="input-group"><label>Teléfono Directo (Opcional)</label><input type="text" id="dPhone" class="input-field" placeholder="Ej. 555 123 4567"></div>
+                        <div class="input-group"><label>Correo Electrónico (Opcional)</label><input type="email" id="dEmail" class="input-field" placeholder="doc@ejemplo.com"></div>
+
+                        <h4 style="margin-top:1.5rem; font-size:0.95rem; color:#0f172a; border-bottom:1px solid #e2e8f0; padding-bottom:0.4rem;">Cédulas y Escudos Profesionales</h4>
+                        <div class="input-group"><label>Cédula Profesional (Licenciatura)</label><input type="text" id="dCed1" class="input-field"></div>
+                        <div class="input-group" style="background:#f8fafc; padding:0.6rem; border-radius:6px; border:1px dashed #cbd5e1;"><label>Escudo Universidad Licenciatura</label><input type="file" id="dUni1" accept="image/*" class="input-field" onchange="uploadDocLogo(event, 'uni1')" style="padding:0.4rem; background:white;"></div>
+                        <div class="input-group" style="margin-top:1rem;"><label>Cédula de Especialidad (Opcional)</label><input type="text" id="dCed2" class="input-field"></div>
+                        <div class="input-group" style="background:#f8fafc; padding:0.6rem; border-radius:6px; border:1px dashed #cbd5e1;"><label>Escudo Universidad Especialidad</label><input type="file" id="dUni2" accept="image/*" class="input-field" onchange="uploadDocLogo(event, 'uni2')" style="padding:0.4rem; background:white;"></div>
+                        
+                        <button class="btn-primary" style="margin-top:1.5rem; padding:1rem; font-size:1.05rem;" onclick="guardarDoctorAdmin()">💾 Guardar Perfil de Doctor</button>
+                        <button class="btn" style="background:white; border:1px solid var(--danger); color:var(--danger-text); width:100%; margin-top:0.8rem; font-size:0.95rem;" onclick="eliminarDoctorAdmin()">🗑️ Eliminar este Doctor</button>
+                    </div>
+                </div>
+
+                <div class="card" style="grid-column: 1 / -1; border-top-color: #64748b;">
+                    <h3 style="font-size:1.2rem; margin-bottom:1rem; color:#475569; border-bottom:2px solid #e2e8f0; padding-bottom:0.5rem;">🌐 Rutas Maestras del Sistema</h3>
+                    <div class="grid-2">
+                        <div class="input-group" style="margin:0;"><label>Directorio Base PC o Nube (Ej. C:\Pacientes)</label><input type="text" id="cDrive" class="input-field" onchange="saveCfg()"></div>
+                        <div class="input-group" style="margin:0;"><label>Enlace Externo Agenda (Google Calendar/Confirmafy)</label><input type="text" id="cAgenda" class="input-field"></div>
+                    </div>
+                    <button class="btn-primary" style="margin-top:1.5rem; padding:1rem; background:#475569;" onclick="saveCfg()">💾 Guardar Rutas Globales</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="t-fin" class="tab-content">
+            <div class="grid-2">
+                <div class="card">
+                    <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid var(--border); margin-bottom:1.5rem; padding-bottom:0.8rem;">
+                        <h3 style="color:var(--primary); font-size:1.3rem; margin:0; font-weight:900;">💰 Finanzas Globales</h3>
+                        <button class="btn" style="background:#2563eb; color:white; padding:0.6rem 1rem; box-shadow: 0 2px 4px rgba(37, 99, 235, 0.2);" onclick="generarReporteMes()">📊 Exportar PDF Mensual</button>
+                    </div>
+                    
+                    <div class="consult-counter" style="display:flex; justify-content:space-around; text-align:center; background:white; border:1px solid #e2e8f0; padding:1.2rem; border-radius:12px; margin-bottom:1.8rem; box-shadow: 0 4px 6px rgba(0,0,0,0.02);">
+                        <div><h3 id="lblCGen" style="color:#0284c7; font-size:1.8rem; font-weight:900; margin-bottom:0.2rem;">0</h3><p style="font-size:0.85rem; font-weight:bold; color:#64748b;">Citas Gral. Atendidas</p></div>
+                        <div style="width:1px; background:#e2e8f0;"></div>
+                        <div><h3 id="lblCOrto" style="color:#059669; font-size:1.8rem; font-weight:900; margin-bottom:0.2rem;">0</h3><p style="font-size:0.85rem; font-weight:bold; color:#64748b;">Citas Orto Atendidas</p></div>
+                    </div>
+
+                    <h4 style="margin-top:1.5rem; font-size:1.05rem; color:#0284c7; border-bottom:1px solid #bae6fd; padding-bottom:0.4rem; margin-bottom:1rem;">Servicios de Odontología General</h4>
+                    <div class="fin-row"><b>Honorarios (Ingreso) por Cita ($)</b><input type="number" id="fConsGen" onchange="saveFin()" style="border:1px solid #bae6fd; border-radius:4px; padding:0.3rem;"></div>
+                    <div class="fin-row"><b style="color:#64748b;">Costo Base Operativo (Fijo/Cita) ($)</b><input type="number" id="fDesGen" onchange="saveFin()" style="border:1px dashed #cbd5e1; border-radius:4px; padding:0.3rem;"></div>
+
+                    <h4 style="margin-top:2rem; font-size:1.05rem; color:#059669; border-bottom:1px solid #a7f3d0; padding-bottom:0.4rem; margin-bottom:1rem;">Servicios de Ortodoncia y Especialidad</h4>
+                    <div class="fin-row"><b>Honorarios (Ingreso) por Cita ($)</b><input type="number" id="fConsOrto" onchange="saveFin()" style="border:1px solid #a7f3d0; border-radius:4px; padding:0.3rem;"></div>
+                    <div class="fin-row"><b style="color:#64748b;">Costo Base Operativo (Fijo/Cita) ($)</b><input type="number" id="fDesOrto" onchange="saveFin()" style="border:1px dashed #cbd5e1; border-radius:4px; padding:0.3rem;"></div>
+                    
+                    <div style="background:#fefce8; padding:0.8rem; border-radius:6px; font-size:0.85rem; color:#b45309; border:1px solid #fde047; margin-top:1rem;">
+                        <i>* Nota: Los costos de <b>Inventario Tangible</b> (Arcos, Brackets, Insumos Extra) se restarán automáticamente del ingreso dependiendo de lo que registres en cada paciente.</i>
+                    </div>
+
+                    <h4 style="margin-top:2rem; border-top:2px dashed #cbd5e1; padding-top:1.5rem; font-size:1.05rem; color:#0f172a; margin-bottom:1rem;">Proyecciones de Tratamiento Completo</h4>
+                    <div class="fin-row"><b style="color:#0f172a;">Costo Cobrado Tx Total Est. ($)</b><input type="number" id="fTxTotal" onchange="saveFin()" style="border:1px solid #cbd5e1; border-radius:4px; padding:0.3rem;"></div>
+                    <div class="fin-row"><b style="color:#0f172a;">Gasto Insumos Totales Est. ($)</b><input type="number" id="fInsTotal" onchange="saveFin()" style="border:1px solid #cbd5e1; border-radius:4px; padding:0.3rem;"></div>
+                </div>
+
+                <div class="card" style="border-top-color:#b45309;">
+                    <h3 style="color:#b45309; font-size:1.2rem; margin:0 0 1rem 0; border-bottom:2px solid #fde68a; padding-bottom:0.5rem;">⚙️ Inventario de Brackets</h3>
+                    <p style="font-size:0.9rem; color:var(--text-muted); margin-bottom:1.2rem;">Registra los sistemas de brackets que manejas. Puedes ingresar el costo neto y marcar la casilla si deseas que el sistema calcule el +16% de IVA automáticamente.</p>
+                    <div id="renderAdminBrackets" style="margin-bottom:1.5rem; background:#f8fafc; padding:1rem; border-radius:8px; border:1px solid #e2e8f0;"></div>
+                    <div style="display:flex; flex-direction:column; gap:0.6rem; margin-bottom:2.5rem; background:white; padding:1.2rem; border-radius:8px; border:1px solid #fcd34d;">
+                        <input type="text" id="nBType" class="input-field" placeholder="Tipo (Metálico, Zafiro, Autoligado...)">
+                        <input type="text" id="nBBrand" class="input-field" placeholder="Marca (Ej. 3M, Ormco...)">
+                        <input type="text" id="nBPres" class="input-field" placeholder="Prescripción (Ej. Roth 0.22)">
+                        <input type="number" id="nBCost" class="input-field" placeholder="Costo Neto del Juego ($)">
+                        <div style="display:flex; align-items:center; gap:0.5rem; margin-top:0.3rem; margin-bottom:0.3rem;">
+                            <input type="checkbox" id="nBIva" style="width:20px;height:20px; accent-color:#b45309;">
+                            <label for="nBIva" style="margin:0; font-size:0.95rem; font-weight:bold; color:#b45309; cursor:pointer;">+ Agregar IVA (16%) Automático</label>
+                        </div>
+                        <button class="btn btn-success" style="padding:0.8rem; margin-top:0.5rem;" onclick="addAdminBracket()">➕ Añadir Bracket a la Base</button>
+                    </div>
+
+                    <h3 style="color:#0284c7; font-size:1.2rem; margin:0 0 1rem 0; border-bottom:2px solid #bae6fd; padding-bottom:0.5rem;">⚙️ Insumos Extra (Inventario Tangible)</h3>
+                    <p style="font-size:0.9rem; color:var(--text-muted); margin-bottom:1.2rem;">Materiales costosos que deseas restar de tu ganancia (Resinas, Injertos, Membranas, etc).</p>
+                    <div id="renderAdminMats" style="margin-bottom:1.5rem; background:#f8fafc; padding:1rem; border-radius:8px; border:1px solid #e2e8f0;"></div>
+                    <div style="display:flex; flex-direction:column; gap:0.6rem; background:white; padding:1.2rem; border-radius:8px; border:1px solid #7dd3fc;">
+                        <input type="text" id="nMatName" class="input-field" placeholder="Nombre descriptivo del insumo">
+                        <input type="number" id="nMatCost" class="input-field" placeholder="Costo Neto Aproximado ($)">
+                        <div style="display:flex; align-items:center; gap:0.5rem; margin-top:0.3rem; margin-bottom:0.3rem;">
+                            <input type="checkbox" id="nMatIva" style="width:20px;height:20px; accent-color:#0284c7;">
+                            <label for="nMatIva" style="margin:0; font-size:0.95rem; font-weight:bold; color:#0284c7; cursor:pointer;">+ Agregar IVA (16%) Automático</label>
+                        </div>
+                        <button class="btn btn-success" style="padding:0.8rem; margin-top:0.5rem;" onclick="addAdminMat()">➕ Añadir Insumo</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="t-arc" class="tab-content">
+            <div class="grid-2">
+                <div class="card" style="margin-bottom:1rem;">
+                    <h3 style="color:var(--primary); margin-bottom:1rem; font-size:1.2rem; border-bottom:2px solid #e0f2fe; padding-bottom:0.5rem;">Gestión de Costos de Arcos</h3>
+                    <div class="fin-row" style="margin-bottom:1.5rem; background:#f8fafc; padding:1rem; border-radius:8px; border:1px solid #e2e8f0; flex-direction:column; align-items:flex-start;">
+                        <div style="display:flex; justify-content:space-between; width:100%; align-items:center; margin-bottom:0.8rem;">
+                            <b style="color:#0f172a;">Calcular deducción del inventario por:</b>
+                            <select id="fModo" class="input-select" style="width:150px; font-weight:bold;" onchange="saveFin()"><option value="box">Caja (10 pzs)</option><option value="unit">Por Unidad</option></select>
+                        </div>
+                        <label style="display:flex; align-items:center; gap:0.5rem; font-size:0.95rem; font-weight:bold; color:#b45309; cursor:pointer;">
+                            <input type="checkbox" id="fIvaArcos" style="width:22px;height:22px; accent-color:#b45309;" onchange="saveFin()"> Aplicar +16% de IVA a los costos base de Arcos
+                        </label>
+                    </div>
+                    
+                    <p style="font-size:0.85rem; color:#64748b; margin-bottom:1rem;">Ingresa el costo NETO a continuación. El sistema aplicará el divisor de caja o el IVA según tus preferencias de arriba.</p>
+                    <div class="fin-row">Costo Neto Memalloy ($)<input type="number" id="fMem" onchange="saveFin()"></div>
+                    <div class="fin-row">Costo Neto Biomemalloy ($)<input type="number" id="fBio" onchange="saveFin()"></div>
+                    <div class="fin-row">Costo Neto NiTi ($)<input type="number" id="fNi" onchange="saveFin()"></div>
+                    <div class="fin-row">Costo Neto Acero / SS ($)<input type="number" id="fSS" onchange="saveFin()"></div>
+                    <div class="fin-row">Costo Neto TMA ($)<input type="number" id="fTMA" onchange="saveFin()"></div>
+                    <div class="fin-row">Costo Neto Trenzado / Multi ($)<input type="number" id="fMul" onchange="saveFin()"></div>
+                    
+                    <h3 style="color:var(--primary); margin-top:2.5rem; margin-bottom:1rem; font-size:1.2rem; border-bottom:2px solid #e0f2fe; padding-bottom:0.5rem;">Filtro de Arcos Activos</h3>
+                    <p style="font-size:0.9rem; color:#64748b; margin-bottom:1rem;">Desmarca los calibres que no usas en tu técnica para limpiar los menús clínicos.</p>
+                    <div class="matrix-container" style="background:#f8fafc; padding:1rem; border-radius:8px; border:1px solid #e2e8f0;">
+                        <div id="rMatx"></div>
+                    </div>
+                    <button class="btn-primary" style="margin-top:1.5rem; padding:1rem; font-size:1.15rem; background:#0284c7; box-shadow: 0 4px 6px -1px rgba(2, 132, 199, 0.3);" onclick="saveMatrix()">Sincronizar Visibilidad de Arcos</button>
+                </div>
+                <div class="card">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem; border-bottom:2px solid var(--border); padding-bottom:0.8rem;">
+                        <h3 style="color:var(--primary); font-size:1.3rem; margin:0; font-weight:900;">📦 Control de Stock (Arcos)</h3>
+                        <button class="btn" style="background:#334155; color:white; padding:0.6rem 1rem; font-size:0.9rem; box-shadow: 0 2px 4px rgba(0,0,0,0.1);" onclick="printShoppingList()">🖨️ Imprimir Faltantes</button>
+                    </div>
+                    <div id="rInv" style="margin-bottom: 1.5rem;"></div>
+                    <h4 style="margin-top:2rem; font-size:1.1rem; color:#0f172a; border-bottom:2px solid #e2e8f0; padding-bottom:0.4rem; margin-bottom:1rem;">Lista Adicional (Checklist Compras)</h4>
+                    <ul class="shop-list" id="rShop" style="background:#f8fafc; padding:1rem; border-radius:8px; border:1px solid #e2e8f0;"></ul>
+                </div>
+            </div>
+        </div>
+
+        <div id="t-data" class="tab-content">
+            <div class="card" style="border-top-color: #3b82f6; grid-column: 1 / -1; margin-bottom: 1.5rem;">
+                <h3 style="font-size:1.2rem; margin-bottom:0.8rem; color:#1d4ed8;">☁️ Sincronización en Tiempo Real (Google Drive)</h3>
+                <p style="font-size:0.95rem; color:var(--text-muted); margin-bottom:1.2rem;">Conecta tu cuenta para guardar y descargar tus pacientes automáticamente. Tus datos vivirán en un archivo oculto llamado <b>SmileFlow_Database.json</b> en tu propia nube, garantizando tu privacidad.</p>
+                <div style="display:flex; gap:1rem; flex-wrap:wrap;">
+                    <button id="btnAuthAdmin" class="btn" style="background:#2563eb; color:white; font-size:1.1rem; padding:1rem; flex-grow:1; display:none;" onclick="handleAuthClick()">☁️ Iniciar Sesión en Google</button>
+                    <button id="btnSyncNow" class="btn" style="background:#10b981; color:white; font-size:1.1rem; padding:1rem; flex-grow:1; display:none;" onclick="checkDriveFile()">🔄 Forzar Descarga de la Nube</button>
+                    <button id="btnSignout" class="btn" style="background:#ef4444; color:white; font-size:1.1rem; padding:1rem; display:none;" onclick="handleSignoutClick()">Desconectar</button>
+                </div>
+            </div>
+
+            <div class="grid-2">
+                <div class="card" style="border-top-color: var(--primary);">
+                    <h3 style="font-size:1.2rem; margin-bottom:0.8rem;">📥 Exportar Localmente (Respaldo Manual)</h3>
+                    <p style="font-size:0.95rem; color:var(--text-muted); margin:0.8rem 0 1.5rem 0;">Descarga toda la información de pacientes, configuraciones y finanzas de tu clínica en un archivo local seguro (JSON).</p>
+                    <button class="btn-primary" style="padding:1rem; font-size:1.1rem; box-shadow: 0 4px 6px -1px rgba(2, 132, 199, 0.3);" onclick="backupDB()">📥 Guardar Copia de Seguridad</button>
+                </div>
+                <div class="card" style="border-top-color: var(--danger-text); background:#fef2f2;">
+                    <h3 style="font-size:1.2rem; margin-bottom:0.8rem; color:var(--danger-text);">📤 Restaurar Base de Datos Local</h3>
+                    <p style="font-size:0.95rem; color:var(--danger-text); margin:0.8rem 0 1.5rem 0;"><b>Advertencia:</b> Subir un archivo aquí sobrescribirá permanentemente la información actual del sistema.</p>
+                    <input type="file" id="fileRestore" accept=".json" style="width:100%; border:2px dashed #fca5a5; background:white; padding:1rem; border-radius:8px; margin-bottom:1rem; cursor:pointer;">
+                    <button class="btn" style="background:var(--danger-text); color:white; width:100%; padding:1rem; font-size:1.1rem; box-shadow: 0 4px 6px -1px rgba(185, 28, 28, 0.3);" onclick="restoreDB()">📤 Cargar Datos</button>
+                </div>
+            </div>
+        </div>
+        
+        <div id="t-help" class="tab-content">
+            <div class="help-box">
+                <h3>📖 Manual de Uso del Sistema</h3>
+                
+                <h4>1. Conexión a Google Drive</h4>
+                <p>Al hacer clic en "Conectar Nube", el sistema guardará automáticamente cada paciente, pago y cambio en tu Google Drive. Esto te permite abrir SmileFlow en tu celular, iPad y PC, y ver siempre la misma información en tiempo real.</p>
+                
+                <h4>2. Perfiles de Doctores (Multiusuario)</h4>
+                <p>Usa el selector azul en la cabecera para elegir quién está atendiendo. Las recetas y consentimientos llevarán sus datos (incluyendo su Teléfono y Correo directo). Si no tiene, se usará el de la Clínica.</p>
+                
+                <h4>3. Impuestos (Cálculo de IVA)</h4>
+                <p>En la sección de <i>Admin -> Costos</i> puedes ingresar los costos NETOS de tus brackets, arcos e insumos extras, y marcar la casilla de "+ IVA (16%)". El sistema hará la multiplicación de forma automática garantizando que deduzcas el costo real del depósito dental.</p>
+
+                <h4>4. Impresión a 1 Sola Hoja Estricta</h4>
+                <p>Las Recetas, Indicaciones y Consentimientos Legales están configurados para no exceder bajo ninguna circunstancia una cuartilla. La receta original llevará tu firma, pero la hoja de abajo (COPIA) imprimirá una marca de agua gigante para dársela al paciente y anulará la línea de la firma por seguridad.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // PROTECCIÓN BASICA
+    document.addEventListener('contextmenu', event => event.preventDefault());
+    document.addEventListener('keydown', function(e) {
+        if(e.keyCode == 123) { e.preventDefault(); return false; } // F12
+        if(e.ctrlKey && e.shiftKey && e.keyCode == 73) { e.preventDefault(); return false; } // Ctrl+Shift+I
+        if(e.ctrlKey && e.keyCode == 85) { e.preventDefault(); return false; } // Ctrl+U
+    });
+
+    const $ = id => document.getElementById(id);
+    
+    // CONTROL VISTA (PC/MOBILE)
+    let isDesktopMode = false;
+    function toggleViewMode() {
+        isDesktopMode = !isDesktopMode;
+        if(isDesktopMode) {
+            document.body.style.width = '1200px';
+            document.body.style.margin = '0 auto';
+            $('meta-viewport').setAttribute('content', 'width=1200');
+            $('btnToggleView').innerText = '📱 Volver a Móvil';
+        } else {
+            document.body.style.width = '100%';
+            document.body.style.margin = '0';
+            $('meta-viewport').setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no');
+            $('btnToggleView').innerText = '🖥️ Forzar Vista PC';
+        }
+    }
+
+    // CONSTANTES
+    const MATS = ['Memalloy', 'Biomemalloy', 'NiTi', 'SS', 'TMA', 'Multi'];
+    const C_RND = ['.012', '.014', '.016', '.018'];
+    const C_REC = ['16x22', '17x25', '19x25', '21x25'];
+    const CALS = [...C_RND, ...C_REC];
+    const SHOP = ['Campos', 'Guantes', 'Alginato', 'Resinas', 'Grabador', 'Módulos', 'Acetatos'];
+    
+    const TR_CATS = { 
+        'Odontología General': ['Profilaxis Simple', 'Obturación / Resina', 'Extracción Simple', 'Blanqueamiento Dental'], 
+        'Maxilofacial': ['Exodoncia Especial', 'Canino Retenido', 'Patología'], 
+        'Periodoncia': ['Gingivectomía', 'Profilaxis Profunda'], 
+        'Endodoncia': ['Tratamiento Conductos', 'Retratamiento'], 
+        'Prótesis e Implantes': ['Rehabilitación', 'Implante'], 
+        'Ortoimplantes': ['Colocación Ortoimplante'] 
+    };
+
+    // BASE DE DATOS Y MIGRACIÓN
+    let db = JSON.parse(localStorage.getItem('sf_db_v10')) || {
+        pats: {}, curr: null, inv: {Sup:{},Inf:{}}, log: [], shopChk: {},
+        cfg: { cli: 'SmilePlan by DentiLike', slogan: 'Cambiando sonrisas, transformando vidas', cofepris: '', logo: '', drive: '', agenda: '', address: 'Himno Nacional 1902-C', contact: 'www.dentilike.com.mx', email: '',
+               act: { 'Memalloy': [...C_RND], 'Biomemalloy': [...C_REC], 'NiTi': [...CALS], 'SS': [...C_REC], 'TMA': ['17x25','19x25'], 'Multi': ['17x25','19x25'] },
+               brackets: [], materials: [] },
+        fin: { conGen: 500, desGen: 100, conOrto: 600, desOrto: 50, mod: 'box', ivaArcos: false, Memalloy: 200, Biomemalloy: 250, NiTi: 200, SS: 150, TMA: 800, Multi: 300, txTotal: 15000, insTotal: 3000 }
+    };
+
+    if(db.fin.conGen === undefined) { db.fin.conGen = db.fin.con || 500; db.fin.desGen = db.fin.des || 100; db.fin.conOrto = db.fin.con || 600; db.fin.desOrto = db.fin.des || 50; }
+    if(db.fin.ivaArcos === undefined) db.fin.ivaArcos = false;
+    if(!db.cfg.brackets) db.cfg.brackets = []; if(!db.cfg.materials) db.cfg.materials = [];
+    
+    // MIGRACIÓN DE DOCTORES
+    if(!db.docs) {
+        db.docs = {};
+        const firstDocId = 'doc_' + Date.now();
+        db.docs[firstDocId] = {
+            id: firstDocId,
+            name: db.cfg.doc || 'Dr. Miguel Alvarado',
+            spec: db.cfg.spec || 'Médico Estomatólogo | Especialista en Ortodoncia y Ortopedia Maxilar',
+            ced1: db.cfg.ced1 || '',
+            ced2: db.cfg.ced2 || '',
+            uni1: db.cfg.logoUni1 || '',
+            uni2: db.cfg.logoUni2 || '',
+            phone: '',
+            email: ''
+        };
+        db.activeDoc = firstDocId;
+        delete db.cfg.doc; delete db.cfg.spec; delete db.cfg.ced1; delete db.cfg.ced2; delete db.cfg.logoUni1; delete db.cfg.logoUni2;
+        saveDB();
+    }
+
+    // --- GOOGLE DRIVE API INTEGRATION ---
+    const CLIENT_ID = '798639911007-sv5lg6p0qbmfkqj35uvdi8s8dmhfp8jg.apps.googleusercontent.com';
+    const API_KEY = 'AIzaSyAfA7Lht4OBgYPLDey-RHqOqUyxPLtwLEA';
+    const DISCOVERY_DOC = 'https://www.googleapis.com/discovery/v1/apis/drive/v3/rest';
+    const SCOPES = 'https://www.googleapis.com/auth/drive.file';
+    
+    let tokenClient;
+    let gapiInited = false;
+    let gisInited = false;
+    let driveFileId = localStorage.getItem('sf_drive_file_id') || null;
+
+    function gapiLoaded() { gapi.load('client', initializeGapiClient); }
+    async function initializeGapiClient() {
+        await gapi.client.init({ apiKey: API_KEY, discoveryDocs: [DISCOVERY_DOC] });
+        gapiInited = true;
+        checkReady();
+    }
+    
+    function gisLoaded() {
+        tokenClient = google.accounts.oauth2.initTokenClient({
+            client_id: CLIENT_ID,
+            scope: SCOPES,
+            callback: '', // Se asigna dinámicamente en handleAuthClick
+        });
+        gisInited = true;
+        checkReady();
+    }
+
+    function checkReady() { 
+        if(gapiInited && gisInited) { 
+            if(gapi.client.getToken() === null) {
+                if($('btnAuthAdmin')) $('btnAuthAdmin').style.display = 'block'; 
+                if($('btnAuthHeader')) $('btnAuthHeader').style.display = 'flex';
+            } else {
+                showConnectedUI();
+            }
+        } 
+    }
+
+    function showConnectedUI() {
+        if($('btnAuthAdmin')) $('btnAuthAdmin').style.display = 'none';
+        if($('btnAuthHeader')) $('btnAuthHeader').style.display = 'none';
+        if($('btnSyncNow')) $('btnSyncNow').style.display = 'block';
+        if($('btnSignout')) $('btnSignout').style.display = 'block';
+        $('syncStatus').innerText = "☁️ Sincronizado";
+    }
+
+    function handleAuthClick() {
+        tokenClient.callback = async (resp) => {
+            if (resp.error !== undefined) { throw resp; }
+            showConnectedUI();
+            await checkDriveFile();
+        };
+        if (gapi.client.getToken() === null) {
+            tokenClient.requestAccessToken({prompt: 'consent'});
+        } else {
+            tokenClient.requestAccessToken({prompt: ''});
+        }
+    }
+
+    function handleSignoutClick() {
+        const token = gapi.client.getToken();
+        if (token !== null) {
+            google.accounts.oauth2.revoke(token.access_token);
+            gapi.client.setToken('');
+            $('syncStatus').innerText = "📍 Modo Offline (Solo este dispositivo)";
+            if($('btnAuthAdmin')) $('btnAuthAdmin').style.display = 'block';
+            if($('btnAuthHeader')) $('btnAuthHeader').style.display = 'flex';
+            if($('btnSyncNow')) $('btnSyncNow').style.display = 'none';
+            if($('btnSignout')) $('btnSignout').style.display = 'none';
+            alert("Desconectado de Google Drive. Los cambios ahora solo se guardarán en este dispositivo de forma local.");
+        }
+    }
+
+    async function checkDriveFile() {
+        $('syncStatus').innerText = "🔄 Sincronizando...";
+        try {
+            let response = await gapi.client.drive.files.list({
+                q: "name='SmileFlow_Database.json' and trashed=false",
+                fields: 'files(id, modifiedTime)',
+                spaces: 'drive'
+            });
+            let files = response.result.files;
+            if (files && files.length > 0) {
+                driveFileId = files[0].id;
+                localStorage.setItem('sf_drive_file_id', driveFileId);
+                await downloadFromDrive(driveFileId);
+            } else {
+                await uploadToDrive(true);
+            }
+            $('syncStatus').innerText = "☁️ Conectado y Sincronizado";
+        } catch (err) {
+            console.error(err);
+            $('syncStatus').innerText = "❌ Error en Nube";
+        }
+    }
+
+    async function downloadFromDrive(fileId) {
+        try {
+            let response = await gapi.client.drive.files.get({ fileId: fileId, alt: 'media' });
+            let remoteDb = response.result;
+            if(remoteDb && remoteDb.cfg) {
+                db = remoteDb;
+                localStorage.setItem('sf_db_v10', JSON.stringify(db));
+                loadConfigUI(); renderPatSelect(); if(db.curr) loadPatient(); else newPatient();
+                alert("Base de datos descargada y actualizada desde Google Drive.");
+            }
+        } catch(e) { console.error("Error bajando de Drive", e); }
+    }
+
+    async function uploadToDrive(isNew = false) {
+        if(typeof gapiInited === 'undefined' || !gapiInited || gapi.client.getToken() === null) return; 
+        $('syncStatus').innerText = "☁️ Subiendo...";
+        
+        const fileContent = JSON.stringify(db);
+        const file = new Blob([fileContent], {type: 'application/json'});
+        const metadata = { name: 'SmileFlow_Database.json', mimeType: 'application/json' };
+
+        let accessToken = gapi.client.getToken().access_token;
+        let form = new FormData();
+        form.append('metadata', new Blob([JSON.stringify(metadata)], {type: 'application/json'}));
+        form.append('file', file);
+
+        let url = isNew ? 'https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart' 
+                        : `https://www.googleapis.com/upload/drive/v3/files/${driveFileId}?uploadType=multipart`;
+        let method = isNew ? 'POST' : 'PATCH';
+
+        try {
+            let res = await fetch(url, {
+                method: method,
+                headers: new Headers({ 'Authorization': 'Bearer ' + accessToken }),
+                body: form
+            });
+            let val = await res.json();
+            if(isNew) {
+                driveFileId = val.id;
+                localStorage.setItem('sf_drive_file_id', driveFileId);
+            }
+            setTimeout(() => { $('syncStatus').innerText = "☁️ Sincronizado"; }, 1000);
+        } catch(e) { 
+            console.error(e); 
+            $('syncStatus').innerText = "❌ Error al subir";
+        }
+    }
+    // --- FIN GOOGLE DRIVE API ---
+
+    function showWorkingPath() {
+        if(typeof db === 'undefined' || !db || !db.cfg) return;
+        let masterRoute = db.cfg.drive ? ` | 📁 Ruta Maestra: ${db.cfg.drive}` : '';
+        let patRoute = (db.curr && db.pats[db.curr] && db.pats[db.curr].drive) ? ` | 👤 Carpeta Px: ${db.pats[db.curr].drive}` : '';
+        const pathEl = $('pathText');
+        if(pathEl) { pathEl.innerText = `${masterRoute}${patRoute}`; }
+    }
+
+    // AUTO CITA (FECHA 1 MES)
+    function autoLoadWaDate() {
+        let d = new Date();
+        d.setDate(d.getDate() + 30);
+        let month = String(d.getMonth() + 1).padStart(2, '0');
+        let day = String(d.getDate()).padStart(2, '0');
+        let year = d.getFullYear();
+        $('waDate').value = `${year}-${month}-${day}`;
+        $('waTime').value = "16:00";
+    }
+
+    // UI NAVEGACIÓN
+    function switchView(v) { document.querySelectorAll('.view').forEach(e=>e.classList.remove('active')); $(`v-${v}`).classList.add('active'); if(v==='admin') renderInvShop(); }
+    function openTab(t, btn) { btn.parentElement.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); btn.parentElement.nextElementSibling.parentElement.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active')); $(t).classList.add('active'); }
+    function openAdminTab(t, btn) { btn.parentElement.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); document.querySelectorAll("#v-admin .tab-content").forEach(c=>c.classList.remove('active')); $(t).classList.add('active'); }
+
+    // UTILIDADES & IDENTIDAD DE CLÍNICA
+    function loadConfigUI() {
+        $('cCli').value = db.cfg.cli || ''; $('cSlogan').value = db.cfg.slogan || '';
+        $('cCofepris').value = db.cfg.cofepris || ''; $('cDrive').value = db.cfg.drive || ''; 
+        $('cAgenda').value = db.cfg.agenda || ''; $('cAddress').value = db.cfg.address || ''; $('cContact').value = db.cfg.contact || ''; $('cEmail').value = db.cfg.email || '';
+        if(db.cfg.logo) { $('hLogo').src = db.cfg.logo; $('hLogo').style.display='block'; } else $('hLogo').style.display='none';
+        const d = new Date(); if(new Date(d.getFullYear(), d.getMonth()+1, 0).getDate() - d.getDate() <= 5) $('monthAlert').style.display = 'flex';
+        renderAdminDyn(); renderClinicaDyn(); renderDocSelects(); showWorkingPath();
+    }
+    
+    function uploadLogo(e) { const f = e.target.files[0]; if(!f) return; const r = new FileReader(); r.onload=ev=>{db.cfg.logo=ev.target.result; saveDB(); loadConfigUI();}; r.readAsDataURL(f); }
+    
+    function saveCfg() { 
+        db.cfg.cli=$('cCli').value; db.cfg.slogan=$('cSlogan').value; db.cfg.cofepris=$('cCofepris').value; db.cfg.drive=$('cDrive').value; 
+        db.cfg.agenda=$('cAgenda').value; db.cfg.address=$('cAddress').value; db.cfg.contact=$('cContact').value; db.cfg.email=$('cEmail').value;
+        saveDB(); loadConfigUI(); alert('Datos de Clínica Guardados'); 
+    }
+    
+    function saveDB() { 
+        localStorage.setItem('sf_db_v10', JSON.stringify(db)); 
+        checkTopAlert(); 
+        if(typeof gapiInited !== 'undefined' && gapiInited && gapi.client.getToken() !== null) { uploadToDrive(false); }
+    }
+    
+    function abrirAgenda() { window.open(db.cfg.agenda || 'https://calendar.google.com', '_blank'); }
+    function abrirRutaWeb(ruta) { if(!ruta) return alert("Ruta vacía."); if(ruta.startsWith('http')) window.open(ruta, '_blank'); else alert("Usa 'Copiar Ruta PC' en su lugar."); }
+    function copiarRutaLocal(ruta) { 
+        if(!ruta) return alert("Ruta vacía."); 
+        if (navigator.clipboard && window.isSecureContext) {
+            navigator.clipboard.writeText(ruta).then(() => alert(`Ruta copiada al portapapeles`)).catch(e => alert("Tu navegador bloqueó el copiado.")); 
+        } else {
+            alert(`Tu ruta es:\n${ruta}`);
+        }
+    }
+    function setAlertLabel(dateSaved) {
+        const today = new Date().toISOString().split('T')[0];
+        const lbl = $('lblAlertTitle'); const box = $('divAlertBox');
+        if (!dateSaved || dateSaved === today) {
+            lbl.innerText = "📌 AVISO PRÓX. CITA (Recordatorio local):"; box.style.background = "var(--warning)"; box.style.borderLeftColor = "var(--warning-text)"; lbl.style.color = "var(--warning-text)"; $('pAlert').style.color = "var(--warning-text)";
+        } else {
+            lbl.innerText = "⚠️ AVISO PARA HOY (De cita anterior):"; box.style.background = "var(--danger)"; box.style.borderLeftColor = "var(--danger-text)"; lbl.style.color = "var(--danger-text)"; $('pAlert').style.color = "var(--danger-text)";
+        }
+    }
+
+    // WHATSAPP SENDER FUNCTIONS
+    function sendApptWA() {
+        if(!db.curr) return alert("Guarda o selecciona un paciente primero.");
+        let p = db.pats[db.curr];
+        if(!p.phone) return alert("El paciente no tiene un teléfono celular registrado en su perfil.");
+        
+        let d = $('waDate').value;
+        let t = $('waTime').value;
+        if(!d || !t) return alert("Por favor selecciona la fecha y la hora para agendar la cita.");
+        
+        let dateParts = d.split('-');
+        let dateObj = new Date(dateParts[0], dateParts[1] - 1, dateParts[2]);
+        let dateStr = dateObj.toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+        
+        let timeParts = t.split(':');
+        let hours = parseInt(timeParts[0]);
+        let ampm = hours >= 12 ? 'PM' : 'AM';
+        hours = hours % 12;
+        hours = hours ? hours : 12; 
+        let timeStr = hours + ':' + timeParts[1] + ' ' + ampm;
+        
+        let activeD = db.docs[db.activeDoc] ? db.docs[db.activeDoc].name : 'Doctor';
+        let cliName = db.cfg.cli || 'nuestra clínica';
+        
+        let msg = `✨ ¡Hola *${p.name}*!\n\nSu próxima cita en *${cliName}* ha sido registrada y confirmada con éxito.\n\n📅 *Día:* ${dateStr}\n⏰ *Hora:* ${timeStr}\n👨‍⚕️ *Especialista:* ${activeD}\n\n🙏 Agradecemos su preferencia y la confianza depositada en nuestro equipo. ¡Que tenga un lindo día y nos vemos muy pronto! 😁`;
+        
+        if (navigator.clipboard && window.isSecureContext) {
+            navigator.clipboard.writeText(msg).catch(err => console.log('Error copiando al portapapeles', err));
+        }
+        
+        let phone = p.phone.replace(/\D/g,'');
+        if(phone.length === 10) phone = '52' + phone; 
+        window.location.href = `https://wa.me/${phone}?text=${encodeURIComponent(msg)}`;
+    }
+
+    function sendIndicacionWA(tipo) {
+        if(!db.curr) return alert("Guarda o selecciona un paciente primero."); 
+        let p = db.pats[db.curr]; 
+        if(!p.phone) return alert("El paciente no tiene teléfono celular registrado.");
+
+        let title = ''; let body = '';
+        if(tipo === 'extraccion') {
+            title = 'INDICACIONES POST-EXTRACCIÓN';
+            body = `*PRIMERAS 24 HRS:*\n- Muerde la gasa por 45 min.\n- No escupir, no usar popote, no enjuagarse.\n- Hielo en mejilla (20 min sí, 20 no).\n- Dormir con cabeza elevada.\n\n*ALIMENTACIÓN:*\n- Dieta blanda y fría.\n- Cero grasas, semillas o irritantes.\n\n*MEDICACIÓN:*\n- Toma tus medicamentos a la hora exacta.`;
+        } else if(tipo === 'brackets') {
+            title = 'CUIDADOS DE BRACKETS';
+            body = `*ALIMENTOS PROHIBIDOS:*\n- Cosas duras (hielo, nueces) o pegajosas (chicles, gomitas).\n- Corta la fruta/verdura en trozos pequeños, no muerdas a tirones.\n\n*HIGIENE:*\n- Cepillado después de cada comida con cepillo interdental e hilo.\n\n*MOLESTIAS:*\n- Usa la cera de ortodoncia si algún bracket te lastima la mejilla (seca el bracket antes de ponerla).`;
+        } else if(tipo === 'blanqueamiento') {
+            title = 'CUIDADOS POST-BLANQUEAMIENTO';
+            body = `*DIETA BLANCA (Mínimo 72 hrs):*\n- Evita café, té, vino tinto, refrescos oscuros, salsas rojas o cítricos.\n- Come pollo, arroz, lácteos, plátano.\n\n*SENSIBILIDAD:*\n- Usa tu pasta desensibilizante 3 veces al día.\n- Si hay molestia aguda, toma tu analgésico indicado.\n- No fumes por 48 horas.`;
+        } else if(tipo === 'profilaxis') {
+            title = 'CUIDADOS POST-LIMPIEZA DENTAL';
+            body = `*SENSIBILIDAD:*\n- Es normal sentir ligera sensibilidad al frío o calor por 24 a 48 hrs.\n\n*ENCÍAS:*\n- Puede notar un poco de sangrado al cepillarse el primer día.\n\n*ALIMENTACIÓN:*\n- Evite alimentos muy calientes o irritantes (picantes, ácidos) por el resto del día para evitar molestias en la encía.\n\n*HIGIENE:*\n- Continúe con su cepillado normal e hilo dental de forma suave.`;
+        } else if(tipo === 'operatoria') {
+            title = 'CUIDADOS POST-RESINA (EMPASTE)';
+            body = `*ANESTESIA:*\n- Cuidado al comer, no mastique alimentos sólidos hasta que el efecto de la anestesia pase por completo (evite morderse labios o lengua).\n\n*MOLESTIAS:*\n- Es normal sentir ligera molestia al masticar o sensibilidad térmica los primeros días.\n\n*CUIDADOS:*\n- Su resina endureció de inmediato, pero evite morder cosas excesivamente duras (hielo, huesos) con ese diente.`;
+        }
+        
+        let cliName = db.cfg.cli || 'la clínica';
+        let msg = `Hola *${p.name}* 👋\n\nTe compartimos tus indicaciones clínicas por parte de *${cliName}* para que las tengas a la mano:\n\n📌 *${title}*\n\n${body}\n\n¡Cualquier duda, estamos a tus órdenes!`;
+        
+        if (navigator.clipboard && window.isSecureContext) {
+            navigator.clipboard.writeText(msg).catch(err => console.log('No se pudo copiar', err));
+        }
+
+        let phone = p.phone.replace(/\D/g,'');
+        if(phone.length === 10) phone = '52' + phone; 
+        window.location.href = `https://wa.me/${phone}?text=${encodeURIComponent(msg)}`;
+    }
+
+    // GESTIÓN DE DOCTORES
+    function renderDocSelects() {
+        let h = '';
+        Object.values(db.docs).forEach(d => { h += `<option value="${d.id}">👨‍⚕️ ${d.name}</option>`; });
+        $('dSelect').innerHTML = h; $('adminDocSelect').innerHTML = h;
+        
+        if(db.activeDoc && db.docs[db.activeDoc]) { $('dSelect').value = db.activeDoc; }
+        if(Object.keys(db.docs).length > 0) {
+            $('adminDocSelect').value = db.activeDoc || Object.keys(db.docs)[0];
+            cargarDoctorAdmin();
+        } else { crearNuevoDoctor(); }
+        updateHeaderDocName();
+    }
+
+    function changeActiveDoc() { db.activeDoc = $('dSelect').value; saveDB(); updateHeaderDocName(); }
+
+    function updateHeaderDocName() {
+        let n = db.docs[db.activeDoc] ? db.docs[db.activeDoc].name : 'Sin Doctor';
+        $('hClinicDoc').innerText = `${db.cfg.cli || 'Clínica'} | ${n}`;
+    }
+
+    function crearNuevoDoctor() {
+        $('dId').value = 'new';
+        $('dName').value = ''; $('dSpec').value = ''; $('dCed1').value = ''; $('dCed2').value = '';
+        $('dPhone').value = ''; $('dEmail').value = ''; $('dUni1').value = ''; $('dUni2').value = '';
+    }
+
+    function cargarDoctorAdmin() {
+        let v = $('adminDocSelect').value;
+        if(!v || !db.docs[v]) return;
+        let d = db.docs[v];
+        $('dId').value = d.id; $('dName').value = d.name; $('dSpec').value = d.spec; $('dCed1').value = d.ced1; $('dCed2').value = d.ced2;
+        $('dPhone').value = d.phone || ''; $('dEmail').value = d.email || ''; $('dUni1').value = ''; $('dUni2').value = '';
+    }
+
+    let tempUni1 = null; let tempUni2 = null;
+    function uploadDocLogo(e, type) {
+        const f = e.target.files[0]; if(!f) return;
+        const r = new FileReader();
+        r.onload = ev => { if(type === 'uni1') tempUni1 = ev.target.result; if(type === 'uni2') tempUni2 = ev.target.result; };
+        r.readAsDataURL(f);
+    }
+
+    function guardarDoctorAdmin() {
+        let id = $('dId').value;
+        if(id === 'new') id = 'doc_' + Date.now();
+        let existingUni1 = db.docs[id] ? db.docs[id].uni1 : '';
+        let existingUni2 = db.docs[id] ? db.docs[id].uni2 : '';
+
+        db.docs[id] = {
+            id: id, name: $('dName').value, spec: $('dSpec').value, ced1: $('dCed1').value, ced2: $('dCed2').value,
+            phone: $('dPhone').value, email: $('dEmail').value,
+            uni1: tempUni1 || existingUni1, uni2: tempUni2 || existingUni2
+        };
+        tempUni1 = null; tempUni2 = null;
+        if(!db.activeDoc) db.activeDoc = id;
+        saveDB(); renderDocSelects(); $('adminDocSelect').value = id; alert("Perfil de Doctor Guardado.");
+    }
+
+    function eliminarDoctorAdmin() {
+        let id = $('dId').value;
+        if(id === 'new') return;
+        if(Object.keys(db.docs).length <= 1) return alert("Debe haber al menos 1 doctor en el sistema.");
+        if(confirm("¿Estás seguro de eliminar permanentemente este perfil de doctor?")) {
+            delete db.docs[id];
+            if(db.activeDoc === id) db.activeDoc = Object.keys(db.docs)[0];
+            saveDB(); renderDocSelects();
+        }
+    }
+
+    // PACIENTES Y TRATAMIENTOS
+    function checkAge() { const a=$('pAge').value; $('divGuardian').classList.toggle('hidden', a===''||a>=18); }
+    function renderPatSelect() {
+        $('pSelect').innerHTML = '<option value="">Selecciona al paciente...</option>';
+        Object.values(db.pats).forEach(p => $('pSelect').innerHTML += `<option value="${p.id}">${p.name}</option>`);
+        if(db.curr && db.pats[db.curr]) $('pSelect').value = db.curr;
+    }
+    function buildTreats() {
+        let h = ``; Object.keys(TR_CATS).forEach(cat => { h += `<div class="treat-box"><h4>${cat}</h4>`; TR_CATS[cat].forEach((tr, i) => h += `<div class="treat-item"><label style="cursor:pointer; display:flex; gap:0.5rem;"><input type="checkbox" id="tr_${cat.substring(0,3)}_${i}"> ${tr}</label><input type="text" id="od_${cat.substring(0,3)}_${i}" placeholder="OD/Zona"></div>`); h += `</div>`; }); $('renderTreats').innerHTML = h;
+    }
+    function loadTreats(p) { Object.keys(TR_CATS).forEach(cat => { TR_CATS[cat].forEach((tr, i) => { const code = `${cat.substring(0,3)}_${i}`; $(`tr_${code}`).checked = p.treats && p.treats[code] ? p.treats[code].chk : false; $(`od_${code}`).value = p.treats && p.treats[code] ? p.treats[code].od : ''; });}); renderPendingTreatsMain(p); }
+    function saveTreats(p) { if(!p.treats) p.treats = {}; Object.keys(TR_CATS).forEach(cat => { TR_CATS[cat].forEach((tr, i) => { const code = `${cat.substring(0,3)}_${i}`; p.treats[code] = { chk: $(`tr_${code}`).checked, od: $(`od_${code}`).value }; });}); }
+    function saveTreatsOnly() { if(!db.curr) return alert("Selecciona un paciente."); saveTreats(db.pats[db.curr]); saveDB(); renderPendingTreatsMain(db.pats[db.curr]); alert("Plan de Tratamientos guardado."); }
+    function renderPendingTreatsMain(p) {
+        let html = '';
+        if(p && p.treats) { Object.keys(TR_CATS).forEach(cat => { TR_CATS[cat].forEach((tr, i) => { const code = `${cat.substring(0,3)}_${i}`; if(p.treats[code] && p.treats[code].chk) { const od = p.treats[code].od ? ` (${p.treats[code].od})` : ''; html += `<span style="display:inline-block; background:white; padding:0.4rem 0.8rem; border-radius:6px; margin:0.3rem; font-size:0.85rem; border:1px solid #bfdbfe; color:#1e40af; font-weight:bold; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">${tr}${od}</span>`; } });}); }
+        $('pPendingTreats').innerHTML = html ? `<label style="color:#1e40af; margin-bottom:0.8rem; font-size:0.9rem; font-weight:900; display:block; border-bottom:1px solid #bfdbfe; padding-bottom:0.4rem;">📋 TX PENDIENTES DEL PACIENTE:</label><div>${html}</div>` : ''; $('pPendingTreats').style.display = html ? 'block' : 'none';
+    }
+
+    function newPatient() {
+        db.curr = null; saveDB(); $('pSelect').value=''; $('lblId').innerText='Nuevo Paciente';
+        ['pName','pAge','pGuardian','pPhone','pSum','pAlert','pBrackets'].forEach(id => $(id).value=''); $('pRetra').checked = false;
+        $('pDrive').value=''; autoLoadWaDate(); checkAge(); loadTreats({}); renderTimeline(); setAlertLabel(null); $('txtReceta').value = ''; $('chkAntibiotico').checked = false;
+        showWorkingPath();
+    }
+    function savePatientAlert() { if(!db.curr) return; let p = db.pats[db.curr]; p.alert = $('pAlert').value; p.alertDate = new Date().toISOString().split('T')[0]; saveDB(); setAlertLabel(p.alertDate); }
+    function savePatient() {
+        const name = $('pName').value.trim(); if(!name) return alert("Falta ingresar el Nombre del paciente."); const dId = 'Px-' + name;
+        if(!db.curr) { db.curr = 'p_'+Date.now(); db.pats[db.curr] = { id: db.curr, displayId: dId, notas: [], treats: {}, alertDate: new Date().toISOString().split('T')[0] }; } else { db.pats[db.curr].displayId = dId; }
+        let p = db.pats[db.curr]; p.name=name; p.age=$('pAge').value; p.guardian=$('pGuardian').value; p.phone=$('pPhone').value; p.sum=$('pSum').value; p.drive=$('pDrive').value; p.brackets=$('pBrackets').value; p.retra=$('pRetra').checked;
+        saveTreats(p); saveDB(); renderPatSelect(); $('lblId').innerText=dId; alert("Perfil del Paciente Guardado Exitosamente."); renderPendingTreatsMain(p); showWorkingPath();
+    }
+    function loadPatient() {
+        const v = $('pSelect').value; if(!v) return newPatient(); db.curr = v; saveDB(); const p = db.pats[v];
+        $('lblId').innerText = p.displayId || 'Sin ID';
+        $('pName').value=p.name||''; $('pAge').value=p.age||''; $('pGuardian').value=p.guardian||''; $('pPhone').value=p.phone||'';
+        $('pSum').value=p.sum||''; $('pAlert').value=p.alert||''; $('pDrive').value=p.drive||''; $('pBrackets').value=p.brackets||''; $('pRetra').checked=p.retra||false;
+        autoLoadWaDate(); checkAge(); loadTreats(p); renderTimeline(); setAlertLabel(p.alertDate); $('txtReceta').value = ''; $('chkAntibiotico').checked = false;
+        showWorkingPath();
+    }
+    function copyPatFolder() { 
+        if(!db.curr) return alert("Debes guardar al paciente primero."); 
+        if (navigator.clipboard && window.isSecureContext) {
+            navigator.clipboard.writeText(db.pats[db.curr].displayId).then(() => alert(`ID copiado al portapapeles`)).catch(e => alert("Tu navegador bloqueó el copiado automático.")); 
+        } else {
+            alert(`No se puede copiar automáticamente en el celular.\nEl ID es: ${db.pats[db.curr].displayId}`);
+        }
+    }
+    function abrirDriveSearch() { if(!db.curr) return alert("Selecciona paciente."); window.open(`https://drive.google.com/drive/u/0/search?q=${encodeURIComponent(db.pats[db.curr].displayId)}`, '_blank'); }
+
+    // GESTORES DINAMICOS MAT/BKT (CON IVA)
+    function renderAdminDyn() {
+        let bH = ''; 
+        db.cfg.brackets.forEach((b,i) => {
+            let tagIva = b.iva ? '<span style="font-size:0.7rem; color:#b45309; font-weight:bold; background:#fef3c7; padding:2px 4px; border-radius:4px;">+ IVA</span>' : '';
+            bH+=`<div style="display:flex; justify-content:space-between; font-size:0.9rem; border-bottom:1px solid #e2e8f0; padding:0.6rem 0; align-items:center;"><span><b>${b.type}</b> | ${b.brand} | ${b.pres} ${tagIva}</span><span>$${b.cost.toFixed(2)} <button onclick="delBkt(${i})" style="color:var(--danger-text); background:none; border:none; cursor:pointer; margin-left:15px; font-size:1.1rem; font-weight:bold;">✖</button></span></div>`;
+        });
+        $('renderAdminBrackets').innerHTML = bH || '<p style="font-size:0.9rem; color:#94a3b8; font-style:italic;">No hay brackets registrados en la base de datos.</p>';
+        
+        let mH = ''; 
+        db.cfg.materials.forEach((m,i) => {
+            let tagIva = m.iva ? '<span style="font-size:0.7rem; color:#0284c7; font-weight:bold; background:#e0f2fe; padding:2px 4px; border-radius:4px;">+ IVA</span>' : '';
+            mH+=`<div style="display:flex; justify-content:space-between; font-size:0.9rem; border-bottom:1px solid #e2e8f0; padding:0.6rem 0; align-items:center;"><span><b>${m.name}</b> ${tagIva}</span><span>$${m.cost.toFixed(2)} <button onclick="delMat(${i})" style="color:var(--danger-text); background:none; border:none; cursor:pointer; margin-left:15px; font-size:1.1rem; font-weight:bold;">✖</button></span></div>`;
+        });
+        $('renderAdminMats').innerHTML = mH || '<p style="font-size:0.9rem; color:#94a3b8; font-style:italic;">No hay materiales registrados en la base de datos.</p>';
+    }
+    
+    function renderClinicaDyn() {
+        let sH = '<option value="">Selecciona bracket a colocar...</option>'; db.cfg.brackets.forEach((b, i) => { sH += `<option value="${i}">${b.type} | ${b.brand} | ${b.pres} (+$${b.cost.toFixed(2)})</option>`; });
+        if($('selBktSup')) $('selBktSup').innerHTML = sH; if($('selBktInf')) $('selBktInf').innerHTML = sH;
+        let cM = ''; db.cfg.materials.forEach((m,i) => cM+=`<input type="checkbox" id="cMat_${i}" value="${i}"><label for="cMat_${i}">${m.name} (+$${m.cost.toFixed(2)})</label>`);
+        if($('renderGenMats')) $('renderGenMats').innerHTML = cM;
+    }
+    
+    function addAdminBracket() { 
+        let t=$('nBType').value, b=$('nBBrand').value, p=$('nBPres').value, c=Number($('nBCost').value), iva=$('nBIva').checked; 
+        if(t && c>=0) { 
+            let finalCost = iva ? c * 1.16 : c;
+            db.cfg.brackets.push({type:t, brand:b, pres:p, base:c, iva:iva, cost:finalCost}); 
+            saveDB(); renderAdminDyn(); renderClinicaDyn(); 
+            $('nBType').value='';$('nBBrand').value='';$('nBPres').value='';$('nBCost').value=''; $('nBIva').checked=false;
+        } 
+    }
+    function delBkt(i) { db.cfg.brackets.splice(i,1); saveDB(); renderAdminDyn(); renderClinicaDyn(); }
+    
+    function addAdminMat() { 
+        let n=$('nMatName').value, c=Number($('nMatCost').value), iva=$('nMatIva').checked; 
+        if(n && c>=0) { 
+            let finalCost = iva ? c * 1.16 : c;
+            db.cfg.materials.push({name:n, base:c, iva:iva, cost:finalCost}); 
+            saveDB(); renderAdminDyn(); renderClinicaDyn(); 
+            $('nMatName').value=''; $('nMatCost').value=''; $('nMatIva').checked=false;
+        } 
+    }
+    function delMat(i) { db.cfg.materials.splice(i,1); saveDB(); renderAdminDyn(); renderClinicaDyn(); }
+
+    // ARCOS Y MATRIZ
+    function buildMatrix() {
+        let h = `<div class="matrix"><div><b style="color:#0f172a;">Material / Calibre</b></div>`; CALS.forEach(c=>h+=`<div><b style="color:#475569;">${c}</b></div>`);
+        MATS.forEach(m => { h+= `<div style="text-align:left;font-weight:900;color:var(--primary);">${m}</div>`; CALS.forEach(c => { const valid = (m==='Memalloy'&&C_RND.includes(c)) || (m==='Biomemalloy'&&C_REC.includes(c)) || (m!=='Memalloy'&&m!=='Biomemalloy'); if(valid) { const chk = (db.cfg.act[m]&&db.cfg.act[m].includes(c))?'checked':''; h+=`<div><input type="checkbox" id="mx_${m}_${c.replace('.','')}" ${chk}></div>`; } else h+=`<div style="color:#cbd5e1;">-</div>`; }); }); $('rMatx').innerHTML = h+`</div>`;
+    }
+    function saveMatrix() { MATS.forEach(m => { db.cfg.act[m] = []; CALS.forEach(c => { const el=$(`mx_${m}_${c.replace('.','')}`); if(el&&el.checked) db.cfg.act[m].push(c); }); }); saveDB(); buildForms(); renderInvShop(); alert("Visibilidad de Arcos Sincronizada Correctamente."); }
+    function buildForms() {
+        ['Sup','Inf'].forEach(a => {
+            let h = `<div class="arch-title">Arcada ${a}</div><div class="pill-wrap">`; MATS.forEach(m => { if(db.cfg.act[m].length>0) h+=`<input type="radio" name="m${a}" id="r${a}${m}" value="${m}" onchange="updCal('${a}')"><label for="r${a}${m}">${m}</label>`; }); h+=`<input type="radio" name="m${a}" id="r${a}NA" value="NA" checked onchange="updCal('${a}')"><label for="r${a}NA" style="background:#e2e8f0; color:#475569;">NA</label></div><div class="pill-wrap" id="c${a}"></div>`; $(`r${a}`).innerHTML = h; updCal(a);
+        });
+    }
+    function updCal(a) { const m = document.querySelector(`input[name="m${a}"]:checked`).value; let h = ``; if(m!=='NA') db.cfg.act[m].forEach(c => h+=`<input type="radio" name="c${a}" id="c${a}${c.replace('.','')}" value="${c}" checked><label for="c${a}${c.replace('.','')}">${c}"</label>`); h+=`<input type="radio" name="c${a}" id="c${a}X" value="NA" ${m==='NA'?'checked':''}><label for="c${a}X" style="background:#e2e8f0; color:#475569;">NA</label>`; $(`c${a}`).innerHTML = h; }
+    function toggleElastics() { $('ePanel').classList.toggle('hidden', $('eNo').checked); }
+    function sugElastic() {
+        const v = document.querySelector('input[name="eVec"]:checked'); if(!v) return; const s = $('eSug'); const p = $('ePos');
+        if(v.value==='Clase II') { s.innerHTML="Retroclinar Sup / Mesializar Inf. (1/4 o 3/16 | Medio/Pesado)"; p.value="13/23 a 36/46"; $('eSize').value='1/4"'; }
+        if(v.value==='Clase III') { s.innerHTML="Retroclinar Inf / Mesializar Sup. (1/4 o 3/16 | Medio/Pesado)"; p.value="33/43 a 16/26"; $('eSize').value='1/4"'; }
+        if(v.value==='Línea Media') { s.innerHTML="Corrección transversal (3/16 | Medio)"; p.value="Vector diagonal ant."; $('eSize').value='3/16"'; }
+        if(v.value==='Asentamiento') { s.innerHTML="Intercuspidación fina (1/8 o 3/16 | L/M)"; p.value="Caja PM-Canino"; $('eSize').value='1/8"'; }
+    }
+
+    // INVENTARIO Y ALERTA
+    function checkTopAlert() { let alert = false; ['Sup','Inf'].forEach(a => MATS.forEach(m => { if(db.cfg.act[m] && db.cfg.act[m].length>0) db.cfg.act[m].forEach(c => { if(db.inv[a] && db.inv[a][m] && db.inv[a][m][c] !== undefined && db.inv[a][m][c] <= 5) alert = true; });})); $('topStockAlert').style.display = alert ? 'block' : 'none'; }
+    function renderInvShop() {
+        let ih = ``; let sh = ``;
+        ['Sup','Inf'].forEach(a => {
+            if(!db.inv[a]) db.inv[a]={}; ih += `<div><h4 style="color:var(--primary); margin-bottom:1rem; font-size:1.2rem; border-bottom:2px solid #e0f2fe; padding-bottom:0.4rem;">Arcada ${a}</h4>`;
+            MATS.forEach(m => {
+                if(db.cfg.act[m].length===0) return; if(!db.inv[a][m]) db.inv[a][m]={}; ih+= `<div class="arch-box"><b style="display:block;margin-bottom:0.8rem;font-size:1rem;color:#0f172a;">${m}</b>`;
+                db.cfg.act[m].forEach(c => {
+                    if(db.inv[a][m][c]===undefined) db.inv[a][m][c]=0; const q = db.inv[a][m][c]; const cls = q<=2?'q-bad':(q<=5?'q-warn':'q-ok'); 
+                    ih+=`<div class="inv-row"><span>Calibre ${c}"</span><div class="inv-controls"><button class="btn-sm" onclick="updInv('${a}','${m}','${c}',-1)">-</button><span class="qty ${cls}" style="color:${q<=5?'#dc2626':'#0f172a'};">${q}</span><button class="btn-sm" onclick="updInv('${a}','${m}','${c}',1)">+</button></div></div>`;
+                    if(q<=5) { sh+=`<li class="urgent" style="color:#b91c1c; font-weight:bold; background:#fef2f2;">⚠️ Faltante: Arco ${a} - ${m} ${c}" (Stock Restante: ${q})</li>`; }
+                }); ih+=`</div>`;
+            }); ih+=`</div>`;
+        }); $('rInv').innerHTML = ih;
+        SHOP.forEach(i => { const chk = db.shopChk[i]?'checked':''; sh+=`<li><input type="checkbox" id="sh_${i}" ${chk} onchange="saveShopChk('${i}')"><label for="sh_${i}">${i}</label></li>`; });
+        $('rShop').innerHTML = sh; checkTopAlert();
+    }
+    function updInv(a,m,c,d) { db.inv[a][m][c] = Math.max(0, db.inv[a][m][c]+d); saveDB(); renderInvShop(); }
+    function saveShopChk(i) { db.shopChk[i] = $(`sh_${i}`).checked; saveDB(); }
+
+    // FINANZAS
+    function loadFin() { 
+        $('fConsGen').value=db.fin.conGen; $('fDesGen').value=db.fin.desGen; $('fConsOrto').value=db.fin.conOrto; $('fDesOrto').value=db.fin.desOrto; 
+        $('fModo').value=db.fin.mod; $('fIvaArcos').checked = db.fin.ivaArcos || false;
+        $('fTxTotal').value=db.fin.txTotal || 0; $('fInsTotal').value=db.fin.insTotal || 0;
+        MATS.forEach(m => { if($('f'+m.substring(0,3))) $('f'+m.substring(0,3)).value = db.fin[m]; }); actualizarContadorMes(); 
+    }
+    function saveFin() { 
+        db.fin.conGen=Number($('fConsGen').value); db.fin.desGen=Number($('fDesGen').value); db.fin.conOrto=Number($('fConsOrto').value); db.fin.desOrto=Number($('fDesOrto').value); 
+        db.fin.mod=$('fModo').value; db.fin.ivaArcos = $('fIvaArcos').checked;
+        db.fin.txTotal=Number($('fTxTotal').value); db.fin.insTotal=Number($('fInsTotal').value);
+        MATS.forEach(m => { if($('f'+m.substring(0,3))) db.fin[m] = Number($('f'+m.substring(0,3)).value); }); saveDB(); actualizarContadorMes(); 
+    }
+    function getArchCost(m) { 
+        let c = db.fin.mod === 'box' ? (db.fin[m] / 10 || 0) : (db.fin[m] || 0);
+        return db.fin.ivaArcos ? c * 1.16 : c;
+    }
+    function actualizarContadorMes() { 
+        const d = new Date(); const prefix = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`; 
+        let cg = 0, co = 0; 
+        db.log.forEach(r => { if(r.f.startsWith(prefix)) { if(r.t === 'gen') cg++; else co++; } }); 
+        if($('lblCGen')) $('lblCGen').innerText = cg; if($('lblCOrto')) $('lblCOrto').innerText = co;
+    }
+
+    // HISTORIAL Y NOTAS
+    function renderTimeline() {
+        const ct = $('tlRender'); ct.innerHTML = ''; 
+        if(!db.curr || !db.pats[db.curr] || !db.pats[db.curr].notas.length) return ct.innerHTML="<p style='color:var(--text-muted);font-size:0.95rem; font-style:italic;'>Aún no hay notas registradas para este paciente.</p>";
+        
+        db.pats[db.curr].notas.forEach(n => {
+            const px = n.fut ? `<div style="color:#b45309;background:#fef3c7;padding:0.6rem;border-radius:6px;font-weight:bold;margin-top:0.8rem;font-size:0.9rem; border:1px solid #fde68a;">📌 Aviso Próxima Cita: ${n.fut}</div>` : '';
+            const delBtn = `<button onclick="deleteNota(${n.id})" style="position:absolute; right:0.5rem; top:0.5rem; background:transparent; border:none; cursor:pointer; font-size:1.4rem; transition:transform 0.2s;" title="Eliminar nota" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">🗑️</button>`;
+            
+            if(n.type === 'gen') {
+                let vitals = ''; if(n.vit && (n.vit.ta || n.vit.fc || n.vit.temp)) { vitals = `<div style="font-size:0.85rem; color:#475569; margin-bottom:0.5rem; background:#f1f5f9; padding:0.4rem; border-radius:4px;"><b>Signos Vitales:</b> TA:${n.vit.ta||'-'} | FC:${n.vit.fc||'-'} | T°:${n.vit.temp||'-'}</div>`; }
+                let anes = ''; if(n.anes && n.anes.used) { anes = `<div style="font-size:0.85rem; color:#0284c7; margin-bottom:0.5rem; background:#f0f9ff; padding:0.4rem; border-radius:4px;">💉 <b>Anestesia:</b> ${n.anes.type} (${n.anes.cart} cartuchos)</div>`; }
+                ct.innerHTML += `<div class="tl-item"><div class="tl-date">${n.f} <span class="tl-tag tag-gen">ODONTOLOGÍA GENERAL</span></div><div class="tl-card">${delBtn}${vitals}${anes}<div style="margin-top:0.6rem; white-space:pre-wrap;">${n.obs||'-'}</div>${px}</div></div>`;
+            } else if(n.type === 'ali') {
+                let det = `<div style="font-size:0.9rem; margin-bottom:0.6rem; background:#ecfdf5; padding:0.5rem; border-radius:4px; color:#065f46;"><b>Fase:</b> ${n.etapa||'-'} | <b>Alineador Entregado:</b> #${n.num||'-'}</div>`;
+                ct.innerHTML += `<div class="tl-item"><div class="tl-date">${n.f} <span class="tl-tag tag-ali">ALINEADORES INVISIBLES</span></div><div class="tl-card">${delBtn}${det}<div style="white-space:pre-wrap;">${n.obs||'-'}</div>${px}</div></div>`;
+            } else {
+                const el = n.eU==='Sí' ? `<div style="margin-top:0.6rem;font-size:0.9rem; background:#f0f9ff; padding:0.5rem; border-radius:4px; border:1px dashed #bae6fd; color:#0369a1;"><b>Elásticos:</b> ${n.eV} | ${n.eS} | ${n.eF} | Pos: ${n.eP}</div>` : '';
+                ct.innerHTML += `<div class="tl-item"><div class="tl-date">${n.f} <span class="tl-tag tag-orto">ORTODONCIA</span></div><div class="tl-card">${delBtn}<div class="tl-arcos" style="font-size:0.95rem; font-weight:bold; color:#334155; margin-bottom:0.6rem; border-bottom:1px solid #e2e8f0; padding-bottom:0.4rem;">Sup: ${n.mS} ${n.cS}"<br>Inf: ${n.mI} ${n.cI}"</div><div style="white-space:pre-wrap;">${n.obs||'-'}</div>${el}${px}</div></div>`;
+            }
+        });
+    }
+
+    function deleteNota(id) { if(confirm("¿Estás seguro de eliminar permanentemente esta nota clínica?")) { db.pats[db.curr].notas = db.pats[db.curr].notas.filter(n => n.id !== id); saveDB(); renderTimeline(); } }
+    function triggerAlertUpdate(fut) { if(fut.trim()!=='') { $('pAlert').value = fut; db.pats[db.curr].alert = fut; db.pats[db.curr].alertDate = new Date().toISOString().split('T')[0]; setAlertLabel(db.pats[db.curr].alertDate); } }
+
+    function saveEvolucionGen() {
+        if(!db.curr) return alert("Guarda o selecciona un paciente primero.");
+        const f = $('nDateGen').value; const fut = $('nFutGen').value;
+        
+        let customMatCost = 0; let customMatLog = '';
+        db.cfg.materials.forEach((m,i) => {
+            if($(`cMat_${i}`) && $(`cMat_${i}`).checked) { customMatCost += m.cost; customMatLog += `\n[+ Insumo Extra Registrado: ${m.name}]`; }
+        });
+
+        let finalObs = $('nObsGen').value + customMatLog;
+        const n = { id: Date.now(), type: 'gen', f: f, obs: finalObs, fut: fut, vit: { ta: $('gTA').value, fc: $('gFC').value, temp: $('gTemp').value }, anes: { used: $('gAnesChk').checked, type: $('gAnesTipo').value, cart: $('gAnesCart').value } };
+        
+        if($('nCobroGen').checked) {
+            db.log.push({ f:f, p:db.pats[db.curr].name, t:'gen', ing:db.fin.conGen, op:db.fin.desGen, inv:customMatCost });
+        }
+        
+        db.pats[db.curr].notas.unshift(n); triggerAlertUpdate(fut); saveDB(); renderTimeline(); actualizarContadorMes();
+        $('nObsGen').value=''; $('nFutGen').value=''; $('gTA').value=''; $('gFC').value=''; $('gTemp').value=''; $('gAnesChk').checked=false; $('gAnesBox').classList.add('hidden'); $('gAnesCart').value='';
+        db.cfg.materials.forEach((m,i) => { if($(`cMat_${i}`)) $(`cMat_${i}`).checked = false; });
+        alert("Evolución General Guardada Correctamente.");
+    }
+
+    function saveEvolucion() {
+        if(!db.curr) return alert("Guarda o selecciona un paciente primero.");
+        const mS = document.querySelector('input[name="mSup"]:checked').value; const cS = document.querySelector('input[name="cSup"]:checked').value;
+        const mI = document.querySelector('input[name="mInf"]:checked').value; const cI = document.querySelector('input[name="cInf"]:checked').value;
+        let cAr = 0; 
+        if(mS!=='NA' && cS!=='NA') { db.inv['Sup'][mS][cS] = Math.max(0, db.inv['Sup'][mS][cS]-1); cAr += getArchCost(mS); }
+        if(mI!=='NA' && cI!=='NA') { db.inv['Inf'][mI][cI] = Math.max(0, db.inv['Inf'][mI][cI]-1); cAr += getArchCost(mI); }
+        
+        let customBktCost = 0; let customBktLog = '';
+        if($('chkBktSup').checked && $('selBktSup').value!=="") { let b = db.cfg.brackets[$('selBktSup').value]; customBktCost += b.cost; customBktLog += `\n[Colocación Sup: ${b.type} ${b.brand} ${b.pres}]`; }
+        if($('chkBktInf').checked && $('selBktInf').value!=="") { let b = db.cfg.brackets[$('selBktInf').value]; customBktCost += b.cost; customBktLog += `\n[Colocación Inf: ${b.type} ${b.brand} ${b.pres}]`; }
+
+        const f = $('nDate').value;
+        if($('nCobroOrto').checked) {
+            db.log.push({ f:f, p:db.pats[db.curr].name, t:'orto', ing:db.fin.conOrto, op:db.fin.desOrto, inv:cAr+customBktCost });
+        }
+
+        const fut = $('nFut').value;
+        let finalObs = $('nObs').value + customBktLog;
+        const n = { id:Date.now(), type: 'orto', f:f, mS, cS, mI, cI, obs:finalObs, fut:fut, eU:$('eSi').checked?'Sí':'No', eV:'', eS:'', eF:'', eP:'' };
+        if(n.eU==='Sí') { n.eV = document.querySelector('input[name="eVec"]:checked')?.value||''; n.eS = $('eSize').value; n.eF = $('eForce').value; n.eP = $('ePos').value; }
+        
+        db.pats[db.curr].notas.unshift(n); triggerAlertUpdate(fut);
+        saveDB(); renderTimeline(); renderInvShop(); actualizarContadorMes();
+        $('nObs').value=''; $('nFut').value=''; $('ePos').value=''; $('rSupNA').click(); $('rInfNA').click(); $('eNo').click(); 
+        $('chkBktSup').checked=false; $('selBktSup').classList.add('hidden'); $('selBktSup').value='';
+        $('chkBktInf').checked=false; $('selBktInf').classList.add('hidden'); $('selBktInf').value='';
+        alert("Evolución de Ortodoncia Guardada. El Stock ha sido actualizado.");
+    }
+
+    function saveEvolucionAli() {
+        if(!db.curr) return alert("Guarda o selecciona un paciente primero.");
+        const f = $('nDateAli').value; const fut = $('aFut').value;
+        const n = { id: Date.now(), type: 'ali', f: f, etapa: $('aEtapa').value, num: $('aNum').value, obs: $('aObs').value, fut: fut };
+        if($('nCobroAli').checked) { db.log.push({ f:f, p:db.pats[db.curr].name, t:'ali', ing:db.fin.conOrto, op:db.fin.desOrto, inv:0 }); }
+        db.pats[db.curr].notas.unshift(n); triggerAlertUpdate(fut); saveDB(); renderTimeline(); actualizarContadorMes();
+        $('aEtapa').value=''; $('aNum').value=''; $('aObs').value=''; $('aFut').value=''; alert("Nota de Alineadores Invisibles Guardada.");
+    }
+
+    function printHistory() {
+        if(!db.curr) return alert("Selecciona paciente para imprimir su historial."); const p = db.pats[db.curr]; 
+        const activeD = db.docs[db.activeDoc] || { name: '', spec: '' };
+        
+        let htmlGen = '', htmlOrto = '', htmlAli = '';
+        if(!p.notas || !p.notas.length) { htmlGen = htmlOrto = htmlAli = "<p>Sin registros en el expediente.</p>"; }
+        else {
+            p.notas.forEach(n => {
+                let block = `<div class="note-block"><div class="note-header"><span>📅 ${n.f}</span></div>`;
+                if(n.type === 'gen') {
+                    if(n.vit && (n.vit.ta || n.vit.fc || n.vit.temp)) block += `<div style="color:#64748b; margin-bottom:2px;"><b>Signos Vitales:</b> TA:${n.vit.ta||'-'} | FC:${n.vit.fc||'-'} | T°:${n.vit.temp||'-'}</div>`;
+                    if(n.anes && n.anes.used) block += `<div style="color:#0284c7; margin-bottom:2px;"><b>Anestesia Administrada:</b> ${n.anes.type} (${n.anes.cart} cart.)</div>`;
+                    block += `<div style="white-space:pre-wrap; margin-top:4px;">${n.obs||'-'}</div></div>`; htmlGen += block;
+                } else if(n.type === 'ali') {
+                    block += `<div style="margin-bottom:2px;"><b>Fase:</b> ${n.etapa||'-'} | <b>Alineador:</b> #${n.num||'-'}</div><div style="white-space:pre-wrap; margin-top:4px;">${n.obs||'-'}</div></div>`; htmlAli += block;
+                } else {
+                    block += `<div style="margin-bottom:2px;"><b>Arcos:</b> Sup: ${n.mS} ${n.cS}" | Inf: ${n.mI} ${n.cI}"</div>`;
+                    if(n.eU==='Sí') block += `<div style="margin-bottom:2px;"><b>Elásticos:</b> ${n.eV} | ${n.eS} | ${n.eF} | Pos: ${n.eP}</div>`;
+                    block += `<div style="white-space:pre-wrap; margin-top:4px;">${n.obs||'-'}</div></div>`; htmlOrto += block;
+                }
+            });
+        }
+        let headerLogo = db.cfg.logo ? `<img src="${db.cfg.logo}" style="max-height:55px; max-width:160px; object-fit:contain; margin-right:15px;">` : '';
+        let watermark = db.cfg.logo ? `<img src="${db.cfg.logo}" class="bg-watermark">` : '';
+        let finalHtml = `<html><head><title>Historial Clínico - ${p.name}</title><style>@page { size: letter portrait; margin: 10mm; } body{font-family: 'Segoe UI', Arial, sans-serif; padding:0; margin:0; color:#1e293b; font-size: 10.5px; line-height: 1.4; -webkit-print-color-adjust: exact; print-color-adjust: exact; max-height: 259mm; overflow: hidden; display: flex; flex-direction: column;} h1, h2, h3 {color:#0f172a; margin: 4px 0;} .section-title {background:#f1f5f9; padding:6px 10px; border-left:4px solid #0284c7; margin-top:10px; margin-bottom:5px; font-size:12px; text-transform:uppercase; letter-spacing:0.5px;} .note-block {border:1px solid #cbd5e1; padding:6px; margin-bottom:6px; border-radius:6px; page-break-inside:avoid; font-size:10px; background:white;} .note-header {border-bottom:1px solid #e2e8f0; padding-bottom:3px; margin-bottom:3px; font-weight:bold; color:#0f172a; display:flex; justify-content:space-between;} .bg-watermark { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); opacity: 0.08; width: 65%; height: auto; z-index: -10; pointer-events: none; } .content-box { flex-grow:1; overflow:hidden; }</style></head><body>${watermark}<div style="display:flex; align-items:center; border-bottom:3px solid #0284c7; padding-bottom:8px; margin-bottom:10px;">${headerLogo}<div><h1 style="font-size:16px;">${db.cfg.cli}</h1><h2 style="font-size:12px; color:#64748b;">${activeD.name}</h2></div></div><div style="background:#f8fafc; padding:8px; border-radius:6px; margin-bottom:10px; border:1px solid #e2e8f0;"><h2 style="font-size:12px; margin-bottom:4px;">Expediente Clínico: <span style="text-transform:uppercase; color:#0284c7;">${p.name}</span></h2><p style="margin:0;"><b>ID:</b> ${p.displayId} | <b>Edad:</b> ${p.age||'N/A'} | <b>Tel:</b> ${p.phone||'N/A'}</p><p style="margin:4px 0 0 0;"><b>Brackets Asignados:</b> ${p.brackets||'N/A'} ${p.retra ? '<span style="color:#dc2626; font-weight:bold;">(Paciente de Retratamiento)</span>' : ''}</p>${p.sum ? `<p style="margin:4px 0 0 0; border-top:1px dashed #cbd5e1; padding-top:4px;"><b>Resumen/Dx:</b> ${p.sum}</p>` : ''}</div><div class="content-box">`;
+        if(htmlGen) finalHtml += `<h3 class="section-title">🩺 Odontología General</h3>${htmlGen}`; if(htmlOrto) finalHtml += `<h3 class="section-title" style="border-color:#0369a1;">🦷 Ortodoncia</h3>${htmlOrto}`; if(htmlAli) finalHtml += `<h3 class="section-title" style="border-color:#047857;">🪥 Alineadores</h3>${htmlAli}`;
+        const win = window.open('','_blank'); win.document.write(finalHtml+"</div></body></html>"); win.document.close(); setTimeout(()=>win.print(), 800);
+    }
+
+    // IMPRESIÓN INDICACIONES
+    function printIndicaciones(tipo) {
+        const cfg = db.cfg; const activeD = db.docs[db.activeDoc] || { name: '', spec: '', phone: '', email: '' };
+        const dPhone = activeD.phone || cfg.contact; const dEmail = activeD.email || cfg.email;
+        let title = '', intro = '', sectionsHtml = '';
+        
+        if(tipo === 'extraccion') {
+            title = 'Indicaciones Post Extracción Dental'; intro = 'Estimado paciente, siga estas indicaciones al pie de la letra para asegurar una adecuada recuperación después de su extracción dental.';
+            const sections = [{ t: 'PRIMERAS 24 HORAS', b: ['Muerda firmemente la gasa colocada durante 30 a 45 minutos.', 'No escupa, no use popote y no enjuague la boca durante las primeras 24 horas.', 'Aplique hielo en la mejilla (20 minutos sí, 20 minutos no) para reducir la inflamación.', 'Mantenga la cabeza elevada al descansar, use almohadas adicionales.', 'Si hay sangrado leve, muerda una gasa húmeda o una bolsita de té negro húmeda por 30 minutos.'] }, { t: 'ALIMENTACIÓN', b: ['Consuma alimentos blandos y fríos: yogur, helado, puré de papa, licuados, sopas tibias.', 'Evite alimentos duros, picantes, muy calientes o con semillas.', 'No consuma bebidas alcohólicas ni carbonatadas durante al menos 72 horas.', 'Mastique del lado contrario a la extracción.'] }, { t: 'HIGIENE BUCAL', b: ['No cepille la zona de la extracción durante las primeras 24 horas.', 'Después de 24 horas, realice enjuagues suaves con agua tibia y sal.', 'Cepille el resto de los dientes con normalidad, evitando la zona afectada.', 'No use enjuague bucal comercial durante la primera semana.'] }, { t: 'RECOMENDACIONES FARMACOLÓGICAS', b: ['Tomar puntualmente los antibióticos y analgésicos recetados en su receta médica.', 'No suspenda el antibiótico aunque se sienta mejor.', 'Si presenta dolor agudo, aplique hielo externo y tome su medicación.'] }, { t: 'ACUDA A CONSULTA DE URGENCIA SI PRESENTA:', bg: '#b91c1c', b: ['Sangrado abundante que no cede después de 1 hora de presión con gasa.', 'Dolor intenso que no mejora con la medicación indicada.', 'Fiebre mayor a 38°C.', 'Inflamación que aumenta en lugar de disminuir después del tercer día.', 'Mal sabor u olor persistente en la boca.'] }];
+            sections.forEach(s => { sectionsHtml += `<div class="i-header" style="background-color:${s.bg || '#1e6091'};">${s.t}</div><ul class="i-list">`; s.b.forEach(item => sectionsHtml += `<li>${item}</li>`); sectionsHtml += `</ul>`; });
+        } else if(tipo === 'brackets') {
+            title = 'Recomendaciones y Cuidados de Brackets'; intro = '<b>¡Felicidades por tomar la decisión de transformar tu sonrisa! Hoy iniciamos un trabajo en equipo, y estamos aquí para apoyarte en cada etapa de tu tratamiento.</b><br><br>Para asegurar el éxito de su tratamiento de ortodoncia y evitar retrasos innecesarios, por favor siga estas indicaciones.';
+            const sections = [{ t: 'ALIMENTOS PROHIBIDOS (Evitan que se despeguen los brackets)', b: ['Alimentos muy duros: hielo, chicharrones, cacahuates, nueces, almendras.', 'Alimentos pegajosos: chicles, chiclosos, caramelos masticables, gomitas.', 'Frutas y verduras enteras: manzanas, zanahorias o elotes (córtelos en trozos pequeños antes de comer).', 'No muerda directamente bolillos, tortas o pizzas; use siempre cubiertos.'] }, { t: 'HIGIENE BUCAL (Previene manchas blancas y caries)', b: ['Cepille sus dientes minuciosamente después de cada comida (mínimo 3 veces al día).', 'Use un cepillo especial para ortodoncia y cepillos interdentales para limpiar entre los brackets y debajo del arco.', 'Utilice hilo dental (ej. Superfloss) al menos una vez al día, preferiblemente en la rutina de noche.', 'El uso de enjuague bucal con flúor es altamente recomendado.'] }, { t: 'FARMACOLOGÍA Y MANEJO DEL DOLOR', b: ['Puede tomar Paracetamol o el analgésico recetado en caso de dolor por los movimientos ortodónticos los primeros 3 a 5 días tras el ajuste.', 'Utilice cera de ortodoncia sobre los brackets o alambres que causen fricción o llagas en la mejilla, secando primero la zona con un algodón.'] }, { t: 'CUIDADOS GENERALES', b: ['No se muerda las uñas ni mastique bolígrafos o lápices.', 'Si practica deportes de contacto, avise a la clínica para evaluar el uso de un protector bucal especial.', 'Si un bracket se despega, guárdelo y comuníquese inmediatamente para agendar una cita de recementado.'] }];
+            sections.forEach(s => { sectionsHtml += `<div class="i-header" style="background-color:${s.bg || '#1e6091'};">${s.t}</div><ul class="i-list">`; s.b.forEach(item => sectionsHtml += `<li>${item}</li>`); sectionsHtml += `</ul>`; });
+        } else if(tipo === 'blanqueamiento') {
+            title = 'Cuidados Post Blanqueamiento Dental'; intro = 'Para mantener los resultados luminosos de su blanqueamiento y minimizar cualquier sensibilidad temporal, tome en cuenta lo siguiente:';
+            const sections = [{ t: 'DIETA BLANCA (Estricta por un Mínimo de 72 horas)', b: ['EVITAR bebidas con colorantes intensos: café, té negro/rojo, vino tinto, refrescos de cola, jugos artificiales.', 'EVITAR alimentos oscuros o ácidos: salsa de tomate, mostaza, salsa de soya, curry, frutos rojos, betabel, cítricos.', 'Puede consumir sin problema: pollo, pescado blanco, arroz, pastas con salsas blancas o queso, lácteos, plátano, manzana pelada.'] }, { t: 'FARMACOLOGÍA Y SENSIBILIDAD', b: ['Utilice Pasta Dental Desensibilizante 3 veces al día para minimizar el impacto térmico en el nervio dental.', 'En caso de sensibilidad punzante o muy incómoda, puede tomar el analgésico (ej. Ibuprofeno) recetado por 24-48 horas.', 'Evite consumir alimentos y bebidas extremadamente frías o muy calientes durante la primera semana.'] }, { t: 'HÁBITOS E HIGIENE BUCAL', b: ['Es completamente normal presentar sensibilidad térmica durante las primeras 24 a 48 horas post-tratamiento.', 'No fume durante al menos 48 horas; el humo manchará inmediatamente los poros del esmalte recién abierto.', 'Utilice pastas dentales blancas convencionales (evite terminantemente pastas con colores fuertes o de carbón activado).', 'Mantenga su rutina regular de cepillado e hilo dental de forma suave.', 'Evite enjuagues bucales comerciales que contengan clorhexidina o colorantes fuertes en estos primeros días.'] }];
+            sections.forEach(s => { sectionsHtml += `<div class="i-header" style="background-color:${s.bg || '#1e6091'};">${s.t}</div><ul class="i-list">`; s.b.forEach(item => sectionsHtml += `<li>${item}</li>`); sectionsHtml += `</ul>`; });
+        } else if(tipo === 'profilaxis') {
+            title = 'Indicaciones Post Profilaxis (Limpieza Dental)'; intro = 'La limpieza dental profunda remueve bacterias y sarro, permitiendo que sus encías sanen. Por favor, siga estas indicaciones:';
+            const sections = [{ t: 'SENSIBILIDAD Y MOLESTIAS', b: ['Es completamente normal experimentar una ligera sensibilidad al frío o calor durante las primeras 24 a 48 horas.', 'Si la sensibilidad es molesta, puede utilizar una pasta dental desensibilizante temporalmente.'] }, { t: 'CUIDADO DE LAS ENCÍAS', b: ['Sus encías pueden estar ligeramente inflamadas o enrojecidas. Es posible que note un ligero sangrado al cepillarse durante el primer o segundo día.', 'Evite enjuagues bucales que contengan alcohol, ya que pueden irritar la encía fresca.'] }, { t: 'ALIMENTACIÓN', b: ['Evite consumir alimentos muy calientes, picantes, o muy ácidos (cítricos, vinagre) por el resto del día para evitar molestias en los tejidos.', 'Masticar suavemente y preferir alimentos a temperatura ambiente.'] }, { t: 'HIGIENE BUCAL', b: ['NO suspenda el cepillado ni el uso de hilo dental. Es fundamental mantener el área limpia para que la encía sane.', 'Cepille sus dientes con un cepillo de cerdas suaves.'] }];
+            sections.forEach(s => { sectionsHtml += `<div class="i-header" style="background-color:${s.bg || '#10b981'};">${s.t}</div><ul class="i-list">`; s.b.forEach(item => sectionsHtml += `<li>${item}</li>`); sectionsHtml += `</ul>`; });
+        } else if(tipo === 'operatoria') {
+            title = 'Indicaciones Post Operatoria (Resinas / Empastes)'; intro = 'Su diente ha sido restaurado exitosamente. Para asegurar la longevidad de su resina y su comodidad, tome en cuenta lo siguiente:';
+            const sections = [{ t: 'CUIDADO CON LA ANESTESIA', bg: '#ef4444', b: ['Si se le aplicó anestesia local, sus labios, lengua y mejillas estarán adormecidos por 2 a 4 horas.', 'EVITE masticar alimentos sólidos hasta que el efecto pase por completo, ya que podría morderse severamente sin sentirlo.', 'Puede tomar líquidos, preferiblemente fríos o a temperatura ambiente.'] }, { t: 'TIEMPO DE ENDURECIMIENTO', b: ['Las resinas compuestas (empastes del color del diente) endurecen por completo en el consultorio mediante la luz especial. Usted puede comer normalmente en cuanto pase la anestesia.'] }, { t: 'SENSIBILIDAD POST-OPERATORIA', b: ['Es normal sentir una ligera sensibilidad al frío o al masticar durante los primeros 3 a 5 días, especialmente si la caries era muy profunda.', 'Si la sensibilidad no disminuye o el diente duele espontáneamente (sin estímulo), contáctenos.'] }, { t: 'AJUSTE DE MORDIDA', b: ['La resina ha sido ajustada a su mordida. Sin embargo, si al pasar la anestesia siente que "choca primero" en ese diente, agende una cita breve para un pulido. Una resina alta puede causar inflamación del nervio dental.'] }];
+            sections.forEach(s => { sectionsHtml += `<div class="i-header" style="background-color:${s.bg || '#6366f1'};">${s.t}</div><ul class="i-list">`; s.b.forEach(item => sectionsHtml += `<li>${item}</li>`); sectionsHtml += `</ul>`; });
+        }
+        
+        let watermark = cfg.logo ? `<img src="${cfg.logo}" class="bg-watermark">` : '';
+        const html = `<html><head><title>${title}</title><style>@page { size: letter portrait; margin: 10mm; } body { font-family: 'Century Gothic', 'Segoe UI', Arial, sans-serif; margin: 0; padding: 0; color: #334155; -webkit-print-color-adjust: exact; print-color-adjust: exact; background: white; height: 100vh; max-height: 259mm; overflow: hidden; display: flex; flex-direction: column; box-sizing: border-box; } .bg-watermark { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); opacity: 0.08; width: 60%; height: auto; z-index: -10; pointer-events: none; } .r-wrapper { display: flex; flex-direction: column; height: 100%; box-sizing: border-box; border-left: 14px solid #004a7c; } .r-topbar { background-color: #63c1c5; height: 12px; width: 100%; flex-shrink:0; } .r-content { padding: 20px 30px 10px 30px; flex-grow: 1; display: flex; flex-direction: column; overflow: hidden; position: relative; z-index: 1;} .r-header { display: flex; justify-content: flex-end; align-items: center; margin-bottom: 8px; flex-shrink:0;} .r-logo { max-height: 55px; max-width: 240px; object-fit: contain; } .r-line-top { border-bottom: 2px solid #004a7c; margin-bottom: 15px; width: 100%; flex-shrink:0;} .i-title { font-size: 18px; font-weight: bold; color: #0f172a; margin: 0 0 10px 0; text-transform: uppercase; letter-spacing: 0.5px; flex-shrink:0; } .i-intro { font-size: 11.5px; line-height: 1.4; margin-bottom: 10px; color: #475569; flex-shrink:0; } .i-sections { flex-grow:1; overflow:hidden; } .i-header { color: white; padding: 4px 8px; font-size: 11.5px; font-weight: bold; margin-top: 10px; margin-bottom: 6px; border-radius: 2px; } .i-list { list-style-type: none; padding-left: 0; margin: 0; font-size: 10.5px; line-height: 1.4; color: #334155; } .i-list li { position: relative; padding-left: 16px; margin-bottom: 5px; } .i-list li::before { content: "•"; position: absolute; left: 0; color: #0284c7; font-size: 16px; font-weight: bold; top: -3px;} .r-footer-area { margin-top: auto; padding-top: 15px; display: flex; justify-content: space-between; font-size: 10.5px; color: #334155; flex-shrink:0; } .r-footer-bar { background-color: #0f172a; color: white; text-align: center; font-size: 9.5px; padding: 10px; width: 100%; box-sizing: border-box; letter-spacing: 1px; flex-shrink:0; }</style></head><body>${watermark}<div class="r-wrapper"><div class="r-topbar"></div><div class="r-content"><div class="r-header">${cfg.logo ? `<img src="${cfg.logo}" class="r-logo">` : `<h2 style="color:#0284c7; margin:0;">${cfg.cli}</h2>`}</div><div style="text-align:right; font-size:10.5px; color:#64748b; margin-bottom:8px;">${cfg.slogan || ''}</div><div class="r-line-top"></div><h1 class="i-title">${title}</h1><p class="i-intro">${intro}</p><div class="i-sections">${sectionsHtml}</div><div class="r-footer-area"><div><span style="color:#004a7c; font-size:12px; font-weight:bold;">${activeD.name}</span><br><span style="color:#63c1c5; text-transform:uppercase; font-size:9.5px;">${activeD.spec || ''}</span></div><div style="text-align:right; line-height:1.4;">${cfg.address}</div></div></div><div class="r-footer-bar">${dPhone} | ${dEmail}</div></div></body></html>`;
+        const win = window.open('', '_blank'); win.document.write(html); win.document.close(); setTimeout(() => win.print(), 800);
+    }
+
+    // IMPRESIÓN LEGALES
+    function printLegal(tipo) {
+        if(!db.curr) return alert("Selecciona un paciente para imprimir su documento legal."); const p = db.pats[db.curr]; const cfg = db.cfg; const activeD = db.docs[db.activeDoc] || { name: '', spec: '', ced1: '', ced2: '', phone: '', email: '' };
+        const dPhone = activeD.phone || cfg.contact; const dEmail = activeD.email || cfg.email;
+        const d = new Date(); const dateStr = `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth()+1).padStart(2, '0')}/${d.getFullYear()}`;
+        let title = '', bodyHtml = ''; let ageStr = p.age || '___'; let declareStr = p.guardian ? `Yo, <b>${p.guardian}</b>, en mi carácter de padre/tutor legal del paciente <b><span style="text-transform:uppercase;">${p.name}</span></b> de <b>${ageStr}</b> años de edad` : `Yo, <b><span style="text-transform:uppercase;">${p.name}</span></b>, de <b>${ageStr}</b> años de edad`;
+        
+        if(tipo === 'contrato_orto') { 
+            let vEng = $('lEnganche').value ? `$${$('lEnganche').value}` : '$_________';
+            let vMen = $('lMensual').value ? `$${$('lMensual').value}` : '$_________';
+            let vRep = $('lRepo').value ? `$${$('lRepo').value}` : '$_________';
+            let vMes = $('lMeses').value ? `${$('lMeses').value}` : '_____';
+            
+            title = 'Contrato de Prestación de Servicios de Ortodoncia'; 
+            bodyHtml = `<p>Que celebramos por una parte el <b>${activeD.name}</b> (en adelante "El Especialista"), y por la otra parte <b>${p.guardian || p.name}</b> (en adelante "El Paciente/Tutor").</p><ol class="l-list"><li><b>OBJETO:</b> El Especialista se compromete a realizar un tratamiento de ortodoncia, cuyo objetivo es la corrección de maloclusiones y alineación dental, mediante la aplicación de aparatología fija o removible.</li><li><b>OBLIGACIONES DEL PACIENTE:</b> El éxito del tratamiento depende de la cooperación del paciente, quien se compromete a:<ul><li>Asistir a sus citas de control mensualmente (o según indicación).</li><li>Mantener una excelente higiene bucal para evitar descalcificaciones y caries.</li><li>Evitar alimentos duros o pegajosos que dañen la aparatología.</li></ul></li><li><b>COSTOS Y PAGOS:</b> El tratamiento consta de un pago inicial (enganche) de <b>${vEng} MXN</b> y mensualidades fijas de <b>${vMen} MXN</b>, las cuales deberán cubrirse en cada cita de control, <b>independientemente de los procedimientos realizados ese día.</b></li><li><b>REPOSICIÓN DE BRACKETS:</b> La caída o desprendimiento de un bracket por descuido del paciente generará un costo de reposición de <b>${vRep} MXN</b> por unidad. El retraso en notificar desprendimientos prolongará el tratamiento.</li><li><b>DURACIÓN:</b> El tiempo estimado del tratamiento es de <b>${vMes} meses</b>. Este tiempo es <b>aproximado</b> y puede extenderse debido a la falta de cooperación, inasistencias o respuesta biológica del paciente.</li><li><b>RETENEDORES:</b> Al finalizar el tratamiento activo, es <b>obligatorio</b> el uso de retenedores. El costo de estos aparatos es independiente al tratamiento. La falta de uso provocará recidiva, exonerando al Especialista de toda responsabilidad.</li></ol><p>Leído el presente contrato y enteradas las partes de su alcance y contenido legal, lo firman de entera conformidad el día <b>${dateStr}</b>.</p>`; 
+        } 
+        else if(tipo === 'cons_orto') { title = 'Consentimiento Informado para Tratamiento de Ortodoncia'; bodyHtml = `<p>${declareStr}, declaro en pleno uso de mis facultades que he sido informado de manera clara y comprensible por el <b>${activeD.name}</b> sobre mi diagnóstico y el plan de tratamiento de ortodoncia propuesto.</p><p><b>Comprendo que el tratamiento de ortodoncia implica riesgos y limitaciones, entre los cuales se incluyen:</b></p><ul class="l-list"><li><b>Reabsorción radicular:</b> Acortamiento de las raíces dentales, que generalmente es leve, pero en casos impredecibles puede comprometer la longevidad del diente.</li><li><b>Descalcificación y Caries:</b> Si no mantengo una higiene bucal impecable, pueden aparecer manchas blancas permanentes, caries o inflamación de encías (gingivitis).</li><li><b>Molestias Temporales:</b> Dolor, sensibilidad o úlceras en los labios y mejillas durante los primeros días después de la colocación o ajuste de los aparatos.</li><li><b>Recidiva:</b> La tendencia natural de los dientes a moverse a su posición original. Entiendo que el uso de retenedores al finalizar el tratamiento es vitalicio y mi responsabilidad absoluta.</li></ul><p>He tenido la oportunidad de hacer preguntas, las cuales han sido respondidas a mi satisfacción. Por lo tanto, <b>AUTORIZO</b> la colocación de aparatología ortodóntica y acepto mi corresponsabilidad en el tratamiento.</p>`; } 
+        else if(tipo === 'cons_retra') { title = 'Consentimiento Informado Especial para Retratamiento de Ortodoncia'; bodyHtml = `<p>${declareStr}, declaro haber sido informado por el <b>${activeD.name}</b> que, debido a que mi tratamiento de ortodoncia (o el de mi representado) fue iniciado por otro profesional en otra clínica o consultorio, existen condiciones preexistentes que pueden afectar el resultado final.</p><p><b>Comprendo y acepto expresamente las siguientes condiciones de un retratamiento:</b></p><ul class="l-list"><li><b>Deslinde de Responsabilidad Previa:</b> El Especialista actual no se hace responsable por daños radiculares (reabsorción), pérdida de hueso periodontal, manchas, descalcificaciones o caries que se hayan generado antes de iniciar la atención en esta clínica.</li><li><b>Tiempos Impredecibles:</b> El tiempo estimado de tratamiento es incierto y puede prolongarse más de lo previsto debido a las mecánicas previas realizadas.</li><li><b>Limitaciones Clínicas:</b> Es posible que el resultado estético o funcional se vea comprometido o limitado de forma permanente por el manejo previo del caso.</li><li><b>Remoción de Aparatología:</b> Entiendo que puede ser estrictamente necesario retirar y reemplazar la aparatología actual si ésta no cumple con los estándares biomecánicos requeridos por el Especialista, lo cual generará costos adicionales no contemplados originalmente.</li></ul><p>Asumo la responsabilidad total de estas limitaciones clínicas y doy mi libre <b>CONSENTIMIENTO</b> para continuar mi tratamiento en esta clínica, deslindando al Especialista actual de cualquier responsabilidad legal o clínica derivada de los actos del dentista anterior.</p>`; } 
+        else if(tipo === 'cons_ope') { title = 'Consentimiento Informado para Operatoria Dental'; bodyHtml = `<p>${declareStr}, declaro haber sido informado por el <b>${activeD.name}</b> sobre la necesidad de realizar procedimientos de operatoria dental (remoción de caries y colocación de restauraciones como resinas o amalgamas).</p><p><b>Entiendo que los riesgos y posibles complicaciones incluyen, de manera enunciativa más no limitativa:</b></p><ul class="l-list"><li>Sensibilidad dental al frío, calor o a la masticación que puede durar días o semanas después de la colocación de la restauración.</li><li>Riesgos asociados al uso de anestesia local (inflamación, hematoma, parestesia temporal, o alergia).</li><li>En casos de caries muy profundas, la remoción del tejido infectado puede exponer el nervio dental (pulpa), lo que requerirá un tratamiento de conductos (endodoncia) posterior, con un costo independiente.</li><li>Fractura futura de la restauración o del diente remanente si se somete a fuerzas masticatorias excesivas.</li></ul><p>Doy mi libre <b>CONSENTIMIENTO</b> para someter a mi persona (o a mi representado) a los procedimientos de operatoria dental indicados, así como a la administración de los anestésicos y medicamentos necesarios.</p>`; } 
+        else if(tipo === 'cons_cir') { title = 'Consentimiento Informado para Cirugía / Exodoncia'; bodyHtml = `<p>${declareStr}, autorizo al <b>${activeD.name}</b> para que me realice los procedimientos quirúrgicos (extracción dental o cirugía) previamente explicados.</p><p><b>Se me ha informado de las posibles complicaciones intraoperatorias y postoperatorias, las cuales incluyen:</b></p><ul class="l-list"><li>Dolor, inflamación (edema) y dificultad para abrir la boca (trismo) durante varios días tras la cirugía.</li><li>Hemorragia prolongada o hematomas en la zona facial o el cuello.</li><li>Infección postoperatoria o "alveolitis seca", que requerirá atención y medicamentos adicionales.</li><li>Daño temporal o permanente a los nervios cercanos (parestesia), lo que puede causar adormecimiento en la lengua, labio, barbilla, dientes o encías.</li><li>Fractura de la raíz dental, porciones de hueso o daño a restauraciones en dientes adyacentes.</li><li>Complicaciones en los senos maxilares (comunicación oroantral) en extracciones de dientes superiores.</li></ul><p>Entiendo la naturaleza irreversible del procedimiento (pérdida de las piezas dentales indicadas). Se me han explicado las indicaciones postoperatorias, las cuales me comprometo a seguir estrictamente.</p>`; }
+        
+        let watermark = cfg.logo ? `<img src="${cfg.logo}" class="bg-watermark">` : '';
+        const html = `<html><head><title>${title}</title><style>@page { size: letter portrait; margin: 10mm; } body { font-family: Arial, sans-serif; margin: 0; padding: 0; color: #1e293b; background: white; -webkit-print-color-adjust: exact; print-color-adjust: exact; height: 100vh; max-height: 259mm; overflow: hidden; display: flex; flex-direction: column; box-sizing: border-box; } .bg-watermark { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); opacity: 0.08; width: 65%; height: auto; z-index: -10; pointer-events: none; } .l-wrapper { padding: 15px 25px; flex-grow: 1; box-sizing: border-box; display: flex; flex-direction: column; overflow: hidden; } .l-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #004a7c; padding-bottom: 8px; margin-bottom: 12px; flex-shrink:0; } .l-logo { max-height: 60px; max-width: 200px; object-fit: contain; } .l-doc-info { text-align: right; } .l-doc-info h2 { margin: 0; color: #004a7c; font-size: 13.5px; text-transform: uppercase; } .l-doc-info p { margin: 2px 0 0 0; font-size: 10px; color: #64748b; } .l-title { text-align: center; font-size: 13.5px; font-weight: bold; margin-bottom: 12px; text-decoration: underline; text-transform: uppercase; color: #0f172a; flex-shrink:0; } .l-body { font-size: 10.5px; line-height: 1.4; text-align: justify; flex-grow: 1; overflow: hidden; } .l-body p { margin-bottom: 8px; } .l-list { padding-left: 20px; margin-bottom: 8px; } .l-list li { margin-bottom: 4px; } .l-signatures { margin-top: 15px; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 15px; flex-shrink:0; } .l-sig-box { width: 40%; text-align: center; font-size: 10.5px; } .l-sig-line { border-top: 1px solid #1e293b; padding-top: 5px; margin-top: 35px; } .l-footer { text-align: center; font-size: 9.5px; color: #64748b; margin-top: 15px; border-top: 1px solid #e2e8f0; padding-top: 10px; letter-spacing:0.5px; flex-shrink:0; }</style></head><body>${watermark}<div class="l-wrapper"><div class="l-header"><div>${cfg.logo ? `<img src="${cfg.logo}" class="l-logo">` : `<h1 style="color:#004a7c; margin:0; font-size:20px;">${cfg.cli}</h1>`}</div><div class="l-doc-info"><h2>${activeD.name}</h2><p>${activeD.spec}</p><p>C.P. ${activeD.ced1 || '______'} ${activeD.ced2 ? '| C.E. ' + activeD.ced2 : ''}</p></div></div><div class="l-title">${title}</div><div class="l-body">${bodyHtml}</div><div class="l-signatures"><div class="l-sig-box"><div class="l-sig-line"><b>FIRMA DEL PACIENTE O TUTOR LEGAL</b><br>${p.guardian ? p.guardian : p.name}</div></div><div class="l-sig-box"><div class="l-sig-line"><b>FIRMA DEL MÉDICO TRATANTE</b><br>${activeD.name}</div></div><div class="l-sig-box"><div class="l-sig-line"><b>TESTIGO 1</b><br>Nombre y Firma</div></div><div class="l-sig-box"><div class="l-sig-line"><b>TESTIGO 2</b><br>Nombre y Firma</div></div></div><div class="l-footer">${cfg.address} | ${dPhone} | ${dEmail}</div></div></body></html>`;
+        const win = window.open('', '_blank'); win.document.write(html); win.document.close(); setTimeout(() => win.print(), 800);
+    }
+
+    // EMISIÓN DE RECETAS
+    function addMedToPrescription() { const sel = $('selMed'); if(!sel.value) return; const txt = $('txtReceta'); txt.value += (txt.value.trim() !== '' ? '\n\n' : '') + '• ' + sel.value; sel.value = ''; }
+    function printReceta() {
+        if(!db.curr) return alert("Debes seleccionar y guardar al paciente primero."); const p = db.pats[db.curr]; const cfg = db.cfg; const activeD = db.docs[db.activeDoc] || { name: '', spec: '', ced1: '', ced2: '', uni1: '', uni2: '', phone: '', email: '' };
+        const dPhone = activeD.phone || cfg.contact; const dEmail = activeD.email || cfg.email;
+        const txt = $('txtReceta').value.replace(/\n/g, '<br>'); const isAntibiotic = $('chkAntibiotico').checked;
+        if(txt.trim() === '') return alert("La receta está vacía. Escribe algo primero.");
+        const d = new Date(); const dateStr = `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth()+1).padStart(2, '0')}/${d.getFullYear()}`;
+        
+        const uni1Html = activeD.uni1 ? `<img src="${activeD.uni1}" class="r-escudo">` : ''; 
+        const uni2Html = activeD.uni2 ? `<img src="${activeD.uni2}" class="r-escudo">` : ''; 
+        const cliLogoHtml = cfg.logo ? `<img src="${cfg.logo}" class="r-logo">` : '';
+        const specHtml = activeD.spec ? `<p class="r-doc-spec">${activeD.spec}</p>` : ''; 
+        const cedulasText = `C.P. ${activeD.ced1 || '______'} ${activeD.ced2 ? '| C.E. ' + activeD.ced2 : ''}`; 
+        const cofeText = cfg.cofepris ? ` | COFEPRIS: ${cfg.cofepris}` : '';
+        
+        const renderHalfPage = (isCopy) => {
+            let stampHtml = ''; let watermarkHtml = '';
+            let localLogoWatermark = cfg.logo ? `<img src="${cfg.logo}" class="half-watermark-logo">` : '';
+            let firmaHtml = `<div class="r-sig-area"><div class="r-sig-line">Firma del Médico Tratante</div></div>`;
+
+            if (isCopy) { 
+                stampHtml = `<div style="text-align:center; color:#dc2626; border: 1px solid #dc2626; background: #fef2f2; font-weight:bold; font-size:10px; padding:3px; margin-bottom:6px; border-radius:4px; text-transform:uppercase;">Copia para el paciente - Solo indicaciones médicas</div>`; 
+                watermarkHtml = `<div class="r-watermark-copy">COPIA</div>` + localLogoWatermark; 
+                firmaHtml = `<div class="r-sig-area"><div style="font-size:10px; color:#94a3b8; font-weight:bold;">ESTA ES UNA COPIA INFORMATIVA. NO VÁLIDA PARA SURTIR EN FARMACIA.</div></div>`; 
+            } 
+            else { 
+                if (isAntibiotic) stampHtml = `<div style="text-align:center; color:#0284c7; font-weight:bold; font-size:10px; padding:3px; margin-bottom:6px; border-bottom: 1px solid #e0f2fe;">ORIGINAL - RETENCIÓN EN FARMACIA</div>`; 
+                watermarkHtml = localLogoWatermark;
+            }
+            return `<div class="half-page">${watermarkHtml}<div class="r-wrapper"><div class="r-topbar"></div><div class="r-content">${stampHtml}<div class="r-header"><div class="r-escudos">${uni1Html}${uni2Html}</div><div class="r-doc-info"><h1 class="r-doc-name">${activeD.name || 'Dr. Nombre'}</h1>${specHtml}<p class="r-doc-ced">${cedulasText}${cofeText}</p></div><div class="r-clinic-logo" style="display:flex;flex-direction:column;align-items:flex-end;">${cliLogoHtml}<span style="font-size:8px;color:#64748b;margin-top:2px;">${cfg.slogan || ''}</span></div></div><div class="r-pat-row"><div class="r-field" style="width: 55%;">Paciente: <span class="r-line" style="text-transform: uppercase;">${p.name}</span></div><div class="r-field" style="width: 15%;">Edad: <span class="r-line">${p.age || ''}</span></div><div class="r-field" style="width: 25%;">Fecha: <span class="r-line">${dateStr}</span></div></div><div class="r-box"><div class="r-rx">Rx</div><div class="r-text">${txt}</div></div>${firmaHtml}</div><div class="r-footer">${cfg.address || 'Dirección Clínica'} | ${dPhone} | ${dEmail}</div></div></div>`;
+        };
+
+        const html = `<html><head><title>Receta - ${p.name}</title><style>@page { size: letter portrait; margin: 10mm; } body { font-family: 'Century Gothic', 'Segoe UI', Arial, sans-serif; margin: 0; padding: 0; color: #334155; -webkit-print-color-adjust: exact; print-color-adjust: exact; background: white; width: 100vw; height: 100vh; max-height:259mm; display: flex; flex-direction: column; overflow: hidden; box-sizing:border-box;} .half-watermark-logo { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); opacity: 0.08; width: 45%; height: auto; z-index: -10; pointer-events: none; } .half-page { height: 50%; max-height: 50%; width: 100%; box-sizing: border-box; padding: 10px 20px; display: flex; flex-direction: column; position: relative; overflow:hidden;} .half-page:first-child:not(:last-child) { border-bottom: 1px dashed #cbd5e1; } .r-wrapper { display: flex; flex-direction: column; flex-grow: 1; box-sizing: border-box; border-left: 10px solid #004a7c; overflow: hidden; position: relative; } .r-topbar { background-color: #63c1c5; height: 6px; width: 100%; flex-shrink:0;} .r-content { padding: 10px 20px; flex-grow: 1; display: flex; flex-direction: column; position: relative; z-index: 1; overflow:hidden;} .r-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; flex-shrink:0;} .r-escudos { width: 25%; display: flex; gap: 6px; align-items: center; justify-content: flex-start; height: 50px;} .r-escudo { max-height: 100%; max-width: 45%; object-fit: contain; } .r-doc-info { width: 50%; text-align: center; } .r-doc-name { font-size: 15px; color: #007698; margin: 0 0 2px 0; font-weight: bold; } .r-doc-spec { font-size: 10px; color: #63c1c5; margin: 0 0 3px 0; } .r-doc-ced { font-size: 8.5px; color: #475569; margin: 0; } .r-clinic-logo { width: 25%; text-align: right; height: 50px;} .r-logo { max-height: 100%; max-width: 100%; object-fit: contain; } .r-pat-row { display: flex; justify-content: space-between; font-size: 10.5px; margin-bottom: 8px; color: #1e293b; flex-shrink:0;} .r-field { display: flex; align-items: flex-end; } .r-line { border-bottom: 1px dashed #94a3b8; flex-grow: 1; margin-left: 5px; font-weight: bold; white-space: nowrap;} .r-box { border: 1px solid #b2e2e5; border-radius: 12px; padding: 12px 15px; flex-grow: 1; position: relative; margin-bottom: 10px; overflow:hidden; } .r-rx { position: absolute; top: 5px; left: 10px; font-size: 45px; color: #e6f4f5; font-family: 'Times New Roman', serif; margin: 0; line-height: 1; z-index: -1; } .r-text { font-size: 11.5px; line-height: 1.4; z-index: 1; position: relative; } .r-sig-area { text-align: center; margin-bottom: 2px; margin-top: auto; flex-shrink:0;} .r-sig-line { border-top: 1px solid #004a7c; width: 180px; margin: 0 auto; padding-top: 3px; font-size: 9px; color: #94a3b8; font-weight: bold; } .r-footer { background-color: #0f172a; color: white; text-align: center; font-size: 8.5px; padding: 5px; width: 100%; box-sizing: border-box; letter-spacing:1px; flex-shrink:0;} .r-watermark-copy { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-45deg); font-size: 120px; color: rgba(220, 38, 38, 0.06); font-family: 'Arial Black', sans-serif; font-weight: 900; margin: 0; line-height: 1; z-index: 0; pointer-events: none; letter-spacing: 12px; }</style></head><body>${renderHalfPage(false)}${isAntibiotic ? renderHalfPage(true) : ''}</body></html>`;
+        const win = window.open('', '_blank'); win.document.write(html); win.document.close(); setTimeout(() => win.print(), 800);
+    }
+
+    // BACKUP & REPORTES
+    function backupDB() { const str = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(db)); const dl = document.createElement('a'); dl.setAttribute("href", str); dl.setAttribute("download", `SmileFlow_Backup.json`); document.body.appendChild(dl); dl.click(); dl.remove(); }
+    function restoreDB() { const file = $('fileRestore').files[0]; if(!file) return alert("Selecciona JSON."); const reader = new FileReader(); reader.onload = function(e) { try { const data = JSON.parse(e.target.result); if(data && data.cfg) { db = data; saveDB(); alert("Restaurado."); location.reload(); } } catch(err) { alert("Archivo inválido."); } }; reader.readAsText(file); }
+    function printShoppingList() { let estCost = 0; let sl = ``; ['Sup','Inf'].forEach(a => MATS.forEach(m => { if(db.cfg.act[m].length>0) db.cfg.act[m].forEach(c => { if(db.inv[a][m][c]<=5) { sl+=`<li style="margin-bottom:5px; padding-bottom:5px; border-bottom:1px solid #ccc;">Arco ${a} - ${m} ${c}" (Stock: <b>${db.inv[a][m][c]}</b>)</li>`; estCost += getArchCost(m); }});})); SHOP.forEach(i => { if(db.shopChk[i]) sl+=`<li style="margin-bottom:5px; padding-bottom:5px; border-bottom:1px solid #ccc;">${i}</li>`; }); let h = `<html><body style="font-family:sans-serif;padding:2rem;"><h2>Lista Compras y Faltantes - ${db.cfg.cli}</h2><ul style="list-style:none; padding:0;">${sl}</ul><h3 style="color:#b91c1c;">Gasto Aprox en Arcos Faltantes: $${estCost.toFixed(2)}</h3></body></html>`; const w = window.open('','_blank'); w.document.write(h); w.document.close(); setTimeout(()=>w.print(), 800); }
+    function generarReporteMes() { 
+        const d = new Date(); const prefix = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`; 
+        let op=0, inv=0, ing=0, pts=new Set(), cGen=0, cOrto=0, ingGen=0, ingOrto=0;
+        
+        db.log.forEach(r => { 
+            if(r.f.startsWith(prefix)) { 
+                pts.add(r.p); 
+                
+                // Soporte para logs antiguos y nuevos
+                let rIng = r.ing !== undefined ? r.ing : (r.cb || 0);
+                let rOp = r.op !== undefined ? r.op : (r.d || 0);
+                let rInv = r.inv !== undefined ? r.inv : (r.a || 0);
+
+                ing += rIng; op += rOp; inv += rInv;
+
+                if(r.t === 'gen') { cGen++; ingGen += rIng; } 
+                else { cOrto++; ingOrto += rIng; }
+            } 
+        }); 
+        
+        let gasTotal = op + inv;
+        let utilidad = ing - gasTotal;
+
+        let h = `<html><head><style>body{font-family:'Segoe UI',sans-serif; padding:2rem; color:#1e293b;} h2{color:#0f172a; border-bottom:2px solid #0284c7; padding-bottom:10px;} .box{background:#f8fafc; padding:1.5rem; border-radius:12px; border:1px solid #cbd5e1; margin-top:20px;} .row{display:flex; justify-content:space-between; margin-bottom:8px; border-bottom:1px dashed #e2e8f0; padding-bottom:4px;} .total-row{display:flex; justify-content:space-between; margin-top:15px; font-size:1.2rem; font-weight:bold;} </style></head><body><h2>Reporte Financiero Mensual (${prefix})<br><span style="font-size:1rem; color:#64748b;">${db.cfg.cli}</span></h2><div class="box"><p style="font-size:1.1rem; text-align:center; background:#e0f2fe; padding:10px; border-radius:8px; font-weight:bold; color:#0369a1;">Pacientes Únicos Atendidos: ${pts.size}</p><h4 style="color:#0284c7; margin-bottom:10px; margin-top:20px; font-size:1.2rem;">🦷 Odontología General</h4><div class="row"><span>Consultas Realizadas:</span><b>${cGen}</b></div><div class="row"><span>Honorarios Generados:</span><b>$${ingGen.toFixed(2)}</b></div><h4 style="color:#059669; margin-bottom:10px; margin-top:20px; font-size:1.2rem;">🪦 Ortodoncia y Especialidades</h4><div class="row"><span>Consultas Realizadas:</span><b>${cOrto}</b></div><div class="row"><span>Honorarios Generados:</span><b>$${ingOrto.toFixed(2)}</b></div></div><div class="box" style="background:#ffffff;"><h3 style="margin-top:0; color:#0f172a;">Resumen de Resultados</h3><div class="row" style="font-size:1.1rem; color:#0369a1;"><span>Ingresos Brutos Totales (Honorarios):</span><b>$${ing.toFixed(2)}</b></div><div class="row" style="color:#64748b;"><span>Gastos Operativos Fijos (Agua, Luz, Renta por cita):</span><b>-$${op.toFixed(2)}</b></div><div class="row" style="color:#b91c1c;"><span>Gastos de Inventario Tangible (Materiales, Arcos):</span><b>-$${inv.toFixed(2)}</b></div><div class="total-row" style="color:${utilidad >= 0 ? '#10b981' : '#dc2626'}; border-top:2px solid ${utilidad >= 0 ? '#a7f3d0' : '#fecaca'}; padding-top:10px; margin-top:15px;"><span>Utilidad Operativa Neta:</span><span>$${utilidad.toFixed(2)}</span></div></div></body></html>`; 
+        const w = window.open('','_blank'); w.document.write(h); w.document.close(); setTimeout(()=>w.print(), 800); 
+    }
+
+    // INIT
+    if($('nDate')) $('nDate').valueAsDate = new Date(); 
+    if($('nDateGen')) $('nDateGen').valueAsDate = new Date();
+    if($('nDateAli')) $('nDateAli').valueAsDate = new Date();
+
+    loadConfigUI(); buildTreats(); buildMatrix(); buildForms(); loadFin(); renderInvShop(); renderPatSelect(); 
+    if(db.curr) loadPatient(); else newPatient();
+</script>
+</body>
+</html>
