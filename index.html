@@ -134,17 +134,18 @@
         .help-box p { color: #475569; margin-bottom: 0.8rem; }
         .doc-btn-group { display: flex; flex-direction: column; gap: 0.8rem; margin-top: 1rem; }
 
-        /* ESTILOS DEL DR MIKE (ASISTENTE FLOTANTE) */
+        /* ESTILOS DEL DR MIKE (ASISTENTE FLOTANTE Y STATUS DOT) */
         #dani-container { position:fixed; bottom:20px; right:20px; z-index:9999; display:flex; flex-direction:column; align-items:flex-end; }
         #dani-bubble { background:white; border:2px solid var(--ai); color:#334155; padding:1rem; border-radius:12px 12px 0 12px; margin-bottom:10px; box-shadow:0 4px 15px rgba(0,0,0,0.15); max-width:280px; font-size:0.9rem; display:none; opacity:0; transition: opacity 0.3s ease-in-out; line-height: 1.4; transform: translateY(10px); cursor: pointer; }
         #dani-bubble.show { display:block; opacity:1; transform: translateY(0); }
+        .dani-btn-wrapper { position: relative; display: flex; justify-content: center; align-items: center; }
         .dani-btn { background:var(--ai); width:75px; height:75px; border-radius:50%; border:2px solid var(--ai); box-shadow:0 4px 15px rgba(139, 92, 246, 0.4); cursor:pointer; display:flex; align-items:center; justify-content:center; transition:transform 0.2s, box-shadow 0.2s; overflow:hidden; padding:0; background-color: #e0f2fe;}
         .dani-btn img { width:100%; height:100%; object-fit:cover; object-position:top; }
         .dani-btn:hover { transform: scale(1.05); box-shadow:0 6px 20px rgba(139, 92, 246, 0.6); }
         .dani-btn:active { transform: scale(0.95); }
+        .dani-dot { position: absolute; top: 0; right: 0; width: 18px; height: 18px; border-radius: 50%; border: 3px solid white; z-index: 10; display: none; transition: background 0.3s; box-shadow: 0 2px 4px rgba(0,0,0,0.2);}
     </style>
 
-    <!-- Librerías de Google Cloud (GAPI y GIS) para Drive Sync -->
     <script async defer src="https://apis.google.com/js/api.js" onload="gapiLoaded()"></script>
     <script async defer src="https://accounts.google.com/gsi/client" onload="gisLoaded()"></script>
 </head>
@@ -224,7 +225,6 @@
                 </div>
             </div>
 
-            <!-- BOTONES DE GUARDADO Y NUBE -->
             <div style="display:flex; gap:0.5rem; margin-top:1.5rem; flex-wrap:wrap;">
                 <button class="btn btn-success" style="flex-grow:1; font-size:1.1rem; padding: 0.8rem; box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.3);" onclick="savePatient()">💾 GUARDAR PERFIL</button>
                 <button class="btn" style="flex-grow:1; background:#2563eb; color:white; font-size:1.1rem; padding: 0.8rem; box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.3);" onclick="forceCloudSync()" title="Asegura el guardado en Google Drive">☁️ FORZAR SUBIDA A NUBE</button>
@@ -615,7 +615,6 @@
 
         <div id="t-cfg" class="tab-content active">
             <div class="grid-2">
-                <!-- SECCION CLÍNICA -->
                 <div class="card">
                     <h3 style="font-size:1.2rem; margin-bottom:1rem; color:#0284c7; border-bottom:2px solid #e0f2fe; padding-bottom:0.5rem;">🏢 Identidad de la Clínica</h3>
                     <div class="input-group"><label>Nombre Comercial</label><input type="text" id="cCli" class="input-field" oninput="applyBranding()"></div>
@@ -628,7 +627,6 @@
                     <div class="input-group"><label>Teléfono o WhatsApp Gral</label><input type="text" id="cContact" class="input-field"></div>
                     <div class="input-group"><label>Correo Electrónico Gral</label><input type="email" id="cEmail" class="input-field"></div>
 
-                    <!-- NUEVA SECCIÓN CONTADOR -->
                     <h4 style="margin-top:1.8rem; font-size:1rem; color:#6d28d9; border-bottom:2px solid #ddd6fe; padding-bottom:0.4rem;">🧾 Datos del Contador (Para Facturación)</h4>
                     <p style="font-size:0.85rem; color:#64748b; margin-bottom:0.8rem;">Llena estos datos para que el sistema envíe las solicitudes de factura automáticamente.</p>
                     <div class="input-group"><label>Nombre del Contador</label><input type="text" id="cContName" class="input-field" placeholder="Ej. C.P. Salvador Aguayo"></div>
@@ -636,7 +634,6 @@
                     <div class="input-group"><label>Correo Electrónico del Contador</label><input type="email" id="cContEmail" class="input-field"></div>
                 </div>
                 
-                <!-- SECCION DOCTORES -->
                 <div class="card" style="border-top-color: #0ea5e9;">
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; border-bottom:2px solid #e0f2fe; padding-bottom:0.5rem;">
                         <h3 style="font-size:1.2rem; margin:0; color:#0ea5e9;">👨‍⚕️ Perfiles de Doctores</h3>
@@ -863,15 +860,20 @@
     </div>
 </div>
 
-<!-- DR MIKE - BOTÓN FLOTANTE E INTERFAZ -->
 <div id="dani-container">
-    <div id="dani-bubble" onclick="this.classList.remove('show'); clearTimeout(daniTimer);" title="Clic para ocultar">
-        <b style="color:var(--ai); display:block; margin-bottom:6px;">✨ Dr. Mike</b>
+    <div id="dani-bubble" onclick="this.classList.remove('show'); clearTimeout(daniTimer);" title="Clic para ocultar o cerrar">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+            <b style="color:var(--ai);">✨ Dr. Mike</b>
+            <span style="font-size:10px; color:#94a3b8; cursor:pointer;" title="Cerrar">✖️</span>
+        </div>
         <span id="dani-msg">¡Hola! Soy tu asistente de inteligencia artificial.</span>
     </div>
-    <button class="dani-btn" onclick="daniRandomTip()" title="Hablar con el Dr. Mike">
-        <img src="avatar_dr_mike.png" alt="Dr. Mike">
-    </button>
+    <div class="dani-btn-wrapper">
+        <div id="dani-dot" class="dani-dot"></div>
+        <button class="dani-btn" onclick="daniRandomTip()" title="Hablar con el Dr. Mike">
+            <img src="avatar_dr_mike.png" alt="Dr. Mike">
+        </button>
+    </div>
 </div>
 
 <script>
@@ -970,16 +972,37 @@
     let hasWarnedUnsaved = false;
     let daniStockWarned = false;
 
-    function daniSpeak(msg, duration = 5000) {
+    function setDaniStatus(status) {
+        const dot = $('dani-dot');
+        dot.style.display = 'block';
+        if(status === 'error') {
+            dot.style.background = '#ef4444';
+            dot.style.borderColor = '#fee2e2';
+        } else if(status === 'warn') {
+            dot.style.background = '#f59e0b';
+            dot.style.borderColor = '#fef3c7';
+        } else if(status === 'info') {
+            dot.style.background = '#3b82f6';
+            dot.style.borderColor = '#dbeafe';
+        } else {
+            dot.style.display = 'none';
+        }
+    }
+
+    function daniSpeak(msg, duration = 5000, type = 'info') {
         if(!db.cfg.daniEn) return; 
         const bubble = $('dani-bubble');
         $('dani-msg').innerText = msg;
         bubble.classList.add('show');
         
+        if (type !== 'none') setDaniStatus(type);
+
         clearTimeout(daniTimer);
         if(duration > 0) {
             daniTimer = setTimeout(() => {
                 bubble.classList.remove('show');
+                // Si había un error o warning de fondo, restaurarlo
+                checkTopAlert(); 
             }, duration);
         }
     }
@@ -993,30 +1016,38 @@
         });
         
         if(names.length > 0) {
-            setTimeout(() => daniSpeak(`📅 ¡Buen día Doc! Hoy tienes ${names.length} cita(s) programada(s) localmente: ${names.join(', ')}.`, 12000), 7000);
+            setTimeout(() => daniSpeak(`📅 ¡Buen día Doc! Hoy tienes ${names.length} cita(s) programada(s) localmente: ${names.join(', ')}.`, 12000, 'info'), 7000);
         } else {
-            setTimeout(() => daniSpeak("👋 ¡Hola! Soy el Dr. Mike. Revisé tu agenda local y no hay citas programadas para hoy.", 6000), 7000);
+            setTimeout(() => daniSpeak("👋 ¡Hola! Soy el Dr. Mike. Revisé tu agenda local y no hay citas programadas para hoy.", 6000, 'info'), 7000);
         }
     }
 
     const daniTips = [
         "💡 Tip: Puedes imprimir la receta y el sistema dividirá automáticamente la copia con marca de agua para la farmacia.",
         "💡 Tip: Si no usas un calibre de arco específico, ocúltalo desde la pestaña de 'Inventario Arcos'.",
-        "💡 Tip: Usa el botón azul 'Forzar Subida' antes de cerrar para estar 100% seguro de que todo está en la nube.",
-        "📋 Recordatorio: Actualiza tu stock de inventario cuando uses resinas o brackets extra para que tus finanzas sean exactas.",
-        "🤖 Recuerda: Escribe unas palabras en el resumen y presiona mi botón morado, redactaré una nota perfecta por ti.",
-        "☁️ Si ves la nube verde arriba, significa que estamos sincronizados y todo está a salvo."
+        "💡 Tip: Usa el botón azul 'Forzar Subida' antes de cerrar para estar seguro de que todo está en la nube.",
+        "📋 Recordatorio: Actualiza tu stock de inventario cuando uses resinas o brackets extra.",
+        "🤖 Recuerda: Escribe unas palabras clave y presiona mi botón morado, redactaré una nota perfecta por ti.",
+        "☁️ Si ves la nube verde arriba, significa que estamos sincronizados a salvo."
     ];
 
     function daniRandomTip() {
+        const bubble = $('dani-bubble');
+        if (bubble.classList.contains('show')) {
+            bubble.classList.remove('show'); // Toggle if already open
+            clearTimeout(daniTimer);
+            checkTopAlert(); // Restaurar punto si es necesario
+            return;
+        }
+
         if(!db.cfg.daniEn) return alert("El Dr. Mike está desactivado. Ve a Admin > Identidad para encenderlo.");
         const tip = daniTips[Math.floor(Math.random() * daniTips.length)];
-        daniSpeak(tip, 6000);
+        daniSpeak(tip, 6000, 'info');
     }
 
     function triggerUnsavedWarning() {
         if(!hasWarnedUnsaved) {
-            daniSpeak("⚠️ ¡Ojo, doc! Veo que estás modificando el perfil. No olvides presionar el botón verde de 'GUARDAR PERFIL' cuando termines.", 6000);
+            daniSpeak("⚠️ ¡Ojo, doc! Veo que estás modificando el perfil. No olvides presionar el botón verde de 'GUARDAR PERFIL' cuando termines.", 6000, 'warn');
             hasWarnedUnsaved = true;
             setTimeout(() => hasWarnedUnsaved = false, 45000); 
         }
@@ -1106,6 +1137,7 @@
             if($('btnAuthHeader')) $('btnAuthHeader').style.display = 'flex';
             if($('btnSyncNow')) $('btnSyncNow').style.display = 'none';
             if($('btnSignout')) $('btnSignout').style.display = 'none';
+            setDaniStatus('none');
             alert("Desconectado de Google Drive. Los cambios ahora solo se guardarán en este dispositivo de forma local.");
         }
     }
@@ -1127,11 +1159,11 @@
                 await uploadToDrive(true);
             }
             $('syncStatus').innerText = "☁️ Conectado y Sincronizado";
-            daniSpeak("✅ ¡Conexión exitosa! Toda tu información ha sido descargada y sincronizada desde Google Drive.", 5000);
+            daniSpeak("✅ ¡Conexión exitosa! Toda tu información ha sido descargada y sincronizada desde Google Drive.", 5000, 'info');
         } catch (err) {
             console.error(err);
             $('syncStatus').innerText = "❌ Error en Nube";
-            daniSpeak("❌ Tuvimos un problema conectando con la nube. Revisa tu internet.", 5000);
+            daniSpeak("❌ Tuvimos un problema conectando con la nube. Revisa tu internet.", 8000, 'error');
         }
     }
 
@@ -1152,50 +1184,72 @@
         $('syncStatus').innerText = "☁️ Subiendo...";
         
         const fileContent = JSON.stringify(db);
-        const file = new Blob([fileContent], {type: 'application/json'});
         const metadata = { name: 'SmileFlow_Database.json', mimeType: 'application/json' };
 
-        let accessToken = gapi.client.getToken().access_token;
-        let form = new FormData();
-        form.append('metadata', new Blob([JSON.stringify(metadata)], {type: 'application/json'}));
-        form.append('file', file);
+        // METODO FORZADO DE MULTIPART EXACTO (Evita el bug crudo de FormData en Google API)
+        const boundary = '314159265358979323846';
+        const delimiter = "\r\n--" + boundary + "\r\n";
+        const close_delim = "\r\n--" + boundary + "--";
 
+        const multipartRequestBody =
+            delimiter +
+            'Content-Type: application/json; charset=UTF-8\r\n\r\n' +
+            JSON.stringify(metadata) +
+            delimiter +
+            'Content-Type: application/json; charset=UTF-8\r\n\r\n' +
+            fileContent +
+            close_delim;
+
+        let accessToken = gapi.client.getToken().access_token;
+        
         let url = isNew ? 'https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart' 
                         : `https://www.googleapis.com/upload/drive/v3/files/${driveFileId}?uploadType=multipart`;
-        let method = isNew ? 'POST' : 'PATCH';
 
         try {
             let res = await fetch(url, {
-                method: method,
-                headers: new Headers({ 'Authorization': 'Bearer ' + accessToken }),
-                body: form
+                method: isNew ? 'POST' : 'PATCH',
+                headers: new Headers({ 
+                    'Authorization': 'Bearer ' + accessToken,
+                    'Content-Type': 'multipart/related; boundary=' + boundary
+                }),
+                body: multipartRequestBody
             });
+            
             let val = await res.json();
-            if(isNew) {
-                driveFileId = val.id;
-                localStorage.setItem('sf_drive_file_id', driveFileId);
+            
+            if(res.ok) {
+                if(isNew) {
+                    driveFileId = val.id;
+                    localStorage.setItem('sf_drive_file_id', driveFileId);
+                }
+                setTimeout(() => { 
+                    $('syncStatus').innerText = "☁️ Sincronizado"; 
+                    checkTopAlert(); // Refrescar alertas y quitar punto rojo
+                }, 1000);
+            } else {
+                throw new Error(val.error ? val.error.message : "Fallo desconocido en Drive");
             }
-            setTimeout(() => { $('syncStatus').innerText = "☁️ Sincronizado"; }, 1000);
         } catch(e) { 
             console.error(e); 
             $('syncStatus').innerText = "❌ Error al subir";
+            setDaniStatus('error');
             throw e;
         }
     }
 
     async function forceCloudSync() {
         if (typeof gapiInited === 'undefined' || !gapiInited || gapi.client.getToken() === null) {
-            daniSpeak("⚠️ La nube no está conectada. Por favor, haz clic en '☁️ Conectar Nube de Drive' arriba primero.", 6000);
+            daniSpeak("⚠️ La nube no está conectada. Por favor, haz clic en '☁️ Conectar Nube de Drive' arriba primero.", 6000, 'warn');
             return;
         }
         
         $('syncStatus').innerText = "☁️ Subiendo datos manualmente...";
-        daniSpeak("☁️ Empujando toda tu base de datos hacia Google Drive...", 3000);
+        daniSpeak("☁️ Empujando toda tu base de datos hacia Google Drive...", 3000, 'info');
         try {
             await uploadToDrive(driveFileId === null);
-            daniSpeak("✅ ¡Base de datos asegurada en la nube! Puedes cerrar el sistema con tranquilidad.", 6000);
+            daniSpeak("✅ ¡Base de datos asegurada en la nube! Puedes cerrar el sistema con tranquilidad.", 6000, 'info');
         } catch (e) {
-            daniSpeak("❌ Ups, hubo un error al subir. Revisa tu conexión de internet e intenta de nuevo.", 5000);
+            daniSpeak("❌ Ups, hubo un error al subir. Revisa tu conexión de internet e intenta de nuevo.", 8000, 'error');
         }
     }
     // -----------------------------------------------------
@@ -1204,21 +1258,21 @@
     async function callDentIA(targetId) {
         const key = db.cfg.geminiKey;
         if(!key) {
-            daniSpeak("⚠️ ¡Aún no me has dado cerebro! Ve a Admin > Identidad (hasta abajo) y pega tu API Key de Gemini.", 7000);
+            daniSpeak("⚠️ ¡Aún no me has dado cerebro! Ve a Admin > Identidad (hasta abajo) y pega tu API Key de Gemini.", 7000, 'warn');
             return;
         }
         
         const inputEl = $(targetId);
         const rawText = inputEl.value.trim();
         if(!rawText) {
-            daniSpeak("🤔 Escribe al menos un par de palabras clave clínicas en la caja antes de llamarme.", 5000);
+            daniSpeak("🤔 Escribe al menos un par de palabras clave clínicas en la caja antes de llamarme.", 5000, 'info');
             return;
         }
         
         const originalBg = inputEl.style.background;
         inputEl.style.background = "#ede9fe";
         inputEl.value = "✨ Dr. Mike está analizando y redactando tu nota clínica...";
-        daniSpeak("✍️ ¡Entendido! Redactando nota con terminología médica...", 3000);
+        daniSpeak("✍️ ¡Entendido! Redactando nota con terminología médica...", 3000, 'info');
         
         const prompt = `Actúa como un médico estomatólogo y ortodoncista experto. Convierte las siguientes notas breves o palabras clave en un texto clínico profesional, fluido, técnico y conciso, listo para pegarse directamente en el expediente médico legal del paciente. No uses saludos, ni negritas, ni asteriscos, ni introducciones; dame única y exclusivamente el párrafo final redactado.\n\nPalabras clave proporcionadas por el doctor: ${rawText}`;
         
@@ -1236,10 +1290,10 @@
             
             const aiText = data.candidates[0].content.parts[0].text.trim();
             inputEl.value = aiText;
-            daniSpeak("✨ ¡Listo! Revisa la nota, modifícala si es necesario, y no olvides guardarla.", 5000);
+            daniSpeak("✨ ¡Listo! Revisa la nota, modifícala si es necesario, y no olvides guardarla.", 5000, 'info');
         } catch(e) {
             console.error(e);
-            daniSpeak("❌ Uy, tuve un problema al contactar el servidor de inteligencia artificial. Intenta de nuevo.", 6000);
+            daniSpeak("❌ Uy, tuve un problema al contactar el servidor de inteligencia artificial. Intenta de nuevo.", 6000, 'error');
             inputEl.value = rawText;
         } finally {
             inputEl.style.background = originalBg;
@@ -1372,7 +1426,7 @@
         let phone = p.phone.replace(/\D/g,'');
         if(phone.length === 10) phone = '52' + phone; 
         
-        daniSpeak("✅ ¡Recordatorio enviado! He guardado la fecha para poder leer tu agenda la próxima vez.", 5000);
+        daniSpeak("✅ ¡Recordatorio enviado! He guardado la fecha para poder leer tu agenda la próxima vez.", 5000, 'info');
         window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`, '_blank');
     }
 
@@ -1493,7 +1547,7 @@
     }
     function loadTreats(p) { Object.keys(TR_CATS).forEach(cat => { TR_CATS[cat].forEach((tr, i) => { const code = `${cat.substring(0,3)}_${i}`; $(`tr_${code}`).checked = p.treats && p.treats[code] ? p.treats[code].chk : false; $(`od_${code}`).value = p.treats && p.treats[code] ? p.treats[code].od : ''; });}); renderPendingTreatsMain(p); }
     function saveTreats(p) { if(!p.treats) p.treats = {}; Object.keys(TR_CATS).forEach(cat => { TR_CATS[cat].forEach((tr, i) => { const code = `${cat.substring(0,3)}_${i}`; p.treats[code] = { chk: $(`tr_${code}`).checked, od: $(`od_${code}`).value }; });}); }
-    function saveTreatsOnly() { if(!db.curr) return alert("Selecciona un paciente."); saveTreats(db.pats[db.curr]); saveDB(); renderPendingTreatsMain(db.pats[db.curr]); daniSpeak("💾 Plan de tratamientos guardado con éxito.", 4000); }
+    function saveTreatsOnly() { if(!db.curr) return alert("Selecciona un paciente."); saveTreats(db.pats[db.curr]); saveDB(); renderPendingTreatsMain(db.pats[db.curr]); daniSpeak("💾 Plan de tratamientos guardado con éxito.", 4000, 'info'); }
     function renderPendingTreatsMain(p) {
         let html = '';
         if(p && p.treats) { Object.keys(TR_CATS).forEach(cat => { TR_CATS[cat].forEach((tr, i) => { const code = `${cat.substring(0,3)}_${i}`; if(p.treats[code] && p.treats[code].chk) { const od = p.treats[code].od ? ` (${p.treats[code].od})` : ''; html += `<span style="display:inline-block; background:white; padding:0.4rem 0.8rem; border-radius:6px; margin:0.3rem; font-size:0.85rem; border:1px solid #bfdbfe; color:#1e40af; font-weight:bold; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">${tr}${od}</span>`; } });}); }
@@ -1525,7 +1579,7 @@
             email: $('facEmail').value
         };
         saveDB();
-        daniSpeak("💾 ¡Datos fiscales actualizados y guardados en el perfil del paciente!", 4000);
+        daniSpeak("💾 ¡Datos fiscales actualizados y guardados en el perfil del paciente!", 4000, 'info');
     }
 
     function sendFactContador(metodo) {
@@ -1549,12 +1603,12 @@
             let phone = cfg.contPhone.replace(/\D/g,'');
             if(phone.length === 10) phone = '52' + phone; 
             window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`, '_blank');
-            daniSpeak("📱 Abriendo WhatsApp con los datos listos para enviar al contador...", 4000);
+            daniSpeak("📱 Abriendo WhatsApp con los datos listos para enviar al contador...", 4000, 'info');
         } else {
             if(!cfg.contEmail) return alert("No registraste el correo del contador en la configuración Admin.");
             let subject = encodeURIComponent(`Solicitud de Factura - Paciente: ${p.name}`);
             window.open(`mailto:${cfg.contEmail}?subject=${subject}&body=${encodeURIComponent(msg)}`, '_blank');
-            daniSpeak("✉️ Abriendo tu correo para mandar los datos de facturación...", 4000);
+            daniSpeak("✉️ Abriendo tu correo para mandar los datos de facturación...", 4000, 'info');
         }
     }
     // ------------------------------------
@@ -1572,7 +1626,7 @@
         if(!db.curr) { db.curr = 'p_'+Date.now(); db.pats[db.curr] = { id: db.curr, displayId: dId, notas: [], treats: {}, alertDate: new Date().toISOString().split('T')[0], factReq: false, factData: {} }; } else { db.pats[db.curr].displayId = dId; }
         let p = db.pats[db.curr]; p.name=name; p.age=$('pAge').value; p.guardian=$('pGuardian').value; p.phone=$('pPhone').value; p.sum=$('pSum').value; p.drive=$('pDrive').value; p.brackets=$('pBrackets').value; p.retra=$('pRetra').checked; p.factReq=$('pFactReq').checked;
         saveTreats(p); saveDB(); renderPatSelect(); $('lblId').innerText=dId; 
-        daniSpeak("💾 ¡Perfil guardado impecablemente!", 4000); 
+        daniSpeak("💾 ¡Perfil guardado impecablemente!", 4000, 'info'); 
         renderPendingTreatsMain(p); showWorkingPath();
     }
     function loadPatient() {
@@ -1686,9 +1740,21 @@
         })); 
         $('topStockAlert').style.display = alertCount > 0 ? 'block' : 'none'; 
         
-        if(alertCount > 0 && !daniStockWarned) {
-            daniSpeak("⚠️ ¡Ojo Doc! Tienes " + alertCount + " arcos con stock crítico. Pasa a Inventario para revisar cuáles faltan.", 8000);
-            daniStockWarned = true; 
+        if(alertCount > 0) {
+            if(!daniStockWarned) {
+                daniSpeak("⚠️ ¡Ojo Doc! Tienes " + alertCount + " arcos con stock crítico. Pasa a Inventario para revisar cuáles faltan.", 8000, 'warn');
+                daniStockWarned = true; 
+            }
+            // Si no hay un punto rojo actualmente, mostrar el amarillo
+            if ($('dani-dot').style.background !== 'rgb(239, 68, 68)' && $('dani-dot').style.background !== '#ef4444') {
+                setDaniStatus('warn');
+            }
+        } else {
+            daniStockWarned = false;
+            // Si el punto actual era amarillo, quitarlo
+            if ($('dani-dot').style.background === 'rgb(245, 158, 11)' || $('dani-dot').style.background === '#f59e0b') {
+                setDaniStatus('none');
+            }
         }
     }
     
@@ -1788,7 +1854,7 @@
         db.pats[db.curr].notas.unshift(n); triggerAlertUpdate(fut); saveDB(); renderTimeline(); actualizarContadorMes();
         $('nObsGen').value=''; $('nFutGen').value=''; $('gTA').value=''; $('gFC').value=''; $('gTemp').value=''; $('gAnesChk').checked=false; $('gAnesBox').classList.add('hidden'); $('gAnesCart').value='';
         db.cfg.materials.forEach((m,i) => { if($(`cMat_${i}`)) $(`cMat_${i}`).checked = false; });
-        daniSpeak("🩺 ¡Evolución general guardada y anexada al historial!", 4000);
+        daniSpeak("🩺 ¡Evolución general guardada y anexada al historial!", 4000, 'info');
     }
 
     function saveEvolucion() {
@@ -1847,7 +1913,7 @@
         $('chkTube1M').checked=false; $('qtyTube1M').value='1';
         $('chkTube2M').checked=false; $('qtyTube2M').value='1';
         
-        daniSpeak("🦷 ¡Nota de ortodoncia guardada! He descontado los arcos, brackets y tubos del inventario.", 6000);
+        daniSpeak("🦷 ¡Nota de ortodoncia guardada! He descontado los arcos, brackets y tubos del inventario.", 6000, 'info');
     }
 
     function saveEvolucionAli() {
@@ -1857,7 +1923,7 @@
         if($('nCobroAli').checked) { db.log.push({ f:f, p:db.pats[db.curr].name, t:'ali', ing:db.fin.conOrto, op:db.fin.desOrto, inv:0 }); }
         db.pats[db.curr].notas.unshift(n); triggerAlertUpdate(fut); saveDB(); renderTimeline(); actualizarContadorMes();
         $('aEtapa').value=''; $('aNum').value=''; $('aObs').value=''; $('aFut').value=''; 
-        daniSpeak("🪥 ¡Nota de alineadores registrada con éxito!", 4000);
+        daniSpeak("🪥 ¡Nota de alineadores registrada con éxito!", 4000, 'info');
     }
 
     function printHistory() {
