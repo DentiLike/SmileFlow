@@ -1169,7 +1169,7 @@
         alert("Desconectado de Google Drive. Los cambios ahora solo se guardarán en este dispositivo.");
     }
 
-    async function checkDriveFile() {
+   async function checkDriveFile() {
         $('syncStatus').innerText = "🔄 Sincronizando...";
         try {
             if (typeof gapi !== 'undefined' && gapi.client && !gapi.client.drive) {
@@ -1178,19 +1178,30 @@
             
             let response = await gapi.client.drive.files.list({
                 q: "name='SmileFlow_Database.json' and trashed=false",
-                fields: 'files(id, modifiedTime)',
+                fields: 'files(id, modifiedTime, size)',
                 spaces: 'drive'
             });
             let files = response.result.files;
+            
             if (files && files.length > 0) {
+                // El archivo existe en la nube.
                 driveFileId = files[0].id;
                 localStorage.setItem('sf_drive_file_id', driveFileId);
+                
+                // DESCARGA OBLIGATORIA: Nunca sube datos si el archivo ya existe, siempre prioriza bajar.
                 await downloadFromDrive(driveFileId);
+                $('syncStatus').innerText = "☁️ Conectado y Sincronizado";
+                if(typeof daniSpeak === 'function') daniSpeak("✅ ¡Base de datos descargada con éxito!", 5000, 'info');
+                
             } else {
-                await uploadToDrive(true);
+                // Solo sube si de verdad NO hay ningún archivo en la nube (primera vez absoluto).
+                if(Object.keys(db.pats).length > 0) {
+                     await uploadToDrive(true);
+                     $('syncStatus').innerText = "☁️ Conectado y Sincronizado";
+                } else {
+                     $('syncStatus').innerText = "☁️ Nube en blanco lista";
+                }
             }
-            $('syncStatus').innerText = "☁️ Conectado y Sincronizado";
-            if(typeof daniSpeak === 'function') daniSpeak("✅ ¡Conexión exitosa! Toda tu información ha sido descargada y sincronizada.", 5000, 'info');
         } catch (err) {
             console.error(err);
             $('syncStatus').innerText = "❌ Error en Nube";
