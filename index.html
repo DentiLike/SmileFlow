@@ -1069,12 +1069,13 @@
     function gapiLoaded() { 
         gapi.load('client', async () => {
             try {
+                // 🛑 CORRECCIÓN: Ya no usamos la llave de Gemini aquí. 
+                // Drive usa el token de tu inicio de sesión, no la llave de IA.
                 await gapi.client.init({
-                    apiKey: db.cfg.geminiKey || '',
                     discoveryDocs: ['https://www.googleapis.com/discovery/v1/apis/drive/v3/rest']
                 });
             } catch(e) {
-                console.warn("Fallo init GAPI (A veces pasa en GitHub Pages). Continuamos.", e);
+                console.warn("Fallo init GAPI. Continuamos.", e);
             } finally {
                 checkReady();
             }
