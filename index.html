@@ -1073,14 +1073,14 @@
     async function initializeGapiClient() {
         try {
             let keyToUse = db.cfg.geminiKey || '';
-            if(keyToUse) {
-                await gapi.client.init({ apiKey: keyToUse, discoveryDocs: [DISCOVERY_DOC] });
-            }
-            gapiInited = true;
-            checkReady();
+            let initConfig = { discoveryDocs: [DISCOVERY_DOC] };
+            if (keyToUse) initConfig.apiKey = keyToUse;
+            
+            await gapi.client.init(initConfig);
         } catch (e) {
-            console.error("Error GAPI:", e);
-            gapiInited = false;
+            console.warn("Aviso: Bloqueo de API Key (Normal en Github Pages). Forzando continuación...", e);
+        } finally {
+            gapiInited = true; // LA CLAVE: Forzamos a true para que no oculte los botones
             checkReady();
         }
     }
@@ -1096,8 +1096,8 @@
     }
 
     function checkReady() { 
-        if(gapiInited && gisInited) { 
-            if(gapi.client.getToken() === null) {
+        if(gisInited) { 
+            if(typeof gapi === 'undefined' || !gapi.client || gapi.client.getToken() === null) {
                 if($('btnAuthAdmin')) $('btnAuthAdmin').style.display = 'block'; 
                 if($('btnAuthHeader')) $('btnAuthHeader').style.display = 'flex';
             } else {
@@ -1110,17 +1110,21 @@
         if($('btnAuthAdmin')) $('btnAuthAdmin').style.display = 'none';
         if($('btnAuthHeader')) $('btnAuthHeader').style.display = 'none';
         if($('btnSyncNow')) $('btnSyncNow').style.display = 'block';
-        if($('btnSignout')) $('btnSignout').style.display = 'block';
+        if($('btnSignout')) $('btnSignout').style.display = 'inline-block';
         $('syncStatus').innerText = "☁️ Sincronizado";
     }
 
     function handleAuthClick() {
+        if(!tokenClient) {
+            daniSpeak("⚠️ Los servicios de Google aún están cargando. Espera 2 segundos.", 4000, 'warn');
+            return;
+        }
         tokenClient.callback = async (resp) => {
             if (resp.error !== undefined) { throw resp; }
             showConnectedUI();
             await checkDriveFile();
         };
-        if (gapi.client.getToken() === null) {
+        if (typeof gapi === 'undefined' || !gapi.client || gapi.client.getToken() === null) {
             tokenClient.requestAccessToken({prompt: 'consent'});
         } else {
             tokenClient.requestAccessToken({prompt: ''});
@@ -1180,13 +1184,12 @@
     }
 
     async function uploadToDrive(isNew = false) {
-        if(typeof gapiInited === 'undefined' || !gapiInited || gapi.client.getToken() === null) return; 
+        if(typeof gapiInited === 'undefined' || !gapiInited || !gapi.client || gapi.client.getToken() === null) return; 
         $('syncStatus').innerText = "☁️ Subiendo...";
         
         const fileContent = JSON.stringify(db);
         const metadata = { name: 'SmileFlow_Database.json', mimeType: 'application/json' };
 
-        // METODO FORZADO DE MULTIPART EXACTO (Evita el bug crudo de FormData en Google API)
         const boundary = '314159265358979323846';
         const delimiter = "\r\n--" + boundary + "\r\n";
         const close_delim = "\r\n--" + boundary + "--";
@@ -1224,7 +1227,7 @@
                 }
                 setTimeout(() => { 
                     $('syncStatus').innerText = "☁️ Sincronizado"; 
-                    checkTopAlert(); // Refrescar alertas y quitar punto rojo
+                    checkTopAlert(); 
                 }, 1000);
             } else {
                 throw new Error(val.error ? val.error.message : "Fallo desconocido en Drive");
@@ -1238,8 +1241,15 @@
     }
 
     async function forceCloudSync() {
-        if (typeof gapiInited === 'undefined' || !gapiInited || gapi.client.getToken() === null) {
-            daniSpeak("⚠️ La nube no está conectada. Por favor, haz clic en '☁️ Conectar Nube de Drive' arriba primero.", 6000, 'warn');
+        if (typeof gisInited === 'undefined' || !gisInited) {
+            daniSpeak("⚠️ Los servicios de Google están cargando...", 4000, 'warn');
+            return;
+        }
+        
+        // AUTO-CONEXIÓN INMEDIATA SI FALLA EL BOTÓN
+        if (typeof gapi === 'undefined' || !gapi.client || gapi.client.getToken() === null) {
+            daniSpeak("☁️ Abriendo ventana de conexión de Google Drive...", 4000, 'info');
+            handleAuthClick();
             return;
         }
         
