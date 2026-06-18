@@ -168,6 +168,7 @@
     <div class="header-actions">
         <button class="btn btn-toggle-view" id="btnToggleView" onclick="toggleViewMode()" title="Cambiar resolución visual">🖥️ Forzar Vista PC</button>
         <button id="btnAuthHeader" class="btn" style="background:#0284c7; border:2px solid #bae6fd; color:white; display:none; grid-column: 1 / -1;" onclick="handleAuthClick()">☁️ Conectar Nube de Drive</button>
+        <button id="btnHeaderSync" class="btn" style="background:#2563eb; border:2px solid #93c5fd; color:white; display:none; grid-column: 1 / -1;" onclick="forceCloudSync()" title="Asegura el guardado en Google Drive">☁️ Forzar Subida a Nube</button>
         
         <select id="dSelect" class="input-select" onchange="changeActiveDoc()" style="background:#e0f2fe; color:#0369a1; font-weight:bold; border:2px solid #38bdf8; grid-column: 1 / -1; box-shadow: 0 2px 4px rgba(0,0,0,0.1);"></select>
         
@@ -1112,12 +1113,14 @@
         }
     }
 
-    function showConnectedUI() {
+   function showConnectedUI() {
         if($('btnAuthAdmin')) $('btnAuthAdmin').style.display = 'none';
         if($('btnAuthHeader')) $('btnAuthHeader').style.display = 'none';
+        if($('btnHeaderSync')) $('btnHeaderSync').style.display = 'flex'; // Muestra Forzar Subida
         if($('btnSyncNow')) $('btnSyncNow').style.display = 'block';
         if($('btnSignout')) $('btnSignout').style.display = 'inline-block';
         $('syncStatus').innerText = "☁️ Sincronizado";
+    }
     }
 
     function handleAuthClick() {
@@ -1148,7 +1151,7 @@
         }
     }
 
-    function handleSignoutClick() {
+   function handleSignoutClick() {
         try {
             if (typeof gapi !== 'undefined' && gapi.client && typeof gapi.client.getToken === 'function') {
                 const token = gapi.client.getToken();
@@ -1162,13 +1165,14 @@
         $('syncStatus').innerText = "📍 Modo Offline (Solo este dispositivo)";
         if($('btnAuthAdmin')) $('btnAuthAdmin').style.display = 'block';
         if($('btnAuthHeader')) $('btnAuthHeader').style.display = 'flex';
+        if($('btnHeaderSync')) $('btnHeaderSync').style.display = 'none'; // Oculta Forzar Subida
         if($('btnSyncNow')) $('btnSyncNow').style.display = 'none';
         if($('btnSignout')) $('btnSignout').style.display = 'none';
         
         if(typeof setDaniStatus === 'function') setDaniStatus('none');
         alert("Desconectado de Google Drive. Los cambios ahora solo se guardarán en este dispositivo.");
     }
-
+    
    async function checkDriveFile() {
         $('syncStatus').innerText = "🔄 Sincronizando...";
         try {
