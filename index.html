@@ -23,6 +23,7 @@
         .h-sub { font-size: 0.85rem; font-weight: 500; opacity: 0.95; width: 100%; margin-top: 0.4rem;}
         
         .header-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem; width: 100%; align-items: center; }
+        
         .px-wrapper { grid-column: 1 / -1; display:flex; align-items:center; gap:0.5rem; background: rgba(0,0,0,0.15); padding: 0.4rem 0.6rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); }
         
         @media(min-width: 768px) { 
@@ -31,7 +32,8 @@
             .h-sub { width: auto; margin-top: 0; border-left: 1px solid rgba(255,255,255,0.3); padding-left: 0.8rem; margin-left: 0.6rem;}
             .header-actions { display: flex; width: auto; align-items: center; gap: 0.8rem; }
             .px-wrapper { width: auto; background: transparent; padding: 0; border: none; }
-            #pSelect { width: 220px; } #dSelect { width: 180px; }
+            #pSelect { width: 220px; }
+            #dSelect { width: 180px; }
         }
 
         /* TOUCH TARGETS & BOTONES ANIMADOS */
@@ -39,6 +41,7 @@
         .btn { padding: 0.5rem 0.8rem; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; transition: all 0.2s ease; text-align: center; display: flex; align-items: center; justify-content: center; gap: 0.4rem;}
         .btn:hover { filter: brightness(1.1); transform: translateY(-1px); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
         .btn:active { transform: translateY(1px); box-shadow: none; }
+        
         .btn-success { background: var(--success); color: white; } 
         .btn-primary { background: var(--primary); color: white; width: 100%; margin-top: 0.5rem;}
         .btn-admin { background: #334155; color: white; } 
@@ -48,12 +51,12 @@
         .btn-toggle-view { background: #6366f1; color: white; border-radius: 20px; grid-column: 1 / -1; font-size: 0.85rem; box-shadow: inset 0 -2px 0 rgba(0,0,0,0.2);}
         @media(min-width: 768px) { .btn-toggle-view { grid-column: auto; width: auto;} }
         
-        .input-select { padding: 0.4rem; border-radius: 6px; border: 1px solid var(--border); outline: none; flex-grow: 1; background: white; -webkit-appearance: none; appearance: none; transition: border 0.2s; cursor: pointer; }
+        .input-select { padding: 0.4rem; border-radius: 6px; border: 1px solid var(--border); outline: none; flex-grow: 1; background: white; transition: border 0.2s; cursor: pointer; }
         .input-select:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(2,132,199,0.15); }
+        
         .container { max-width: 1200px; margin: 1.2rem auto; padding: 0 0.8rem; overflow-x: hidden; }
         .view { display: none; animation: fadeIn 0.3s ease; } .view.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
 
         /* CARDS MEJORADAS */
         .card { background: var(--card); padding: 1.2rem; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -1px rgba(0,0,0,0.03); margin-bottom: 1.2rem; border: none; border-top: 4px solid #cbd5e1; transition: transform 0.2s; }
@@ -876,507 +879,26 @@
         </button>
     </div>
 </div>
-    <script>
-    // PROTECCIÓN BÁSICA
-    document.addEventListener('contextmenu', event => event.preventDefault());
-    document.addEventListener('keydown', function(e) {
-        if(e.keyCode == 123) { e.preventDefault(); return false; } 
-        if(e.ctrlKey && e.shiftKey && e.keyCode == 73) { e.preventDefault(); return false; } 
-        if(e.ctrlKey && e.keyCode == 85) { e.preventDefault(); return false; } 
-    });
-
-    const $ = id => document.getElementById(id);
-    let isDesktopMode = false;
-    
-    function toggleViewMode() {
-        isDesktopMode = !isDesktopMode;
-        if(isDesktopMode) {
-            document.body.style.width = '1200px'; document.body.style.margin = '0 auto';
-            $('meta-viewport').setAttribute('content', 'width=1200'); $('btnToggleView').innerText = '📱 Volver a Móvil';
-        } else {
-            document.body.style.width = '100%'; document.body.style.margin = '0';
-            $('meta-viewport').setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no');
-            $('btnToggleView').innerText = '🖥️ Forzar Vista PC';
-        }
-    }
-
-    const MATS = ['Memalloy', 'Biomemalloy', 'NiTi', 'SS', 'TMA', 'Multi'];
-    const C_RND = ['.012', '.014', '.016', '.018']; const C_REC = ['16x22', '17x25', '19x25', '21x25']; const CALS = [...C_RND, ...C_REC];
-    const SHOP = ['Campos', 'Guantes', 'Alginato', 'Resinas', 'Grabador', 'Módulos', 'Acetatos'];
-    
-    const TR_CATS = { 
-        'Odontología General': ['Profilaxis Simple', 'Obturación / Resina', 'Extracción Simple', 'Blanqueamiento Dental'], 
-        'Maxilofacial': ['Exodoncia Especial', 'Canino Retenido', 'Patología'], 
-        'Periodoncia': ['Gingivectomía', 'Profilaxis Profunda'], 
-        'Endodoncia': ['Tratamiento Conductos', 'Retratamiento'], 
-        'Prótesis e Implantes': ['Rehabilitación', 'Implante'], 
-        'Ortoimplantes': ['Colocación Ortoimplante'] 
-    };
-
-    // BASE DE DATOS LOCAL
-    let db = JSON.parse(localStorage.getItem('sf_db_v10')) || {
-        pats: {}, curr: null, inv: {Sup:{},Inf:{}}, log: [], shopChk: {},
-        cfg: { cli: 'SmilePlan by DentiLike', slogan: 'Cambiando sonrisas, transformando vidas', cofepris: '', logo: '', drive: '', agenda: '', address: 'Himno Nacional 1902-C', contact: 'www.dentilike.com.mx', email: '', geminiKey: '', contName: 'C.P. Salvador Aguayo', contPhone: '', contEmail: '', daniEn: true, act: {}, brackets: [], materials: [], customMeds: [] },
-        fin: { conGen: 500, desGen: 100, conOrto: 600, desOrto: 50, mod: 'box', ivaArcos: false, Memalloy: 200, Biomemalloy: 250, NiTi: 200, SS: 150, TMA: 800, Multi: 300, txTotal: 15000, insTotal: 3000, t1m: 50, t2m: 50 }
-    };
-
-    // 🛡️ REPARADOR ANTI-ERRORES (MIGRACIONES BLINDADAS)
-    if (!db.cfg.act || typeof db.cfg.act !== 'object') db.cfg.act = {};
-    MATS.forEach(m => { if (!db.cfg.act[m] || !Array.isArray(db.cfg.act[m])) { db.cfg.act[m] = m === 'Memalloy' ? [...C_RND] : (m === 'Biomemalloy' || m === 'SS' ? [...C_REC] : (m === 'NiTi' ? [...CALS] : ['17x25','19x25'])); } });
-    ['Sup','Inf'].forEach(a => { if(!db.inv[a]) db.inv[a] = {}; MATS.forEach(m => { if(!db.inv[a][m]) db.inv[a][m] = {}; }); });
-    if(db.fin.conGen === undefined) { db.fin.conGen = 500; db.fin.desGen = 100; db.fin.conOrto = 600; db.fin.desOrto = 50; }
-    if(db.fin.ivaArcos === undefined) db.fin.ivaArcos = false;
-    if(db.cfg.geminiKey === undefined) db.cfg.geminiKey = ''; if(db.cfg.daniEn === undefined) db.cfg.daniEn = true;
-    if(!db.cfg.contName) db.cfg.contName = 'C.P. Salvador Aguayo'; if(!db.cfg.contPhone) db.cfg.contPhone = ''; if(!db.cfg.contEmail) db.cfg.contEmail = '';
-    if(!db.cfg.brackets) db.cfg.brackets = []; if(!db.cfg.materials) db.cfg.materials = [];
-    if(!db.cfg.customMeds) db.cfg.customMeds = [];
-    if(!db.inv.tubes) db.inv.tubes = { t1m: 0, t2m: 0 };
-    if(db.fin.t1m === undefined) db.fin.t1m = 50; if(db.fin.t2m === undefined) db.fin.t2m = 50;
-    db.cfg.brackets.forEach(b => { if(b.stock === undefined) b.stock = 0; });
-    
-    if(!db.docs) {
-        db.docs = {}; const firstDocId = 'doc_' + Date.now();
-        db.docs[firstDocId] = { id: firstDocId, name: db.cfg.doc || 'Dr. Miguel Alvarado', spec: db.cfg.spec || 'Médico Estomatólogo | Especialista en Ortodoncia', ced1: db.cfg.ced1 || '', ced2: db.cfg.ced2 || '', uni1: db.cfg.logoUni1 || '', uni2: db.cfg.logoUni2 || '', phone: '', email: '' };
-        db.activeDoc = firstDocId;
-        delete db.cfg.doc; delete db.cfg.spec; delete db.cfg.ced1; delete db.cfg.ced2; delete db.cfg.logoUni1; delete db.cfg.logoUni2;
-    }
-
-    window.openHelpCloud = function() { switchView('admin'); const btns = document.querySelectorAll('#v-admin .tab-btn'); openAdminTab('t-help', btns[btns.length - 1]); setTimeout(() => { document.getElementById('help-nube').scrollIntoView({behavior: 'smooth', block: 'start'}); }, 300); };
-
-    // --- LÓGICA DEL DR. MIKE ---
-    let daniTimer; let hasWarnedUnsaved = false; let daniStockWarned = false;
-
-    function setDaniStatus(status) {
-        const dot = $('dani-dot'); dot.style.display = 'block';
-        if(status === 'error') { dot.style.background = '#ef4444'; dot.style.borderColor = '#fee2e2'; } 
-        else if(status === 'warn') { dot.style.background = '#f59e0b'; dot.style.borderColor = '#fef3c7'; } 
-        else if(status === 'info') { dot.style.background = '#3b82f6'; dot.style.borderColor = '#dbeafe'; } 
-        else { dot.style.display = 'none'; }
-    }
-
-    function daniSpeak(msg, duration = 5000, type = 'info', action = null) {
-        if(!db.cfg.daniEn) return; const bubble = $('dani-bubble'); bubble.dataset.action = action ? action : '';
-        if (action === 'cloud') msg += ' 👉 Clic aquí para ver por qué Drive es fundamental para tu privacidad.';
-        $('dani-msg').innerHTML = msg; bubble.classList.add('show');
-        if (type !== 'none') setDaniStatus(type); clearTimeout(daniTimer);
-        if(duration > 0) { daniTimer = setTimeout(() => { bubble.classList.remove('show'); checkTopAlert(); }, duration); }
-    }
-
-    function daniCheckAgenda() {
-        if(!db.cfg.daniEn) return;
-        let today = new Date().toISOString().split('T')[0]; let names = [];
-        Object.values(db.pats).forEach(p => { if(p.nextAppt === today) names.push(p.name.split(' ')[0]); });
-        if(names.length > 0) { setTimeout(() => daniSpeak(`📅 ¡Buen día Doc! Hoy tienes ${names.length} cita(s) programada(s): ${names.join(', ')}.`, 12000, 'info'), 7000); } 
-        else {
-            if(!tokenClient || (typeof gapi !== 'undefined' && gapi.client && gapi.client.getToken() === null)) { setTimeout(() => daniSpeak("⚠️ Trabajas de forma local (Offline). Por seguridad, conecta la Nube.", 10000, 'warn', 'cloud'), 7000); } 
-            else { setTimeout(() => daniSpeak("👋 ¡Hola! Soy el Dr. Mike. Revisé tu agenda y no hay citas programadas para hoy.", 6000, 'info'), 7000); }
-        }
-    }
-
-    const daniTips = ["💡 Si el paciente tiene alergias, regístralas en su perfil. Yo limpiaré los medicamentos peligrosos.", "💡 Puedes imprimir la receta y yo dividiré la hoja con marca de agua para la farmacia.", "💡 Usa 'Forzar Subida' antes de irte para que todo quede en tu Drive personal.", "🤖 Escribe palabras clave y presiona mi botón morado. Redactaré una nota impecable.", "☁️ Si ves la NUBE VERDE arriba, significa que estamos conectados y a salvo."];
-
-    function daniRandomTip() {
-        const bubble = $('dani-bubble'); if (bubble.classList.contains('show')) { bubble.classList.remove('show'); clearTimeout(daniTimer); checkTopAlert(); return; }
-        if(!db.cfg.daniEn) return alert("El Dr. Mike está desactivado. Ve a Admin > Sistema para encenderlo.");
-        if(!tokenClient || (typeof gapi !== 'undefined' && gapi.client && gapi.client.getToken() === null)) { daniSpeak("⚠️ Guardar datos solo en esta PC es riesgoso. Conecta tu nube de Drive.", 8000, 'warn', 'cloud'); } 
-        else { const tip = daniTips[Math.floor(Math.random() * daniTips.length)]; daniSpeak(tip, 6000, 'info'); }
-    }
-
-    function triggerUnsavedWarning() { if(!hasWarnedUnsaved) { daniSpeak("⚠️ ¡Ojo, doc! Modificaste el perfil. No olvides 'GUARDAR PERFIL' al terminar.", 6000, 'warn'); hasWarnedUnsaved = true; setTimeout(() => hasWarnedUnsaved = false, 45000); } }
-    window.addEventListener('load', () => { daniCheckAgenda(); });
-
-    // --- GOOGLE DRIVE API ---
-    const CLIENT_ID = '798639911007-sv5lg6p0qbmfkqj35uvdi8s8dmhfp8jg.apps.googleusercontent.com'; const SCOPES = 'https://www.googleapis.com/auth/drive.file'; let tokenClient; let gisInited = false; let driveFileId = localStorage.getItem('sf_drive_file_id') || null;
-
-    function gapiLoaded() { gapi.load('client', async () => { try { await gapi.client.init({ discoveryDocs: ['https://www.googleapis.com/discovery/v1/apis/drive/v3/rest'] }); } catch(e) { console.warn("Fallo init GAPI.", e); } finally { checkReady(); } }); }
-    function gisLoaded() { tokenClient = google.accounts.oauth2.initTokenClient({ client_id: CLIENT_ID, scope: SCOPES, callback: '' }); gisInited = true; checkReady(); }
-    function checkReady() { if(!gisInited) return; let token = null; try { if (typeof gapi !== 'undefined' && gapi.client && typeof gapi.client.getToken === 'function') token = gapi.client.getToken(); } catch(e) {} if(token === null) { if($('btnAuthAdmin')) $('btnAuthAdmin').style.display = 'block'; if($('btnAuthHeader')) $('btnAuthHeader').style.display = 'flex'; } else { showConnectedUI(); } }
-    function showConnectedUI() { if($('btnAuthAdmin')) $('btnAuthAdmin').style.display = 'none'; if($('btnAuthHeader')) $('btnAuthHeader').style.display = 'none'; if($('btnHeaderSync')) $('btnHeaderSync').style.display = 'flex'; if($('btnSyncNow')) $('btnSyncNow').style.display = 'block'; if($('btnSignout')) $('btnSignout').style.display = 'inline-block'; $('syncStatus').innerText = "☁️ Sincronizado"; }
-
-    function handleAuthClick() {
-        if(!tokenClient) return alert("Cargando servicios Google. Espera o revisa AdBlockers.");
-        tokenClient.callback = async (resp) => { if (resp.error !== undefined) return console.error(resp); showConnectedUI(); await checkDriveFile(); };
-        let token = null; try { if (typeof gapi !== 'undefined' && gapi.client && typeof gapi.client.getToken === 'function') token = gapi.client.getToken(); } catch(e) {}
-        if (token === null) tokenClient.requestAccessToken({prompt: 'consent'}); else tokenClient.requestAccessToken({prompt: ''});
-    }
-
-   function handleSignoutClick() {
-        try { if (typeof gapi !== 'undefined' && gapi.client && typeof gapi.client.getToken === 'function') { const token = gapi.client.getToken(); if (token !== null) { google.accounts.oauth2.revoke(token.access_token); gapi.client.setToken(''); } } } catch(e) {}
-        $('syncStatus').innerText = "📍 Modo Offline (Solo este dispositivo)";
-        if($('btnAuthAdmin')) $('btnAuthAdmin').style.display = 'block'; if($('btnAuthHeader')) $('btnAuthHeader').style.display = 'flex'; if($('btnHeaderSync')) $('btnHeaderSync').style.display = 'none'; if($('btnSyncNow')) $('btnSyncNow').style.display = 'none'; if($('btnSignout')) $('btnSignout').style.display = 'none';
-        if(typeof setDaniStatus === 'function') setDaniStatus('none'); alert("Desconectado de Drive.");
-    }
-    
-   async function checkDriveFile() {
-        $('syncStatus').innerText = "🔄 Sincronizando...";
-        try {
-            if (typeof gapi !== 'undefined' && gapi.client && !gapi.client.drive) await gapi.client.load('drive', 'v3');
-            let response = await gapi.client.drive.files.list({ q: "name='SmileFlow_Database.json' and trashed=false", fields: 'files(id, modifiedTime, size)', spaces: 'drive' });
-            let files = response.result.files;
-            if (files && files.length > 0) {
-                driveFileId = files[0].id; localStorage.setItem('sf_drive_file_id', driveFileId); await downloadFromDrive(driveFileId);
-                $('syncStatus').innerText = "☁️ Conectado y Sincronizado"; daniSpeak("✅ ¡Base de datos descargada con éxito!", 5000, 'info');
-            } else {
-                if(Object.keys(db.pats).length > 0) { await uploadToDrive(true); $('syncStatus').innerText = "☁️ Conectado y Sincronizado"; } else { $('syncStatus').innerText = "☁️ Nube en blanco lista"; }
-            }
-        } catch (err) { console.error(err); $('syncStatus').innerText = "❌ Error en Nube"; daniSpeak("❌ Error al leer Drive.", 8000, 'error'); }
-    }
-
-    async function downloadFromDrive(fileId) {
-        try {
-            let response = await gapi.client.drive.files.get({ fileId: fileId, alt: 'media' }); let remoteDb = response.result;
-            if(remoteDb && remoteDb.cfg) { db = remoteDb; localStorage.setItem('sf_db_v10', JSON.stringify(db)); loadConfigUI(); renderPatSelect(); if(db.curr) loadPatient(); else newPatient(); }
-        } catch(e) { console.error("Error bajando de Drive", e); }
-    }
-
-    async function uploadToDrive(isNew = false) {
-        let token = null; try { if (typeof gapi !== 'undefined' && gapi.client && typeof gapi.client.getToken === 'function') token = gapi.client.getToken(); } catch(e) {} if(!token) return; 
-        $('syncStatus').innerText = "☁️ Subiendo...";
-        const fileContent = JSON.stringify(db); const metadata = { name: 'SmileFlow_Database.json', mimeType: 'application/json' }; const boundary = '314159265358979323846'; const delimiter = "\r\n--" + boundary + "\r\n"; const close_delim = "\r\n--" + boundary + "--"; const multipartRequestBody = delimiter + 'Content-Type: application/json; charset=UTF-8\r\n\r\n' + JSON.stringify(metadata) + delimiter + 'Content-Type: application/json; charset=UTF-8\r\n\r\n' + fileContent + close_delim; let url = isNew ? 'https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart' : `https://www.googleapis.com/upload/drive/v3/files/${driveFileId}?uploadType=multipart`;
-        try {
-            let res = await fetch(url, { method: isNew ? 'POST' : 'PATCH', headers: new Headers({ 'Authorization': 'Bearer ' + token.access_token, 'Content-Type': 'multipart/related; boundary=' + boundary }), body: multipartRequestBody });
-            let val = await res.json();
-            if(res.ok) { if(isNew) { driveFileId = val.id; localStorage.setItem('sf_drive_file_id', driveFileId); } setTimeout(() => { $('syncStatus').innerText = "☁️ Sincronizado"; checkTopAlert(); }, 1000); } else { throw new Error(val.error ? val.error.message : "Fallo Drive"); }
-        } catch(e) { $('syncStatus').innerText = "❌ Error al subir"; setDaniStatus('error'); throw e; }
-    }
-
-    async function forceCloudSync() {
-        let token = null; try { if (typeof gapi !== 'undefined' && gapi.client && typeof gapi.client.getToken === 'function') token = gapi.client.getToken(); } catch(e) {}
-        if (!token) { daniSpeak("☁️ Abriendo ventana de conexión de Google Drive...", 4000, 'info'); handleAuthClick(); return; }
-        $('syncStatus').innerText = "☁️ Subiendo datos..."; daniSpeak("☁️ Empujando tu base de datos a Google Drive...", 3000, 'info');
-        try { await uploadToDrive(driveFileId === null); daniSpeak("✅ ¡Base de datos asegurada en tu nube privada!", 6000, 'info'); } catch (e) { daniSpeak("❌ Hubo un error al subir. Revisa tu conexión.", 8000, 'error'); }
-    }
-
-    // --- INTEGRACIÓN CON GEMINI IA (Dr. Mike) ---
-    async function callDentIA(targetId) {
-        const key = db.cfg.geminiKey; if(!key) { daniSpeak("⚠️ ¡Aún no tengo mi llave API! Ve a Admin > Sistema y pega tu API Key de Gemini.", 7000, 'warn'); return; }
-        const inputEl = $(targetId); const rawText = inputEl.value.trim(); if(!rawText) { daniSpeak("🤔 Escribe algunas palabras clave clínicas antes de llamarme.", 5000, 'info'); return; }
-        const originalBg = inputEl.style.background; inputEl.style.background = "#ede9fe"; inputEl.value = "✨ Dr. Mike está analizando y redactando tu nota clínica...";
-        daniSpeak("✍️ ¡Entendido! Redactando nota con terminología médica pericial...", 3000, 'info');
-        const prompt = `Actúa como un médico estomatólogo y ortodoncista experto. Convierte las siguientes notas breves en un texto clínico profesional, fluido, altamente técnico y exhaustivo, listo para un expediente médico legal o peritaje. No uses saludos, ni negritas, ni asteriscos. Dame únicamente el párrafo final redactado.\n\nPalabras clave: ${rawText}`;
-        try {
-            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }], generationConfig: { temperature: 0.3 } }) });
-            const data = await response.json(); if(data.error) throw new Error(data.error.message);
-            inputEl.value = data.candidates[0].content.parts[0].text.trim();
-            daniSpeak("✨ ¡Listo! Revisa la nota y no olvides guardarla.", 5000, 'info');
-        } catch(e) { console.error(e); daniSpeak("❌ Uy, tuve un problema con la IA. Revisa tu internet o la llave.", 6000, 'error'); inputEl.value = rawText; } finally { inputEl.style.background = originalBg; }
-    }
-
-    function showWorkingPath() {
-        if(typeof db === 'undefined' || !db || !db.cfg) return; let masterRoute = db.cfg.drive ? ` | 📁 Ruta Maestra: ${db.cfg.drive}` : ''; let patRoute = (db.curr && db.pats[db.curr] && db.pats[db.curr].drive) ? ` | 👤 Carpeta Px: ${db.pats[db.curr].drive}` : '';
-        const pathEl = $('pathText'); if(pathEl) { pathEl.innerText = `${masterRoute}${patRoute}`; }
-    }
-
-    function autoLoadWaDate() { let d = new Date(); d.setDate(d.getDate() + 30); $('waDate').value = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; $('waTime').value = "16:00"; }
-    function switchView(v) { document.querySelectorAll('.view').forEach(e=>e.classList.remove('active')); $(`v-${v}`).classList.add('active'); if(v==='admin') renderInvShop(); }
-    function openTab(t, btn) { btn.parentElement.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); btn.parentElement.nextElementSibling.parentElement.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active')); $(t).classList.add('active'); if(t === 't-fact' && !$('facDate').value) $('facDate').valueAsDate = new Date(); if(t === 't-receta') renderMedsList(); }
-    function openAdminTab(t, btn) { btn.parentElement.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); document.querySelectorAll("#v-admin .tab-content").forEach(c=>c.classList.remove('active')); $(t).classList.add('active'); }
-
-    // BLINDAJE DE CONFIGURACIÓN INICIAL
-    function loadConfigUI() {
-        $('cCli').value = db.cfg.cli || ''; $('cSlogan').value = db.cfg.slogan || ''; $('cCofepris').value = db.cfg.cofepris || ''; $('cDrive').value = db.cfg.drive || ''; $('cAgenda').value = db.cfg.agenda || ''; $('cAddress').value = db.cfg.address || ''; $('cContact').value = db.cfg.contact || ''; $('cEmail').value = db.cfg.email || ''; $('cGeminiKey').value = db.cfg.geminiKey || ''; $('cDaniEn').checked = db.cfg.daniEn; $('cContName').value = db.cfg.contName || ''; $('cContPhone').value = db.cfg.contPhone || ''; $('cContEmail').value = db.cfg.contEmail || '';
-        if(db.cfg.logo) { $('hLogo').src = db.cfg.logo; $('hLogo').style.display='block'; } else $('hLogo').style.display='none';
-        const d = new Date(); if(new Date(d.getFullYear(), d.getMonth()+1, 0).getDate() - d.getDate() <= 5) $('monthAlert').style.display = 'flex';
-        
-        try { renderAdminDyn(); } catch(e){ console.error(e); }
-        try { renderClinicaDyn(); } catch(e){ console.error(e); }
-        try { renderDocSelects(); } catch(e){ console.error(e); }
-        try { buildForms(); } catch(e){ console.error("Error al pintar pestañas de arcos:", e); }
-        try { renderAdminMeds(); } catch(e){ console.error(e); }
-        try { showWorkingPath(); } catch(e){ console.error(e); }
-    }
-    
-    function uploadLogo(e) { const f = e.target.files[0]; if(!f) return; const r = new FileReader(); r.onload=ev=>{db.cfg.logo=ev.target.result; saveDB(); loadConfigUI();}; r.readAsDataURL(f); }
-    function saveCfg() { db.cfg.cli=$('cCli').value; db.cfg.slogan=$('cSlogan').value; db.cfg.cofepris=$('cCofepris').value; db.cfg.drive=$('cDrive').value; db.cfg.agenda=$('cAgenda').value; db.cfg.address=$('cAddress').value; db.cfg.contact=$('cContact').value; db.cfg.email=$('cEmail').value; db.cfg.geminiKey=$('cGeminiKey').value; db.cfg.daniEn=$('cDaniEn').checked; db.cfg.contName=$('cContName').value; db.cfg.contPhone=$('cContPhone').value; db.cfg.contEmail=$('cContEmail').value; saveDB(); loadConfigUI(); alert('Opciones Globales Guardadas.'); }
-    function saveDB() { localStorage.setItem('sf_db_v10', JSON.stringify(db)); checkTopAlert(); if(typeof gapiInited !== 'undefined' && gapiInited && gapi.client.getToken() !== null) { uploadToDrive(false); } }
-    
-    function abrirAgenda() { window.open(db.cfg.agenda || 'https://calendar.google.com', '_blank'); }
-    function copiarRutaLocal(ruta) { if(!ruta) return alert("Ruta vacía."); if (navigator.clipboard && window.isSecureContext) { navigator.clipboard.writeText(ruta).then(() => alert(`Ruta copiada al portapapeles`)).catch(e => alert("Bloqueado por navegador.")); } else { alert(`Tu ruta es:\n${ruta}`); } }
-    function setAlertLabel(dateSaved) { const today = new Date().toISOString().split('T')[0]; const lbl = $('lblAlertTitle'); const box = $('divAlertBox'); if (!dateSaved || dateSaved === today) { lbl.innerText = "📌 AVISO PRÓX. CITA (Recordatorio local):"; box.style.background = "var(--warning)"; box.style.borderLeftColor = "var(--warning-text)"; lbl.style.color = "var(--warning-text)"; $('pAlert').style.color = "var(--warning-text)"; } else { lbl.innerText = "⚠️ AVISO PARA HOY (De cita anterior):"; box.style.background = "var(--danger)"; box.style.borderLeftColor = "var(--danger-text)"; lbl.style.color = "var(--danger-text)"; $('pAlert').style.color = "var(--danger-text)"; } }
-
-    function sendApptWA() {
-        if(!db.curr) return alert("Guarda paciente primero."); let p = db.pats[db.curr]; if(!p.phone) return alert("Falta celular del paciente.");
-        let d = $('waDate').value; let t = $('waTime').value; if(!d || !t) return alert("Selecciona fecha y hora."); p.nextAppt = d; saveDB();
-        let dateParts = d.split('-'); let dateObj = new Date(dateParts[0], dateParts[1] - 1, dateParts[2]); let dateStr = dateObj.toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-        let timeParts = t.split(':'); let hours = parseInt(timeParts[0]); let ampm = hours >= 12 ? 'PM' : 'AM'; hours = hours % 12; hours = hours ? hours : 12; let timeStr = hours + ':' + timeParts[1] + ' ' + ampm;
-        let activeD = db.docs[db.activeDoc] ? db.docs[db.activeDoc].name : 'Doctor'; let cliName = db.cfg.cli || 'nuestra clínica';
-        let msg = `✨ ¡Hola *${p.name}*!\n\nSu próxima cita en *${cliName}* ha sido registrada y confirmada con éxito.\n\n📅 *Día:* ${dateStr}\n⏰ *Hora:* ${timeStr}\n👨‍⚕️ *Especialista:* ${activeD}\n\n🙏 Agradecemos su preferencia y la confianza depositada en nuestro equipo. ¡Que tenga un lindo día y nos vemos muy pronto! 😁`;
-        if (navigator.clipboard && window.isSecureContext) navigator.clipboard.writeText(msg).catch(err => console.log('Error copiando', err));
-        let phone = p.phone.replace(/\D/g,''); if(phone.length === 10) phone = '52' + phone; daniSpeak("✅ ¡Recordatorio enviado! He guardado la fecha para tu agenda.", 5000, 'info'); window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`, '_blank');
-    }
-
-    function sendIndicacionWA(tipo) {
-        if(!db.curr) return alert("Guarda paciente primero."); let p = db.pats[db.curr]; if(!p.phone) return alert("Falta celular."); let title = ''; let body = '';
-        if(tipo === 'extraccion') { title = 'INDICACIONES POST-EXTRACCIÓN'; body = `*PRIMERAS 24 HRS:*\n- Muerde la gasa por 45 min.\n- No escupir, no usar popote, no enjuagarse.\n- Hielo en mejilla (20 min sí, 20 no).\n- Dormir con cabeza elevada.\n- ESTRICTAMENTE prohibido fumar o beber alcohol por 72 horas.\n\n*ALIMENTACIÓN:*\n- Dieta blanda y fría.\n- Cero grasas, semillas o irritantes.\n\n*MEDICACIÓN:*\n- Toma tus medicamentos a la hora exacta.`; } else if(tipo === 'brackets') { title = 'CUIDADOS DE BRACKETS'; body = `*ALIMENTOS PROHIBIDOS:*\n- Cosas duras (hielo, nueces) o pegajosas (chicles, gomitas).\n- Corta la fruta/verdura en trozos pequeños, no muerdas a tirones.\n\n*HIGIENE:*\n- Cepillado después de cada comida con cepillo interdental e hilo.\n\n*MOLESTIAS:*\n- Usa la cera de ortodoncia si algún bracket te lastima la mejilla (seca el bracket antes de ponerla).`; } else if(tipo === 'blanqueamiento') { title = 'CUIDADOS POST-BLANQUEAMIENTO'; body = `*DIETA BLANCA (Mínimo 72 hrs):*\n- Evita café, té, vino tinto, refrescos oscuros, salsas rojas o cítricos.\n- Come pollo, arroz, lácteos, plátano.\n\n*SENSIBILIDAD:*\n- Usa tu pasta desensibilizante 3 veces al día.\n- Si hay molestia aguda, toma tu analgésico indicado.\n- No fumes por 48 horas.`; } else if(tipo === 'profilaxis') { title = 'CUIDADOS POST-LIMPIEZA DENTAL'; body = `*SENSIBILIDAD:*\n- Es normal sentir ligera sensibilidad al frío o calor por 24 a 48 hrs.\n\n*ENCÍAS:*\n- Puede notar un poco de sangrado al cepillarse el primer día.\n\n*ALIMENTACIÓN:*\n- Evite alimentos muy calientes o irritantes (picantes, ácidos) por el resto del día para evitar molestias en la encía.\n\n*HIGIENE:*\n- Continúe con su cepillado normal e hilo dental de forma suave.`; } else if(tipo === 'operatoria') { title = 'CUIDADOS POST-RESINA (EMPASTE)'; body = `*ANESTESIA:*\n- Cuidado al comer, no mastique alimentos sólidos hasta que el efecto de la anestesia pase por completo (evite morderse labios o lengua).\n\n*MOLESTIAS:*\n- Es normal sentir ligera molestia al masticar o sensibilidad térmica los primeros días.\n\n*CUIDADOS:*\n- Su resina endureció de inmediato, pero evite morder cosas excesivamente duras (hielo, huesos) con ese diente.`; }
-        let cliName = db.cfg.cli || 'la clínica'; let msg = `Hola *${p.name}* 👋\n\nTe compartimos tus indicaciones clínicas por parte de *${cliName}*:\n\n📌 *${title}*\n\n${body}\n\n¡Cualquier duda, estamos a tus órdenes!`;
-        if (navigator.clipboard && window.isSecureContext) navigator.clipboard.writeText(msg).catch(err => console.log('No se pudo copiar', err)); let phone = p.phone.replace(/\D/g,''); if(phone.length === 10) phone = '52' + phone; window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`, '_blank');
-    }
-
-    function toggleAllergies() { const has = $('pHasAl').checked; $('alBox').classList.toggle('hidden', !has); if(!has) { $('pAlPen').checked=false; $('pAlAin').checked=false; $('pAlLat').checked=false; $('pAlOther').value=''; } checkLatexAlert(); }
-    function checkLatexAlert() { $('latexAlert').classList.toggle('hidden', !$('pAlLat').checked); }
-    function updateAnesWarning() {
-        const val = $('gAnesTipo').value; const w = $('anesWarning'); w.style.display = 'block';
-        if(val.includes('sin Epinefrina') || val.includes('Sin Vaso') || val.includes('Feli')) { w.innerHTML = "⚠️ <b>Precaución Médica:</b> Anestésico <b>SIN vasoconstrictor</b>. Menor duración de isquemia. Uso de elección para hipertensos, cardiópatas o diabéticos no controlados."; } else if (val.includes('Articaína')) { w.innerHTML = "⚠️ <b>Precaución Médica:</b> Alta capacidad de difusión ósea. Evitar en bloqueos mandibulares profundos tronculares por riesgo potencial de parestesia prolongada."; } else if (val.includes('Bupivacaína')) { w.innerHTML = "⚠️ <b>Precaución Médica:</b> Acción prolongada (hasta 8 hrs). Advertir encarecidamente al paciente sobre el alto riesgo de morderse labios o lengua al comer."; } else { w.innerHTML = "⚠️ <b>Precaución Médica:</b> Contiene Epinefrina (Vasoconstrictor). Usar con suma cautela en pacientes con problemas cardiovasculares, hipertiroidismo o ansiedad severa."; }
-    }
-
-    function renderMedsList() {
-        if(!db.curr) return; const p = db.pats[db.curr]; const isPen = p.alPen || false; const isAin = p.alAin || false;
-        let h = '<option value="">Selecciona para añadir a la receta...</option><optgroup label="Analgésicos y Antiinflamatorios">';
-        if(!isAin) { h += '<option value="Ibuprofeno 400mg - Tomar 1 tableta cada 8 horas por 5 días. (Desinflamatorio)">Ibuprofeno 400mg (AINE - Analgésico y Desinflamatorio)</option><option value="Ketorolaco 10mg - Tomar 1 tableta cada 8 horas por 3 días. (Dolor agudo)">Ketorolaco 10mg (AINE - Dolor moderado a severo)</option>'; }
-        h += '<option value="Paracetamol 500mg - Tomar 1 tableta cada 8 horas por 3 días. (Analgésico seguro)">Paracetamol 500mg (Seguro / Antipirético)</option>';
-        if(isAin) h += '<option value="Clonixinato de Lisina 250mg - Tomar 1 tableta cada 8 horas. (Alternativa a AINEs)">Clonixinato de Lisina 250mg (Seguro Alergia AINEs)</option>';
-        h += '</optgroup><optgroup label="Antibióticos">';
-        if(!isPen) { h += '<option value="Amoxicilina 500mg - Tomar 1 cápsula cada 8 horas por 7 días. (Infección moderada)">Amoxicilina 500mg (Infección leve a moderada)</option><option value="Amoxicilina 875mg / Ácido Clavulánico 125mg - Tomar 1 tableta cada 12 horas por 7 días. (Infección severa)">Amoxicilina + Ác. Clavulánico (Infección severa/resistente)</option>'; } else { h += '<option value="Clindamicina 300mg - Tomar 1 cápsula cada 8 horas por 7 días. (Infección hueso/tejidos)">Clindamicina 300mg (Seguro Alergia Penicilina. Ideal hueso)</option><option value="Eritromicina 500mg - Tomar 1 tableta cada 6 horas por 7 días. (Alternativa macrólido)">Eritromicina 500mg (Seguro Alergia Penicilina. Vías resp.)</option>'; }
-        h += '</optgroup><optgroup label="Blanqueamiento / Sensibilidad"><option value="Pasta Dental Desensibilizante (ej. Sensodyne / Colgate Sensitive) - Cepillar suavemente 3 veces al día o aplicar localmente.">Pasta Desensibilizante (Tratamiento Tópico)</option><option value="Clorhexidina 0.12% - Realizar enjuagues cada 12 horas por 10 días.">Enjuague Clorhexidina (Control placa bacteriana)</option></optgroup>';
-        if(db.cfg.customMeds && db.cfg.customMeds.length > 0) { let addedCustom = false; db.cfg.customMeds.forEach(m => { if(isAin && m.cat === 'Analgésicos y Antiinflamatorios') return; if(isPen && m.cat === 'Antibióticos') return; if(!addedCustom) { h += '<optgroup label="Mis Medicamentos (Agregados en Admin)">'; addedCustom = true; } h += `<option value="${m.name} - ${m.dose}. (${m.ind})">${m.name} (${m.ind})</option>`; }); if(addedCustom) h += '</optgroup>'; }
-        $('selMed').innerHTML = h; $('alertaReceta').classList.toggle('hidden', !(isPen || isAin));
-    }
-    
-    function addMedToPrescription() { const val = $('selMed').value; if(val) { const txt = $('txtReceta'); txt.value += (txt.value ? '\n\n' : '') + val; $('selMed').value = ''; if (val.includes("Amoxicilina") || val.includes("Clindamicina") || val.includes("Eritromicina")) { $('chkAntibiotico').checked = true; } } }
-    function checkAge() { const a=$('pAge').value; $('divGuardian').classList.toggle('hidden', a===''||a>=18); }
-    function renderPatSelect() { $('pSelect').innerHTML = '<option value="">Selecciona al paciente...</option>'; Object.values(db.pats).forEach(p => $('pSelect').innerHTML += `<option value="${p.id}">${p.name}</option>`); if(db.curr && db.pats[db.curr]) $('pSelect').value = db.curr; }
-    
-    function newPatient() { db.curr = null; saveDB(); $('pSelect').value=''; $('lblId').innerText='Nuevo Paciente'; ['pName','pAge','pGuardian','pPhone','pSum','pAlert','pBrackets'].forEach(id => $(id).value=''); $('pRetra').checked = false; $('pFactReq').checked = false; $('pHasAl').checked = false; $('pAlPen').checked = false; $('pAlAin').checked = false; $('pAlLat').checked = false; $('pAlOther').value = ''; $('pDrive').value=''; autoLoadWaDate(); checkAge(); toggleAllergies(); loadTreats({}); renderTimeline(); setAlertLabel(null); $('txtReceta').value = ''; $('chkAntibiotico').checked = false; loadFacturacion({}); showWorkingPath(); }
-    function savePatientAlert() { if(!db.curr) return; let p = db.pats[db.curr]; p.alert = $('pAlert').value; p.alertDate = new Date().toISOString().split('T')[0]; saveDB(); setAlertLabel(p.alertDate); }
-    function savePatient() { const name = $('pName').value.trim(); if(!name) return alert("Falta ingresar el Nombre del paciente."); const dId = 'Px-' + name; if(!db.curr) { db.curr = 'p_'+Date.now(); db.pats[db.curr] = { id: db.curr, displayId: dId, notas: [], treats: {}, alertDate: new Date().toISOString().split('T')[0], factReq: false, factData: {} }; } else { db.pats[db.curr].displayId = dId; } let p = db.pats[db.curr]; p.name=name; p.age=$('pAge').value; p.guardian=$('pGuardian').value; p.phone=$('pPhone').value; p.sum=$('pSum').value; p.drive=$('pDrive').value; p.brackets=$('pBrackets').value; p.retra=$('pRetra').checked; p.factReq=$('pFactReq').checked; p.hasAl = $('pHasAl').checked; p.alPen = $('pAlPen').checked; p.alAin = $('pAlAin').checked; p.alLat = $('pAlLat').checked; p.alOther = $('pAlOther').value; saveTreats(p); saveDB(); renderPatSelect(); $('lblId').innerText=dId; daniSpeak("💾 ¡Perfil guardado impecablemente!", 4000, 'info'); renderPendingTreatsMain(p); showWorkingPath(); renderMedsList(); }
-    function loadPatient() { const v = $('pSelect').value; if(!v) return newPatient(); db.curr = v; saveDB(); const p = db.pats[v]; $('lblId').innerText = p.displayId || 'Sin ID'; $('pName').value=p.name||''; $('pAge').value=p.age||''; $('pGuardian').value=p.guardian||''; $('pPhone').value=p.phone||''; $('pSum').value=p.sum||''; $('pAlert').value=p.alert||''; $('pDrive').value=p.drive||''; $('pBrackets').value=p.brackets||''; $('pRetra').checked=p.retra||false; $('pFactReq').checked=p.factReq||false; $('pHasAl').checked=p.hasAl||false; $('pAlPen').checked=p.alPen||false; $('pAlAin').checked=p.alAin||false; $('pAlLat').checked=p.alLat||false; $('pAlOther').value=p.alOther||''; autoLoadWaDate(); checkAge(); toggleAllergies(); loadTreats(p); renderTimeline(); setAlertLabel(p.alertDate); $('txtReceta').value = ''; $('chkAntibiotico').checked = false; loadFacturacion(p); showWorkingPath(); renderMedsList(); }
-    function copyPatFolder() { if(!db.curr) return alert("Guarda paciente primero."); if (navigator.clipboard && window.isSecureContext) { navigator.clipboard.writeText(db.pats[db.curr].displayId).then(() => alert(`ID copiado al portapapeles`)).catch(e => alert("Bloqueado por navegador.")); } else { alert(`ID: ${db.pats[db.curr].displayId}`); } }
-    function abrirDriveSearch() { if(!db.curr) return alert("Selecciona paciente."); window.open(`https://drive.google.com/drive/u/0/search?q=${encodeURIComponent(db.pats[db.curr].displayId)}`, '_blank'); }
-
-    // GESTORES DINÁMICOS
-    function renderDocSelects() { let h = ''; Object.values(db.docs).forEach(d => { h += `<option value="${d.id}">👨‍⚕️ ${d.name}</option>`; }); $('dSelect').innerHTML = h; $('adminDocSelect').innerHTML = h; if(db.activeDoc && db.docs[db.activeDoc]) { $('dSelect').value = db.activeDoc; } if(Object.keys(db.docs).length > 0) { $('adminDocSelect').value = db.activeDoc || Object.keys(db.docs)[0]; cargarDoctorAdmin(); } else { crearNuevoDoctor(); } updateHeaderDocName(); }
-    function changeActiveDoc() { db.activeDoc = $('dSelect').value; saveDB(); updateHeaderDocName(); }
-    function updateHeaderDocName() { let n = db.docs[db.activeDoc] ? db.docs[db.activeDoc].name : 'Sin Doctor'; $('hClinicDoc').innerText = `${db.cfg.cli || 'Clínica'} | ${n}`; }
-    function crearNuevoDoctor() { $('dId').value = 'new'; $('dName').value = ''; $('dSpec').value = ''; $('dCed1').value = ''; $('dCed2').value = ''; $('dPhone').value = ''; $('dEmail').value = ''; $('dUni1').value = ''; $('dUni2').value = ''; }
-    function cargarDoctorAdmin() { let v = $('adminDocSelect').value; if(!v || !db.docs[v]) return; let d = db.docs[v]; $('dId').value = d.id; $('dName').value = d.name; $('dSpec').value = d.spec; $('dCed1').value = d.ced1; $('dCed2').value = d.ced2; $('dPhone').value = d.phone || ''; $('dEmail').value = d.email || ''; $('dUni1').value = ''; $('dUni2').value = ''; }
-    let tempUni1 = null; let tempUni2 = null;
-    function uploadDocLogo(e, type) { const f = e.target.files[0]; if(!f) return; const r = new FileReader(); r.onload = ev => { if(type === 'uni1') tempUni1 = ev.target.result; if(type === 'uni2') tempUni2 = ev.target.result; }; r.readAsDataURL(f); }
-    function guardarDoctorAdmin() { let id = $('dId').value; if(id === 'new') id = 'doc_' + Date.now(); let existingUni1 = db.docs[id] ? db.docs[id].uni1 : ''; let existingUni2 = db.docs[id] ? db.docs[id].uni2 : ''; db.docs[id] = { id: id, name: $('dName').value, spec: $('dSpec').value, ced1: $('dCed1').value, ced2: $('dCed2').value, phone: $('dPhone').value, email: $('dEmail').value, uni1: tempUni1 || existingUni1, uni2: tempUni2 || existingUni2 }; tempUni1 = null; tempUni2 = null; if(!db.activeDoc) db.activeDoc = id; saveDB(); renderDocSelects(); $('adminDocSelect').value = id; alert("Perfil de Doctor Guardado."); }
-    function eliminarDoctorAdmin() { let id = $('dId').value; if(id === 'new') return; if(Object.keys(db.docs).length <= 1) return alert("Debe haber al menos 1 doctor en el sistema."); if(confirm("¿Estás seguro de eliminar permanentemente este perfil de doctor?")) { delete db.docs[id]; if(db.activeDoc === id) db.activeDoc = Object.keys(db.docs)[0]; saveDB(); renderDocSelects(); } }
-
-    function renderAdminDyn() {
-        let bH = ''; db.cfg.brackets.forEach((b,i) => { let tagIva = b.iva ? '<span style="font-size:0.7rem; color:#b45309; font-weight:bold; background:#fef3c7; padding:2px 4px; border-radius:4px;">+ IVA</span>' : ''; bH+=`<div style="display:flex; justify-content:space-between; font-size:0.9rem; border-bottom:1px solid #e2e8f0; padding:0.6rem 0; align-items:center;"><span><b>${b.type}</b> | ${b.brand} | ${b.pres} ${tagIva}<br><small style="color:#64748b;">Stock: <b>${b.stock}</b> juegos ${b.hasTubes? '(Incl. Tubos)':''}</small></span><span style="white-space:nowrap;">$${b.cost.toFixed(2)} <button onclick="updBktStock(${i},1)" style="margin-left:10px; cursor:pointer; font-weight:bold; width:22px;">+</button><button onclick="updBktStock(${i},-1)" style="margin-left:5px; cursor:pointer; font-weight:bold; width:22px;">-</button><button onclick="delBkt(${i})" style="color:var(--danger-text); background:none; border:none; cursor:pointer; margin-left:10px; font-size:1.1rem; font-weight:bold;">✖</button></span></div>`; }); $('renderAdminBrackets').innerHTML = bH || '<p style="font-size:0.9rem; color:#94a3b8; font-style:italic;">No hay brackets registrados en la base de datos.</p>';
-        let mH = ''; db.cfg.materials.forEach((m,i) => { let tagIva = m.iva ? '<span style="font-size:0.7rem; color:#0284c7; font-weight:bold; background:#e0f2fe; padding:2px 4px; border-radius:4px;">+ IVA</span>' : ''; mH+=`<div style="display:flex; justify-content:space-between; font-size:0.9rem; border-bottom:1px solid #e2e8f0; padding:0.6rem 0; align-items:center;"><span><b>${m.name}</b> ${tagIva}</span><span>$${m.cost.toFixed(2)} <button onclick="delMat(${i})" style="color:var(--danger-text); background:none; border:none; cursor:pointer; margin-left:15px; font-size:1.1rem; font-weight:bold;">✖</button></span></div>`; }); $('renderAdminMats').innerHTML = mH || '<p style="font-size:0.9rem; color:#94a3b8; font-style:italic;">No hay materiales registrados en la base de datos.</p>';
-    }
-    function updBktStock(i, qty) { db.cfg.brackets[i].stock = Math.max(0, db.cfg.brackets[i].stock + qty); saveDB(); renderAdminDyn(); renderClinicaDyn(); }
-    function renderClinicaDyn() { let sH = '<option value="">Selecciona bracket a colocar...</option>'; db.cfg.brackets.forEach((b, i) => { sH += `<option value="${i}">${b.type} | ${b.brand} | ${b.pres} (Quedan: ${b.stock})</option>`; }); if($('selBktSup')) $('selBktSup').innerHTML = sH; if($('selBktInf')) $('selBktInf').innerHTML = sH; let cM = ''; db.cfg.materials.forEach((m,i) => cM+=`<input type="checkbox" id="cMat_${i}" value="${i}"><label for="cMat_${i}">${m.name} (+$${m.cost.toFixed(2)})</label>`); if($('renderGenMats')) $('renderGenMats').innerHTML = cM; }
-    function addAdminBracket() { let t=$('nBType').value, b=$('nBBrand').value, p=$('nBPres').value, c=Number($('nBCost').value), iva=$('nBIva').checked; let stock=Number($('nBStock').value) || 0, hasTubes=$('nBTubos').checked, tc=Number($('nBTubosCost').value) || 0; if(t && c>=0) { let baseCost = c + (hasTubes ? tc : 0); let finalCost = iva ? baseCost * 1.16 : baseCost; db.cfg.brackets.push({type:t, brand:b, pres:p, base:baseCost, iva:iva, cost:finalCost, stock:stock, hasTubes:hasTubes}); saveDB(); renderAdminDyn(); renderClinicaDyn(); $('nBType').value='';$('nBBrand').value='';$('nBPres').value='';$('nBCost').value=''; $('nBIva').checked=false; $('nBStock').value='';$('nBTubos').checked=false;$('nBTubosCost').value=''; document.getElementById('divTB').style.display='none'; } }
-    function delBkt(i) { db.cfg.brackets.splice(i,1); saveDB(); renderAdminDyn(); renderClinicaDyn(); }
-    function addAdminMat() { let n=$('nMatName').value, c=Number($('nMatCost').value), iva=$('nMatIva').checked; if(n && c>=0) { let finalCost = iva ? c * 1.16 : c; db.cfg.materials.push({name:n, base:c, iva:iva, cost:finalCost}); saveDB(); renderAdminDyn(); renderClinicaDyn(); $('nMatName').value=''; $('nMatCost').value=''; $('nMatIva').checked=false; } }
-    function delMat(i) { db.cfg.materials.splice(i,1); saveDB(); renderAdminDyn(); renderClinicaDyn(); }
-
-    function renderAdminMeds() { if(!db.cfg.customMeds) db.cfg.customMeds = []; let h = ''; db.cfg.customMeds.forEach((m,i) => { h+=`<div style="display:flex; justify-content:space-between; font-size:0.9rem; border-bottom:1px solid #e2e8f0; padding:0.6rem 0; align-items:center;"><span><b>${m.name}</b><br><small>${m.dose} (${m.ind})</small></span><button onclick="delAdminMed(${i})" style="color:var(--danger-text); background:none; border:none; cursor:pointer; font-size:1.1rem; font-weight:bold;">✖</button></div>`; }); $('renderAdminMeds').innerHTML = h || '<p style="font-size:0.9rem; color:#94a3b8; font-style:italic;">No hay medicamentos personalizados.</p>'; }
-    function addAdminMed() { if(!db.cfg.customMeds) db.cfg.customMeds = []; let n=$('nMedName').value, d=$('nMedDose').value, ind=$('nMedInd').value, c=$('nMedCat').value; if(n && d) { db.cfg.customMeds.push({name:n, dose:d, ind:ind, cat:c}); saveDB(); renderAdminMeds(); renderMedsList(); $('nMedName').value=''; $('nMedDose').value=''; $('nMedInd').value=''; } }
-    function delAdminMed(i) { db.cfg.customMeds.splice(i,1); saveDB(); renderAdminMeds(); renderMedsList(); }
-
-    // BLINDAJE DE ARCOS (Funciones que causaban crash reparadas)
-    function buildMatrix() {
-        let h = `<div class="matrix"><div><b style="color:#0f172a;">Material / Calibre</b></div>`; CALS.forEach(c=>h+=`<div><b style="color:#475569;">${c}</b></div>`);
-        MATS.forEach(m => { h+= `<div style="text-align:left;font-weight:900;color:var(--primary);">${m}</div>`; CALS.forEach(c => { const valid = (m==='Memalloy'&&C_RND.includes(c)) || (m==='Biomemalloy'&&C_REC.includes(c)) || (m!=='Memalloy'&&m!=='Biomemalloy'); if(valid) { const chk = (db.cfg.act[m]&&db.cfg.act[m].includes(c))?'checked':''; h+=`<div><input type="checkbox" id="mx_${m}_${c.replace('.','')}" ${chk}></div>`; } else h+=`<div style="color:#cbd5e1;">-</div>`; }); }); $('rMatx').innerHTML = h+`</div>`;
-    }
-    function saveMatrix() { MATS.forEach(m => { db.cfg.act[m] = []; CALS.forEach(c => { const el=$(`mx_${m}_${c.replace('.','')}`); if(el&&el.checked) db.cfg.act[m].push(c); }); }); saveDB(); buildForms(); renderInvShop(); alert("Visibilidad de Arcos Sincronizada Correctamente."); }
-    
-    function buildForms() {
-        ['Sup','Inf'].forEach(a => {
-            let h = `<div class="arch-title">Arcada ${a}</div><div class="pill-wrap">`; 
-            MATS.forEach(m => { 
-                if(db.cfg.act[m] && db.cfg.act[m].length > 0) { 
-                    h+=`<input type="radio" name="m${a}" id="r${a}${m}" value="${m}" onchange="updCal('${a}')"><label for="r${a}${m}">${m}</label>`; 
-                } 
-            }); 
-            h+=`<input type="radio" name="m${a}" id="r${a}NA" value="NA" checked onchange="updCal('${a}')"><label for="r${a}NA" style="background:#e2e8f0; color:#475569;">NA</label></div><div class="pill-wrap" id="c${a}"></div>`; 
-            if($(`r${a}`)) $(`r${a}`).innerHTML = h; 
-            updCal(a);
-        });
-    }
-    
-    function updCal(a) { 
-        const mEl = document.querySelector(`input[name="m${a}"]:checked`); if(!mEl) return; 
-        const m = mEl.value; let h = ``; 
-        if(m !== 'NA' && db.cfg.act[m]) { 
-            db.cfg.act[m].forEach(c => h+=`<input type="radio" name="c${a}" id="c${a}${c.replace('.','')}" value="${c}" checked><label for="c${a}${c.replace('.','')}">${c}"</label>`); 
-        } 
-        h+=`<input type="radio" name="c${a}" id="c${a}X" value="NA" ${m==='NA'?'checked':''}><label for="c${a}X" style="background:#e2e8f0; color:#475569;">NA</label>`; 
-        if($(`c${a}`)) $(`c${a}`).innerHTML = h; 
-    }
-
-    function toggleElastics() { $('ePanel').classList.toggle('hidden', $('eNo').checked); }
-    function sugElastic() { const v = document.querySelector('input[name="eVec"]:checked'); if(!v) return; const s = $('eSug'); const p = $('ePos'); if(v.value==='Clase II') { s.innerHTML="Retroclinar Sup / Mesializar Inf. (1/4 o 3/16 | Medio/Pesado)"; p.value="13/23 a 36/46"; $('eSize').value='1/4"'; } if(v.value==='Clase III') { s.innerHTML="Retroclinar Inf / Mesializar Sup. (1/4 o 3/16 | Medio/Pesado)"; p.value="33/43 a 16/26"; $('eSize').value='1/4"'; } if(v.value==='Línea Media') { s.innerHTML="Corrección transversal (3/16 | Medio)"; p.value="Vector diagonal ant."; $('eSize').value='3/16"'; } if(v.value==='Asentamiento') { s.innerHTML="Intercuspidación fina (1/8 o 3/16 | L/M)"; p.value="Caja PM-Canino"; $('eSize').value='1/8"'; } }
-
-    function checkTopAlert() { let alertCount = 0; ['Sup','Inf'].forEach(a => MATS.forEach(m => { if(db.cfg.act[m] && db.cfg.act[m].length>0) db.cfg.act[m].forEach(c => { if(db.inv[a] && db.inv[a][m] && db.inv[a][m][c] !== undefined && db.inv[a][m][c] <= 5) alertCount++; }); })); $('topStockAlert').style.display = alertCount > 0 ? 'block' : 'none'; if(alertCount > 0) { if(!daniStockWarned) { daniSpeak("⚠️ ¡Ojo Doc! Tienes " + alertCount + " arcos con stock crítico. Pasa a Inventario para revisar cuáles faltan.", 8000, 'warn'); daniStockWarned = true; } if ($('dani-dot').style.background !== 'rgb(239, 68, 68)' && $('dani-dot').style.background !== '#ef4444') { setDaniStatus('warn'); } } else { daniStockWarned = false; if ($('dani-dot').style.background === 'rgb(245, 158, 11)' || $('dani-dot').style.background === '#f59e0b') { setDaniStatus('none'); } } }
-    
-    function renderInvShop() {
-        let ih = ``; let sh = ``;
-        ['Sup','Inf'].forEach(a => {
-            if(!db.inv[a]) db.inv[a]={}; ih += `<div><h4 style="color:var(--primary); margin-bottom:1rem; font-size:1.2rem; border-bottom:2px solid #e0f2fe; padding-bottom:0.4rem;">Arcada ${a}</h4>`;
-            MATS.forEach(m => {
-                if(!db.cfg.act[m] || db.cfg.act[m].length===0) return; 
-                if(!db.inv[a][m]) db.inv[a][m]={}; 
-                ih+= `<div class="arch-box"><b style="display:block;margin-bottom:0.8rem;font-size:1rem;color:#0f172a;">${m}</b>`;
-                db.cfg.act[m].forEach(c => {
-                    if(db.inv[a][m][c]===undefined) db.inv[a][m][c]=0; const q = db.inv[a][m][c]; const cls = q<=2?'q-bad':(q<=5?'q-warn':'q-ok'); 
-                    ih+=`<div class="inv-row"><span>Calibre ${c}"</span><div class="inv-controls"><button class="btn-sm" onclick="updInv('${a}','${m}','${c}',-1)">-</button><span class="qty ${cls}" style="color:${q<=5?'#dc2626':'#0f172a'};">${q}</span><button class="btn-sm" onclick="updInv('${a}','${m}','${c}',1)">+</button></div></div>`;
-                    if(q<=5) { sh+=`<li class="urgent" style="color:#b91c1c; font-weight:bold; background:#fef2f2;">⚠️ Faltante: Arco ${a} - ${m} ${c}" (Stock Restante: ${q})</li>`; }
-                }); ih+=`</div>`;
-            }); ih+=`</div>`;
-        }); $('rInv').innerHTML = ih;
-        if($('qty_t1m')) $('qty_t1m').innerText = db.inv.tubes.t1m; if($('qty_t2m')) $('qty_t2m').innerText = db.inv.tubes.t2m;
-        SHOP.forEach(i => { const chk = db.shopChk[i]?'checked':''; sh+=`<li><input type="checkbox" id="sh_${i}" ${chk} onchange="saveShopChk('${i}')"><label for="sh_${i}">${i}</label></li>`; });
-        $('rShop').innerHTML = sh; checkTopAlert(); buildMatrix();
-    }
-    
-    function updInv(a,m,c,d) { db.inv[a][m][c] = Math.max(0, db.inv[a][m][c]+d); saveDB(); renderInvShop(); }
-    function updInvTubes(tType, d) { db.inv.tubes[tType] = Math.max(0, db.inv.tubes[tType]+d); saveDB(); renderInvShop(); }
-    function saveShopChk(i) { db.shopChk[i] = $(`sh_${i}`).checked; saveDB(); }
-
-    function loadFin() { $('fConsGen').value=db.fin.conGen; $('fDesGen').value=db.fin.desGen; $('fConsOrto').value=db.fin.conOrto; $('fDesOrto').value=db.fin.desOrto; $('fModo').value=db.fin.mod; $('fIvaArcos').checked = db.fin.ivaArcos || false; $('fTxTotal').value=db.fin.txTotal || 0; $('fInsTotal').value=db.fin.insTotal || 0; $('ft1m').value=db.fin.t1m || 0; $('ft2m').value=db.fin.t2m || 0; MATS.forEach(m => { if($('f'+m.substring(0,3))) $('f'+m.substring(0,3)).value = db.fin[m]; }); actualizarContadorMes(); }
-    function saveFin() { db.fin.conGen=Number($('fConsGen').value); db.fin.desGen=Number($('fDesGen').value); db.fin.conOrto=Number($('fConsOrto').value); db.fin.desOrto=Number($('fDesOrto').value); db.fin.mod=$('fModo').value; db.fin.ivaArcos = $('fIvaArcos').checked; db.fin.txTotal=Number($('fTxTotal').value); db.fin.insTotal=Number($('fInsTotal').value); db.fin.t1m=Number($('ft1m').value); db.fin.t2m=Number($('ft2m').value); MATS.forEach(m => { if($('f'+m.substring(0,3))) db.fin[m] = Number($('f'+m.substring(0,3)).value); }); saveDB(); actualizarContadorMes(); }
-    function getArchCost(m) { let c = db.fin.mod === 'box' ? (db.fin[m] / 10 || 0) : (db.fin[m] || 0); return db.fin.ivaArcos ? c * 1.16 : c; }
-    function actualizarContadorMes() { const d = new Date(); const prefix = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`; let cg = 0, co = 0; db.log.forEach(r => { if(r.f.startsWith(prefix)) { if(r.t === 'gen') cg++; else co++; } }); if($('lblCGen')) $('lblCGen').innerText = cg; if($('lblCOrto')) $('lblCOrto').innerText = co; }
-
-    function buildTreats() { 
-        let h = ``; 
-        Object.keys(TR_CATS).forEach(cat => { 
-            h += `<div class="treat-box"><h4>${cat}</h4>`; 
-            TR_CATS[cat].forEach((tr, i) => {
-                h += `<div class="treat-item"><label style="cursor:pointer; display:flex; gap:0.5rem;"><input type="checkbox" id="tr_${cat.substring(0,3)}_${i}"> ${tr}</label><input type="text" id="od_${cat.substring(0,3)}_${i}" placeholder="OD/Zona"></div>`;
-            }); 
-            h += `</div>`; 
-        }); 
-        if($('renderTreats')) $('renderTreats').innerHTML = h; 
-    }
-    function loadTreats(p) { Object.keys(TR_CATS).forEach(cat => { TR_CATS[cat].forEach((tr, i) => { const code = `${cat.substring(0,3)}_${i}`; if($(`tr_${code}`)) $(`tr_${code}`).checked = p.treats && p.treats[code] ? p.treats[code].chk : false; if($(`od_${code}`)) $(`od_${code}`).value = p.treats && p.treats[code] ? p.treats[code].od : ''; });}); renderPendingTreatsMain(p); }
-    function saveTreats(p) { if(!p.treats) p.treats = {}; Object.keys(TR_CATS).forEach(cat => { TR_CATS[cat].forEach((tr, i) => { const code = `${cat.substring(0,3)}_${i}`; if($(`tr_${code}`)) p.treats[code] = { chk: $(`tr_${code}`).checked, od: $(`od_${code}`).value }; });}); }
-    function saveTreatsOnly() { if(!db.curr) return alert("Selecciona un paciente."); saveTreats(db.pats[db.curr]); saveDB(); renderPendingTreatsMain(db.pats[db.curr]); daniSpeak("💾 Plan de tratamientos guardado con éxito.", 4000, 'info'); }
-    function renderPendingTreatsMain(p) {
-        let html = '';
-        if(p && p.treats) { Object.keys(TR_CATS).forEach(cat => { TR_CATS[cat].forEach((tr, i) => { const code = `${cat.substring(0,3)}_${i}`; if(p.treats[code] && p.treats[code].chk) { const od = p.treats[code].od ? ` (${p.treats[code].od})` : ''; html += `<span style="display:inline-block; background:white; padding:0.4rem 0.8rem; border-radius:6px; margin:0.3rem; font-size:0.85rem; border:1px solid #bfdbfe; color:#1e40af; font-weight:bold; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">${tr}${od}</span>`; } });}); }
-        if($('pPendingTreats')) { $('pPendingTreats').innerHTML = html ? `<label style="color:#1e40af; margin-bottom:0.8rem; font-size:0.9rem; font-weight:900; display:block; border-bottom:1px solid #bfdbfe; padding-bottom:0.4rem;">📋 TX PENDIENTES DEL PACIENTE:</label><div>${html}</div>` : ''; $('pPendingTreats').style.display = html ? 'block' : 'none'; }
-    }
-
-    function loadFacturacion(p) { let f = p.factData || {}; $('facRFC').value = f.rfc || ''; $('facNom').value = f.nom || ''; $('facReg').value = f.reg || 'Sueldos y Salarios (605)'; $('facCP').value = f.cp || ''; $('facUso').value = f.uso || 'Honorarios médicos, dentales y hospitalarios (D01)'; $('facEmail').value = f.email || ''; $('facMonto').value = ''; $('facConcepto').value = ''; }
-    function saveFactDatos() { if(!db.curr) return alert("Selecciona y guarda el perfil del paciente primero."); db.pats[db.curr].factData = { rfc: $('facRFC').value, nom: $('facNom').value, reg: $('facReg').value, cp: $('facCP').value, uso: $('facUso').value, email: $('facEmail').value }; saveDB(); daniSpeak("💾 ¡Datos fiscales actualizados y guardados en el perfil del paciente!", 4000, 'info'); }
-    function sendFactContador(metodo) { if(!db.curr) return alert("Selecciona un paciente."); let cfg = db.cfg; if(!cfg.contName || !cfg.contPhone) return alert("⚠️ Faltan datos de tu Contador. Ve a la pestaña de Admin > Identidad."); let docName = db.docs[db.activeDoc] ? db.docs[db.activeDoc].name : "nuestro consultorio"; let p = db.pats[db.curr]; let fd = p.factData || {}; let d = $('facDate').value; let m = $('facMonto').value; let c = $('facConcepto').value; if(!m) return alert("Por favor ingresa la Cantidad a Facturar ($)."); let msg = `Hola ${cfg.contName}, excelente día 👋\n\nTe envío los datos para generar una nueva factura por parte de *${docName}*:\n\n*DATOS DEL PACIENTE:*\n- RFC: ${fd.rfc||'N/A'}\n- Nombre / Razón Social: ${fd.nom||'N/A'}\n- Régimen Fiscal: ${fd.reg||'N/A'}\n- Código Postal: ${fd.cp||'N/A'}\n- Uso CFDI: ${fd.uso||'N/A'}\n- Correo Px: ${fd.email||'N/A'}\n\n*DATOS DEL PAGO:*\n- Fecha de emisión solicitada: ${d}\n- Monto a facturar: $${m}\n- Concepto: ${c||'Atención dental'}\n\nQuedo al pendiente. ¡Muchas gracias!`; if(metodo === 'wa') { let phone = cfg.contPhone.replace(/\D/g,''); if(phone.length === 10) phone = '52' + phone; window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`, '_blank'); daniSpeak("📱 Abriendo WhatsApp con los datos listos para enviar al contador...", 4000, 'info'); } else { if(!cfg.contEmail) return alert("No registraste el correo del contador."); let subject = encodeURIComponent(`Solicitud de Factura - Paciente: ${p.name}`); window.open(`mailto:${cfg.contEmail}?subject=${subject}&body=${encodeURIComponent(msg)}`, '_blank'); daniSpeak("✉️ Abriendo tu correo para mandar los datos de facturación...", 4000, 'info'); } }
-
-    function renderTimeline() {
-        if(!db.curr) { $('tlRender').innerHTML=''; return; } const p = db.pats[db.curr];
-        if(!p.notas || p.notas.length === 0) { $('tlRender').innerHTML = '<p style="color:#64748b; font-style:italic;">No hay notas registradas para este paciente.</p>'; return; }
-        let h = '';
-        p.notas.forEach(n => {
-            let label = n.type === 'gen' ? '<span class="tl-tag tag-gen">Odontología Gral</span>' : (n.type === 'ali' ? '<span class="tl-tag tag-ali">Alineadores</span>' : '<span class="tl-tag tag-orto">Ortodoncia</span>');
-            let content = '';
-            if(n.type === 'gen') {
-                if(n.vit && (n.vit.ta || n.vit.fc || n.vit.temp)) content += `<div style="font-size:0.8rem; color:#64748b; margin-bottom:0.4rem; border-bottom:1px dashed #cbd5e1; padding-bottom:0.4rem;"><b>Signos Vitales:</b> T.A: ${n.vit.ta||'--'} | F.C: ${n.vit.fc||'--'} | T°: ${n.vit.temp||'--'}</div>`;
-                if(n.anes && n.anes.used) content += `<div style="font-size:0.8rem; color:#0284c7; margin-bottom:0.4rem; border-bottom:1px dashed #bae6fd; padding-bottom:0.4rem;"><b>Anestesia:</b> ${n.anes.type} (${n.anes.cart} cartuchos)</div>`;
-                content += `<div>${n.obs}</div>`;
-            } else if(n.type === 'ali') { content = `<div><b>Fase:</b> ${n.etapa} | <b>Alineador:</b> #${n.num}</div><div style="margin-top:0.4rem;">${n.obs}</div>`;
-            } else {
-                content = `<div style="display:flex; gap:1rem; margin-bottom:0.4rem; font-size:0.85rem;"><span style="background:#f1f5f9; padding:0.2rem 0.5rem; border-radius:4px;"><b>Sup:</b> ${n.mS} ${n.cS}"</span><span style="background:#f1f5f9; padding:0.2rem 0.5rem; border-radius:4px;"><b>Inf:</b> ${n.mI} ${n.cI}"</span></div>`;
-                if(n.eU === 'Sí') content += `<div style="font-size:0.8rem; color:#0369a1; margin-bottom:0.4rem;"><b>Elásticos:</b> ${n.eV} | ${n.eS} | ${n.eF} | Pos: ${n.eP}</div>`;
-                content += `<div>${n.obs}</div>`;
-            }
-            h += `<div class="tl-item"><div class="tl-date">${n.f} ${label} <button style="background:none; border:none; cursor:pointer; color:#ef4444; font-size:0.8rem;" onclick="deleteNota(${n.id})">🗑️</button></div><div class="tl-card">${content}</div></div>`;
-        });
-        $('tlRender').innerHTML = h;
-    }
-
-    function deleteNota(id) { if(confirm("¿Estás seguro de eliminar permanentemente esta nota clínica?")) { db.pats[db.curr].notas = db.pats[db.curr].notas.filter(n => n.id !== id); saveDB(); renderTimeline(); } }
-    function triggerAlertUpdate(fut) { if(fut.trim()!=='') { $('pAlert').value = fut; db.pats[db.curr].alert = fut; db.pats[db.curr].alertDate = new Date().toISOString().split('T')[0]; setAlertLabel(db.pats[db.curr].alertDate); } }
-
-    function saveEvolucionGen() {
-        if(!db.curr) return alert("Guarda o selecciona un paciente primero.");
-        const f = $('nDateGen').value; const fut = $('nFutGen').value; let customMatCost = 0; let customMatLog = '';
-        db.cfg.materials.forEach((m,i) => { if($(`cMat_${i}`) && $(`cMat_${i}`).checked) { customMatCost += m.cost; customMatLog += `\n[+ Insumo Extra Registrado: ${m.name}]`; } });
-        let finalObs = $('nObsGen').value + customMatLog;
-        const n = { id: Date.now(), type: 'gen', f: f, obs: finalObs, fut: fut, vit: { ta: $('gTA').value, fc: $('gFC').value, temp: $('gTemp').value }, anes: { used: $('gAnesChk').checked, type: $('gAnesTipo').value, cart: $('gAnesCart').value } };
-        if($('nCobroGen').checked) db.log.push({ f:f, p:db.pats[db.curr].name, t:'gen', ing:db.fin.conGen, op:db.fin.desGen, inv:customMatCost });
-        db.pats[db.curr].notas.unshift(n); triggerAlertUpdate(fut); saveDB(); renderTimeline(); actualizarContadorMes();
-        $('nObsGen').value=''; $('nFutGen').value=''; $('gTA').value=''; $('gFC').value=''; $('gTemp').value=''; $('gAnesChk').checked=false; $('gAnesBox').classList.add('hidden'); $('gAnesCart').value='';
-        db.cfg.materials.forEach((m,i) => { if($(`cMat_${i}`)) $(`cMat_${i}`).checked = false; });
-        daniSpeak("🩺 ¡Evolución general guardada y anexada al historial!", 4000, 'info');
-    }
-
-    function saveEvolucion() {
-        if(!db.curr) return alert("Guarda paciente primero.");
-        const mS = document.querySelector('input[name="mSup"]:checked').value; const cS = document.querySelector('input[name="cSup"]:checked').value; const mI = document.querySelector('input[name="mInf"]:checked').value; const cI = document.querySelector('input[name="cInf"]:checked').value; let cAr = 0; 
-        if(mS!=='NA' && cS!=='NA') { db.inv['Sup'][mS][cS] = Math.max(0, db.inv['Sup'][mS][cS]-1); cAr += getArchCost(mS); } if(mI!=='NA' && cI!=='NA') { db.inv['Inf'][mI][cI] = Math.max(0, db.inv['Inf'][mI][cI]-1); cAr += getArchCost(mI); }
-        let customBktCost = 0; let customBktLog = '';
-        if($('chkBktSup').checked && $('selBktSup').value!=="") { let b = db.cfg.brackets[$('selBktSup').value]; customBktCost += b.cost; if(b.stock > 0) b.stock--; customBktLog += `\n[Colocación Sup: ${b.type} ${b.brand} ${b.pres}]`; }
-        if($('chkBktInf').checked && $('selBktInf').value!=="") { let b = db.cfg.brackets[$('selBktInf').value]; customBktCost += b.cost; if(b.stock > 0) b.stock--; customBktLog += `\n[Colocación Inf: ${b.type} ${b.brand} ${b.pres}]`; }
-        let ivaMult = db.fin.ivaArcos ? 1.16 : 1;
-        if($('chkTube1M').checked) { let q = Number($('qtyTube1M').value) || 1; db.inv.tubes.t1m = Math.max(0, db.inv.tubes.t1m - q); customBktCost += (db.fin.t1m * q * ivaMult); customBktLog += `\n[Recolocación Extras: ${q} x Tubo(s) 1er Molar]`; }
-        if($('chkTube2M').checked) { let q = Number($('qtyTube2M').value) || 1; db.inv.tubes.t2m = Math.max(0, db.inv.tubes.t2m - q); customBktCost += (db.fin.t2m * q * ivaMult); customBktLog += `\n[Recolocación Extras: ${q} x Tubo(s) 2do Molar]`; }
-        const f = $('nDate').value;
-        if($('nCobroOrto').checked) db.log.push({ f:f, p:db.pats[db.curr].name, t:'orto', ing:db.fin.conOrto, op:db.fin.desOrto, inv:cAr+customBktCost });
-        const fut = $('nFut').value; let finalObs = $('nObs').value + customBktLog;
-        const n = { id:Date.now(), type: 'orto', f:f, mS, cS, mI, cI, obs:finalObs, fut:fut, eU:$('eSi').checked?'Sí':'No', eV:'', eS:'', eF:'', eP:'' };
-        if(n.eU==='Sí') { n.eV = document.querySelector('input[name="eVec"]:checked')?.value||''; n.eS = $('eSize').value; n.eF = $('eForce').value; n.eP = $('ePos').value; }
-        db.pats[db.curr].notas.unshift(n); triggerAlertUpdate(fut); saveDB(); renderTimeline(); renderInvShop(); renderClinicaDyn(); actualizarContadorMes();
-        $('nObs').value=''; $('nFut').value=''; $('ePos').value=''; $('rSupNA').click(); $('rInfNA').click(); $('eNo').click(); $('chkBktSup').checked=false; $('selBktSup').classList.add('hidden'); $('selBktSup').value=''; $('chkBktInf').checked=false; $('selBktInf').classList.add('hidden'); $('selBktInf').value=''; $('chkTube1M').checked=false; $('qtyTube1M').value='1'; $('chkTube2M').checked=false; $('qtyTube2M').value='1';
-        daniSpeak("🦷 ¡Nota de ortodoncia guardada! Inventario actualizado.", 6000, 'info');
-    }
-
-    function saveEvolucionAli() {
-        if(!db.curr) return alert("Guarda paciente primero."); const f = $('nDateAli').value; const fut = $('aFut').value;
-        const n = { id: Date.now(), type: 'ali', f: f, etapa: $('aEtapa').value, num: $('aNum').value, obs: $('aObs').value, fut: fut };
-        if($('nCobroAli').checked) db.log.push({ f:f, p:db.pats[db.curr].name, t:'ali', ing:db.fin.conOrto, op:db.fin.desOrto, inv:0 });
-        db.pats[db.curr].notas.unshift(n); triggerAlertUpdate(fut); saveDB(); renderTimeline(); actualizarContadorMes();
-        $('aEtapa').value=''; $('aNum').value=''; $('aObs').value=''; $('aFut').value=''; 
-        daniSpeak("🪥 ¡Nota de alineadores registrada con éxito!", 4000, 'info');
-    }
-
-    function printHistory() {
-        if(!db.curr) return alert("Selecciona paciente para imprimir su historial."); const p = db.pats[db.curr]; const activeD = db.docs[db.activeDoc] || { name: '', spec: '' }; let htmlGen = '', htmlOrto = '', htmlAli = '';
-        if(!p.notas || !p.notas.length) { htmlGen = htmlOrto = htmlAli = "<p>Sin registros en el expediente.</p>"; }
-        else {
-            p.notas.forEach(n => {
-                let block = `<div class="note-block"><div class="note-header"><span>📅 ${n.f}</span></div>`;
-                if(n.type === 'gen') { if(n.vit && (n.vit.ta || n.vit.fc || n.vit.temp)) block += `<div style="color:#64748b; margin-bottom:2px;"><b>Signos Vitales:</b> TA:${n.vit.ta||'-'} | FC:${n.vit.fc||'-'} | T°:${n.vit.temp||'-'}</div>`; if(n.anes && n.anes.used) block += `<div style="color:#0284c7; margin-bottom:2px;"><b>Anestesia Administrada:</b> ${n.anes.type} (${n.anes.cart} cart.)</div>`; block += `<div style="white-space:pre-wrap; margin-top:4px;">${n.obs||'-'}</div></div>`; htmlGen += block; } 
-                else if(n.type === 'ali') { block += `<div style="margin-bottom:2px;"><b>Fase:</b> ${n.etapa||'-'} | <b>Alineador:</b> #${n.num||'-'}</div><div style="white-space:pre-wrap; margin-top:4px;">${n.obs||'-'}</div></div>`; htmlAli += block; } 
-                else { block += `<div style="margin-bottom:2px;"><b>Arcos:</b> Sup: ${n.mS} ${n.cS}" | Inf: ${n.mI} ${n.cI}"</div>`; if(n.eU==='Sí') block += `<div style="margin-bottom:2px;"><b>Elásticos:</b> ${n.eV} | ${n.eS} | ${n.eF} | Pos: ${n.eP}</div>`; block += `<div style="white-space:pre-wrap; margin-top:4px;">${n.obs||'-'}</div></div>`; htmlOrto += block; }
-            });
-        }
-        let headerLogo = db.cfg.logo ? `<img src="${db.cfg.logo}" style="max-height:55px; max-width:160px; object-fit:contain; margin-right:15px;">` : ''; let watermark = db.cfg.logo ? `<img src="${db.cfg.logo}" class="bg-watermark">` : '';
-        let allergyAlertStr = ''; if(p.hasAl) { let als = []; if(p.alPen) als.push('Penicilina'); if(p.alAin) als.push('AINEs'); if(p.alLat) als.push('Látex (Usar Nitrilo)'); if(p.alOther) als.push(p.alOther); allergyAlertStr = `<div style="background:#fef2f2; color:#b91c1c; font-weight:bold; padding:6px; border:1px solid #ef4444; border-radius:4px; margin-top:8px;">⚠️ ALERGIAS REGISTRADAS: ${als.join(', ')}</div>`; }
-        let finalHtml = `<html><head><title>Historial Clínico - ${p.name}</title><style>@page { size: letter portrait; margin: 10mm; } body{font-family: 'Segoe UI', Arial, sans-serif; padding:0; margin:0; color:#1e293b; font-size: 10.5px; line-height: 1.4; -webkit-print-color-adjust: exact; print-color-adjust: exact; max-height: 259mm; overflow: hidden; display: flex; flex-direction: column;} h1, h2, h3 {color:#0f172a; margin: 4px 0;} .section-title {background:#f1f5f9; padding:6px 10px; border-left:4px solid #0284c7; margin-top:10px; margin-bottom:5px; font-size:12px; text-transform:uppercase; letter-spacing:0.5px;} .note-block {border:1px solid #cbd5e1; padding:6px; margin-bottom:6px; border-radius:6px; page-break-inside:avoid; font-size:10px; background:white;} .note-header {border-bottom:1px solid #e2e8f0; padding-bottom:3px; margin-bottom:3px; font-weight:bold; color:#0f172a; display:flex; justify-content:space-between;} .bg-watermark { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); opacity: 0.08; width: 65%; height: auto; z-index: -10; pointer-events: none; } .content-box { flex-grow:1; overflow:hidden; }</style></head><body>${watermark}<div style="display:flex; align-items:center; border-bottom:3px solid #0284c7; padding-bottom:8px; margin-bottom:10px;">${headerLogo}<div><h1 style="font-size:16px;">${db.cfg.cli}</h1><h2 style="font-size:12px; color:#64748b;">${activeD.name}</h2></div></div><div style="background:#f8fafc; padding:8px; border-radius:6px; margin-bottom:10px; border:1px solid #e2e8f0;"><h2 style="font-size:12px; margin-bottom:4px;">Expediente Clínico: <span style="text-transform:uppercase; color:#0284c7;">${p.name}</span></h2><p style="margin:0;"><b>ID:</b> ${p.displayId} | <b>Edad:</b> ${p.age||'N/A'} | <b>Tel:</b> ${p.phone||'N/A'}</p><p style="margin:4px 0 0 0;"><b>Brackets Asignados:</b> ${p.brackets||'N/A'} ${p.retra ? '<span style="color:#dc2626; font-weight:bold;">(Paciente de Retratamiento)</span>' : ''}</p>${p.sum ? `<p style="margin:4px 0 0 0; border-top:1px dashed #cbd5e1; padding-top:4px;"><b>Resumen/Dx:</b> ${p.sum}</p>` : ''}${allergyAlertStr}</div><div class="content-box">`;
-        if(htmlGen) finalHtml += `<h3 class="section-title">🩺 Odontología General</h3>${htmlGen}`; if(htmlOrto) finalHtml += `<h3 class="section-title" style="border-color:#0369a1;">🦷 Ortodoncia</h3>${htmlOrto}`; if(htmlAli) finalHtml += `<h3 class="section-title" style="border-color:#047857;">🪥 Alineadores</h3>${htmlAli}`;
-        const win = window.open('','_blank'); win.document.write(finalHtml+"</div></body></html>"); win.document.close(); setTimeout(()=>win.print(), 800);
-    }
-
-    function printReceta() {
-        if(!db.curr) return alert("Debes seleccionar y guardar al paciente primero."); const p = db.pats[db.curr]; const cfg = db.cfg; const activeD = db.docs[db.activeDoc] || { name: '', spec: '', ced1: '', ced2: '', uni1: '', uni2: '', phone: '', email: '' }; const dPhone = activeD.phone || cfg.contact; const dEmail = activeD.email || cfg.email; const txt = $('txtReceta').value.replace(/\n/g, '<br>'); const isAntibiotic = $('chkAntibiotico').checked; if(txt.trim() === '') return alert("La receta está vacía. Escribe algo primero."); const d = new Date(); const dateStr = `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth()+1).padStart(2, '0')}/${d.getFullYear()}`;
-        let allergyAlertStr = ''; if(p.hasAl) { let als = []; if(p.alPen) als.push('Penicilina'); if(p.alAin) als.push('AINEs'); if(p.alLat) als.push('Látex'); if(p.alOther) als.push(p.alOther); if(als.length > 0) allergyAlertStr = `<div style="color:#b91c1c; font-weight:bold; font-size:9.5px; border:1px dashed #ef4444; padding:2px; text-align:center; margin-bottom:5px;">⚠️ ALERGIAS: ${als.join(', ')}</div>`; }
-        const uni1Html = activeD.uni1 ? `<img src="${activeD.uni1}" class="r-escudo">` : ''; const uni2Html = activeD.uni2 ? `<img src="${activeD.uni2}" class="r-escudo">` : ''; const cliLogoHtml = cfg.logo ? `<img src="${cfg.logo}" class="r-logo">` : ''; const specHtml = activeD.spec ? `<p class="r-doc-spec">${activeD.spec}</p>` : ''; const cedulasText = `C.P. ${activeD.ced1 || '______'} ${activeD.ced2 ? '| C.E. ' + activeD.ced2 : ''}`; const cofeText = cfg.cofepris ? ` | COFEPRIS: ${cfg.cofepris}` : '';
-        const renderHalfPage = (isCopy) => {
-            let stampHtml = ''; let watermarkHtml = ''; let localLogoWatermark = cfg.logo ? `<img src="${cfg.logo}" class="half-watermark-logo">` : ''; let firmaHtml = `<div class="r-sig-area"><div class="r-sig-line">Firma del Médico Tratante</div></div>`;
-            if (isCopy) { stampHtml = `<div style="text-align:center; color:#dc2626; border: 1px solid #dc2626; background: #fef2f2; font-weight:bold; font-size:10px; padding:3px; margin-bottom:6px; border-radius:4px; text-transform:uppercase;">Copia para el paciente - Solo indicaciones médicas</div>`; watermarkHtml = `<div class="r-watermark-copy">COPIA</div>` + localLogoWatermark; firmaHtml = `<div class="r-sig-area"><div style="font-size:10px; color:#94a3b8; font-weight:bold;">ESTA ES UNA COPIA INFORMATIVA. NO VÁLIDA PARA SURTIR EN FARMACIA.</div></div>`; } 
-            else { if (isAntibiotic) stampHtml = `<div style="text-align:center; color:#0284c7; font-weight:bold; font-size:10px; padding:3px; margin-bottom:6px; border-bottom: 1px solid #e0f2fe;">ORIGINAL - RETENCIÓN EN FARMACIA</div>`; watermarkHtml = localLogoWatermark; }
-            return `<div class="half-page">${watermarkHtml}<div class="r-wrapper"><div class="r-topbar"></div><div class="r-content">${stampHtml}<div class="r-header"><div class="r-escudos">${uni1Html}${uni2Html}</div><div class="r-doc-info"><h1 class="r-doc-name">${activeD.name || 'Dr. Nombre'}</h1>${specHtml}<p class="r-doc-ced">${cedulasText}${cofeText}</p></div><div class="r-clinic-logo" style="display:flex;flex-direction:column;align-items:flex-end;">${cliLogoHtml}<span style="font-size:8px;color:#64748b;margin-top:2px;">${cfg.slogan || ''}</span></div></div><div class="r-pat-row"><div class="r-field" style="width: 55%;">Paciente: <span class="r-line" style="text-transform: uppercase;">${p.name}</span></div><div class="r-field" style="width: 15%;">Edad: <span class="r-line">${p.age || ''}</span></div><div class="r-field" style="width: 25%;">Fecha: <span class="r-line">${dateStr}</span></div></div>${allergyAlertStr}<div class="r-box"><div class="r-rx">Rx</div><div class="r-text">${txt}</div></div>${firmaHtml}</div><div class="r-footer">${cfg.address || 'Dirección Clínica'} | ${dPhone} | ${dEmail}</div></div></div>`;
-        };
-        const html = `<html><head><title>Receta - ${p.name}</title><style>@page { size: letter portrait; margin: 10mm; } body { font-family: 'Century Gothic', 'Segoe UI', Arial, sans-serif; margin: 0; padding: 0; color: #334155; -webkit-print-color-adjust: exact; print-color-adjust: exact; background: white; width: 100vw; height: 100vh; max-height:259mm; display: flex; flex-direction: column; overflow: hidden; box-sizing:border-box;} .half-watermark-logo { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); opacity: 0.08; width: 45%; height: auto; z-index: -10; pointer-events: none; } .half-page { height: 50%; max-height: 50%; width: 100%; box-sizing: border-box; padding: 10px 20px; display: flex; flex-direction: column; position: relative; overflow:hidden;} .half-page:first-child:not(:last-child) { border-bottom: 1px dashed #cbd5e1; } .r-wrapper { display: flex; flex-direction: column; flex-grow: 1; box-sizing: border-box; border-left: 10px solid #004a7c; overflow: hidden; position: relative; } .r-topbar { background-color: #63c1c5; height: 6px; width: 100%; flex-shrink:0;} .r-content { padding: 10px 20px; flex-grow: 1; display: flex; flex-direction: column; position: relative; z-index: 1; overflow:hidden;} .r-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; flex-shrink:0;} .r-escudos { width: 25%; display: flex; gap: 6px; align-items: center; justify-content: flex-start; height: 50px;} .r-escudo { max-height: 100%; max-width: 45%; object-fit: contain; } .r-doc-info { width: 50%; text-align: center; } .r-doc-name { font-size: 15px; color: #007698; margin: 0 0 2px 0; font-weight: bold; } .r-doc-spec { font-size: 10px; color: #63c1c5; margin: 0 0 3px 0; } .r-doc-ced { font-size: 8.5px; color: #475569; margin: 0; } .r-clinic-logo { width: 25%; text-align: right; height: 50px;} .r-logo { max-height: 100%; max-width: 100%; object-fit: contain; } .r-pat-row { display: flex; justify-content: space-between; font-size: 10.5px; margin-bottom: 8px; color: #1e293b; flex-shrink:0;} .r-field { display: flex; align-items: flex-end; } .r-line { border-bottom: 1px dashed #94a3b8; flex-grow: 1; margin-left: 5px; font-weight: bold; white-space: nowrap;} .r-box { border: 1px solid #b2e2e5; border-radius: 12px; padding: 12px 15px; flex-grow: 1; position: relative; margin-bottom: 10px; overflow:hidden; } .r-rx { position: absolute; top: 5px; left: 10px; font-size: 45px; color: #e6f4f5; font-family: 'Times New Roman', serif; margin: 0; line-height: 1; z-index: -1; } .r-text { font-size: 11.5px; line-height: 1.4; z-index: 1; position: relative; } .r-sig-area { text-align: center; margin-bottom: 2px; margin-top: auto; flex-shrink:0;} .r-sig-line { border-top: 1px solid #004a7c; width: 180px; margin: 0 auto; padding-top: 3px; font-size: 9px; color: #94a3b8; font-weight: bold; } .r-footer { background-color: #0f172a; color: white; text-align: center; font-size: 8.5px; padding: 5px; width: 100%; box-sizing: border-box; letter-spacing:1px; flex-shrink:0;} .r-watermark-copy { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-45deg); font-size: 120px; color: rgba(220, 38, 38, 0.08); font-weight: bold; z-index: -10; pointer-events: none; white-space: nowrap; }</style></head><body>${renderHalfPage(false)}${renderHalfPage(true)}</body></html>`;
-        const win = window.open('', '_blank'); win.document.write(html); win.document.close(); setTimeout(() => win.print(), 800);
-    }
-
-    function printShoppingList() {
-        let l = ''; ['Sup','Inf'].forEach(a => { MATS.forEach(m => { if(db.cfg.act[m].length===0) return; db.cfg.act[m].forEach(c => { const q = db.inv[a]&&db.inv[a][m]&&db.inv[a][m][c]!==undefined ? db.inv[a][m][c] : 0; if(q<=5) l+=`<li>Arco ${a} - ${m} ${c}" (Quedan: ${q})</li>`; }); }); }); SHOP.forEach(i => { if(db.shopChk[i]) l+=`<li>${i} (Marcado en sistema)</li>`; }); if(db.inv.tubes.t1m <= 5) l+=`<li>Tubos 1er Molar Sueltos (Quedan: ${db.inv.tubes.t1m})</li>`; if(db.inv.tubes.t2m <= 5) l+=`<li>Tubos 2do Molar Sueltos (Quedan: ${db.inv.tubes.t2m})</li>`;
-        if(!l) return alert("Tu inventario está en excelentes condiciones, no hay faltantes.");
-        const html = `<html><head><title>Lista de Compras</title><style>body{font-family:sans-serif; padding:20px;} h2{color:#0284c7; border-bottom:2px solid #0284c7; padding-bottom:10px;} ul{line-height:1.8;}</style></head><body><h2>🛒 Lista Faltantes Depósito Dental</h2><ul>${l}</ul><script>window.print();<\/script></body></html>`;
-        const win = window.open('','_blank'); win.document.write(html); win.document.close();
-    }
-
-    function backupDB() { const dStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(db)); const dl = document.createElement('a'); dl.setAttribute("href", dStr); dl.setAttribute("download", `SmileFlow_Backup_${new Date().toISOString().split('T')[0]}.json`); dl.click(); }
-    function restoreDB() { const file = $('fileRestore').files[0]; if(!file) return alert("Selecciona un archivo JSON."); const reader = new FileReader(); reader.onload = e => { try { db = JSON.parse(e.target.result); saveDB(); alert("Base de datos restaurada correctamente. La página se recargará."); location.reload(); } catch(err) { alert("Archivo inválido o corrupto."); } }; reader.readAsText(file); }
-
     function generarReporteMes() {
         const d = new Date(); const prefix = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
         let trG = 0, ingG = 0, opG = 0; let trO = 0, ingO = 0, opO = 0; let invTotal = 0; let trA = 0;
-        db.log.forEach(r => { if(r.f.startsWith(prefix)) { if(r.t === 'gen') { trG++; ingG += (r.ing||0); opG += (r.op||0); invTotal += (r.inv||0); } else if(r.t === 'orto') { trO++; ingO += (r.ing||0); opO += (r.op||0); invTotal += (r.inv||0); } else if(r.t === 'ali') { trA++; ingO += (r.ing||0); } } });
-        const ingTotal = ingG + ingO; const opTotal = opG + opO; const neto = ingTotal - opTotal - invTotal; const monthNames = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+        
+        db.log.forEach(r => {
+            if(r.f.startsWith(prefix)) {
+                if(r.t === 'gen') { trG++; ingG += (r.ing||0); opG += (r.op||0); invTotal += (r.inv||0); }
+                else if(r.t === 'orto') { trO++; ingO += (r.ing||0); opO += (r.op||0); invTotal += (r.inv||0); }
+                else if(r.t === 'ali') { trA++; ingO += (r.ing||0); }
+            }
+        });
+        const ingTotal = ingG + ingO; const opTotal = opG + opO;
+        const neto = ingTotal - opTotal - invTotal;
+        const monthNames = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+
         const html = `<html><head><title>Reporte Financiero Mensual</title><style>@page { size: letter portrait; margin: 15mm; } body { font-family: 'Segoe UI', Arial, sans-serif; color: #1e293b; padding: 0; margin: 0; -webkit-print-color-adjust: exact; print-color-adjust: exact; } h1 { color: #0f172a; border-bottom: 3px solid #0284c7; padding-bottom: 10px; margin-bottom: 20px; font-size: 24px; text-transform: uppercase; } .summary-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 30px; } .summary-box { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 15px; text-align: center; } .summary-box h3 { margin: 0; font-size: 32px; color: #0284c7; } .summary-box p { margin: 5px 0 0 0; font-size: 14px; color: #64748b; font-weight: bold; text-transform: uppercase; } .fin-table { width: 100%; border-collapse: collapse; margin-bottom: 30px; } .fin-table th { background: #f1f5f9; color: #334155; font-weight: bold; text-align: left; padding: 12px; border-bottom: 2px solid #cbd5e1; } .fin-table td { padding: 12px; border-bottom: 1px solid #e2e8f0; } .fin-table tr:last-child td { border-bottom: none; } .total-row { background: #f8fafc; font-weight: bold; font-size: 16px; border-top: 2px solid #94a3b8; } .net-profit { text-align: right; font-size: 20px; margin-top: 30px; padding: 20px; background: #ecfdf5; border: 2px solid #10b981; border-radius: 8px; color: #064e3b; } .net-profit span { font-size: 36px; font-weight: 900; color: #059669; display: block; margin-top: 5px; } .footer { text-align: center; margin-top: 40px; font-size: 12px; color: #94a3b8; }</style></head><body><h1>Reporte Financiero y Estadístico</h1><p style="font-size: 16px; font-weight: bold; margin-bottom: 25px; color: #475569;">Mes: ${monthNames[d.getMonth()]} ${d.getFullYear()}</p><div class="summary-grid"><div class="summary-box"><h3>${trG + trO + trA}</h3><p>Total Citas Atendidas</p></div><div class="summary-box" style="border-color:#bae6fd; background:#f0f9ff;"><h3 style="color:#0369a1;">$${ingTotal.toLocaleString('en-US', {minimumFractionDigits: 2})}</h3><p>Ingresos Brutos Estimados</p></div></div><table class="fin-table"><thead><tr><th>Categoría</th><th>Consultas</th><th>Ingresos Brutos</th><th>Costos Operativos</th><th>Costo Inventario (Arcos/Extras)</th></tr></thead><tbody><tr><td>Odontología General</td><td>${trG}</td><td>$${ingG.toLocaleString('en-US', {minimumFractionDigits: 2})}</td><td>$${opG.toLocaleString('en-US', {minimumFractionDigits: 2})}</td><td>--</td></tr><tr><td>Ortodoncia Activa</td><td>${trO}</td><td>$${ingO.toLocaleString('en-US', {minimumFractionDigits: 2})}</td><td>$${opO.toLocaleString('en-US', {minimumFractionDigits: 2})}</td><td>$${invTotal.toLocaleString('en-US', {minimumFractionDigits: 2})}</td></tr><tr class="total-row"><td>TOTAL</td><td>${trG + trO}</td><td>$${ingTotal.toLocaleString('en-US', {minimumFractionDigits: 2})}</td><td>$${opTotal.toLocaleString('en-US', {minimumFractionDigits: 2})}</td><td>$${invTotal.toLocaleString('en-US', {minimumFractionDigits: 2})}</td></tr></tbody></table><div class="net-profit">Utilidad Neta (Ingresos - Gastos e Inventario)<span>$${neto.toLocaleString('en-US', {minimumFractionDigits: 2})} MXN</span></div><div class="footer">Reporte generado automáticamente por SmileFlow by DentiLike</div></body></html>`;
         const win = window.open('','_blank'); win.document.write(html); win.document.close(); setTimeout(()=>win.print(), 800);
     }
 
-    // INIT FINAL (BLINDADO)
-    try { loadConfigUI(); } catch(e) { console.error("Error UI Inicial:", e); }
-    try { buildTreats(); } catch(e) { console.error("Error Construyendo Tratamientos:", e); }
+    loadConfigUI();
 </script>
+</body>
+</html>
