@@ -2260,6 +2260,7 @@ AVISO PRÓX. CITA (Recordatorio local):
 <div class="input-group" style="margin-top:0.5rem; background:#f8fafc; padding:1rem; border-radius:var(--radius-md); border:1px dashed #cbd5e1;">
 <label><i class="fa-regular fa-image"></i> Logo del Consultorio (Transparente recomendado para Marca de Agua)</label>
 <input accept="image/*" class="input-field" id="cLogo" onchange="uploadLogo(event)" style="padding:0.4rem; background:white;" type="file"/>
+<div style="margin-top:0.4rem; font-size:0.78rem; color:#64748b;"><i class="fa-solid fa-circle-info"></i> Este logo aparece en tus recetas y documentos PDF. La barra lateral siempre muestra el logo de Dentilike.</div>
 </div>
 
 <h4 style="margin-top:2rem; font-size:1rem; color:#0f172a; border-bottom:2px solid #e2e8f0; padding-bottom:0.5rem;"><i class="fa-solid fa-address-book"></i> Datos de Contacto Globales</h4>
@@ -10483,7 +10484,7 @@ ${patientText}`;
         const setV = (id,val)=>{ const el=$(id); if(el) el.value = val; };
         const setC = (id,val)=>{ const el=$(id); if(el) el.checked = val; };
         setV('cCli', db.cfg.cli||''); setV('cSlogan', db.cfg.slogan||''); setV('cDrive', db.cfg.drive||''); setV('cAgenda', db.cfg.agenda||''); setV('cAddress', db.cfg.address||''); setV('cContact', db.cfg.contact||''); setV('cEmail', db.cfg.email||''); setV('cCofepris', db.cfg.cofepris||''); setV('cGeminiKey', localStorage.getItem('sf_gemini_key') || ''); setC('cDaniEn', db.cfg.daniEn); setV('cContName', db.cfg.contName||''); setV('cContPhone', db.cfg.contPhone||''); setV('cContEmail', db.cfg.contEmail||'');
-        if(db.cfg.logo) { if($('hLogo')){ $('hLogo').src=db.cfg.logo; $('hLogo').style.display='block'; } } else if($('hLogo')) $('hLogo').style.display='none';
+        if($('hLogo')) $('hLogo').style.display='block'; /* Sidebar SIEMPRE muestra el logo de Dentilike (de fabrica); db.cfg.logo se usa solo en recetas/PDF */
         if($('astNameLabel')) $('astNameLabel').innerHTML = '<i class="fa-solid fa-robot"></i> Dr. Mikes Molares'; try{renderAdminDyn();}catch(e){} try{renderClinicaDyn();}catch(e){} try{renderDocSelects();}catch(e){} try{renderPatSelect();}catch(e){} try{buildForms();}catch(e){} try{renderAdminMeds();}catch(e){} try{loadFin();}catch(e){}
     }
     function uploadAstPhoto(e) { /* Avatar fijo (Dr. Mikes Molares) - no editable */ }
