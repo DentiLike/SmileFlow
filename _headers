@@ -1,0 +1,20 @@
+# SmileFlow — Control de caché (Netlify)
+# Evita que el navegador sirva versiones estancadas de la app.
+
+/*
+  Cache-Control: no-cache, no-store, must-revalidate
+  Pragma: no-cache
+  Expires: 0
+
+# El Service Worker SIEMPRE debe revalidarse para que las actualizaciones lleguen al instante
+/sw.js
+  Cache-Control: no-cache, no-store, must-revalidate
+
+/manifest.json
+  Cache-Control: no-cache
+
+# Los iconos casi nunca cambian: caché de 7 días para ahorrar datos
+/icon-192.png
+  Cache-Control: public, max-age=604800
+/icon-512.png
+  Cache-Control: public, max-age=604800
