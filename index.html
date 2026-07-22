@@ -3506,6 +3506,16 @@ SmileFlow <b>no es un Expediente Clínico Electrónico certificado</b> conforme 
     
 // --- MOTOR IDB INYECTADO ---
 let db = null;
+// Abre la base principal garantizando el store 'clinica'. Versión 2: repara
+// bases que quedaron creadas vacías (sin store) por aperturas previas sin upgrade.
+function sfOpenMainDB(){
+    const r = indexedDB.open('SmileFlowDB_DentiLike', 2);
+    r.onupgradeneeded = (e) => {
+        const d = e.target.result;
+        if(!d.objectStoreNames.contains('clinica')) d.createObjectStore('clinica', { keyPath: 'id' });
+    };
+    return r;
+}
 function sfPantallaError(titulo, detalle, mostrarUrl) {
     document.body.innerHTML = `
     <div style="min-height:100vh; display:flex; align-items:center; justify-content:center; padding:1.5rem; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif; background:#f8fafc;">
@@ -3542,7 +3552,7 @@ async function initDB() {
     } catch(e) { console.warn('persist() no disponible', e); }
     return new Promise((resolve, reject) => {
         let req;
-        try { req = indexedDB.open('SmileFlowDB_DentiLike', 1); }
+        try { req = sfOpenMainDB(); }
         catch(err) {
             sfPantallaError('No se pudo abrir la base de datos', 'El navegador bloqueó el almacenamiento local.<br><br>Si estás en <b>modo incógnito</b>, ciérralo y abre la app normal. Detalle: ' + (err.message||err), true);
             return reject(err);
@@ -3555,7 +3565,7 @@ async function initDB() {
         const listo = () => clearTimeout(salvavidas);
         req.onerror = (e) => { listo(); sfPantallaError('No se pudo abrir la base de datos', 'El navegador bloqueó el almacenamiento local. Si abriste el archivo descargado en vez del sitio web, ese es el motivo.', true); reject(e); };
         req.onblocked = () => { listo(); sfPantallaError('Hay otra pestaña abierta', 'SmileFlow está abierto en otra pestaña o ventana. Ciérrala y recarga esta página.', false); reject(new Error('blocked')); };
-        req.onupgradeneeded = (e) => { e.target.result.createObjectStore('clinica', { keyPath: 'id' }); };
+        // El store 'clinica' lo garantiza sfOpenMainDB() (con guardia, sin duplicar).
         req.onsuccess = (e) => {
             const dbInstance = e.target.result;
             try {
@@ -13417,14 +13427,14 @@ Reglas: español de México; terminología dental correcta; máximo 6 líneas; u
 
     function sfIdbPut(id, valor){
         return new Promise((res)=>{
-            const req = indexedDB.open('SmileFlowDB_DentiLike', 1);
+            const req = sfOpenMainDB();
             req.onsuccess = e => { try{ const tx=e.target.result.transaction('clinica','readwrite'); tx.objectStore('clinica').put({id:id, handle:valor}); tx.oncomplete=()=>res(true); tx.onerror=()=>res(false); }catch(err){ res(false); } };
             req.onerror = ()=>res(false);
         });
     }
     function sfIdbGet(id){
         return new Promise((res)=>{
-            const req = indexedDB.open('SmileFlowDB_DentiLike', 1);
+            const req = sfOpenMainDB();
             req.onsuccess = e => { try{ const tx=e.target.result.transaction('clinica','readonly'); const g=tx.objectStore('clinica').get(id); g.onsuccess=()=>res(g.result?g.result.handle:null); g.onerror=()=>res(null); }catch(err){ res(null); } };
             req.onerror = ()=>res(null);
         });
@@ -14021,7 +14031,7 @@ Reglas: español de México; terminología dental correcta; máximo 6 líneas; u
         }
         db=rDb;
         // Persistir en IndexedDB (localStorage truena con imágenes grandes por límite de 5MB)
-        try { const rq=indexedDB.open('SmileFlowDB_DentiLike',1); rq.onsuccess=(e)=>{ try{ e.target.result.transaction('clinica','readwrite').objectStore('clinica').put({id:'main_data',data:db}); }catch(err){} }; } catch(e){}
+        try { const rq=sfOpenMainDB(); rq.onsuccess=(e)=>{ try{ e.target.result.transaction('clinica','readwrite').objectStore('clinica').put({id:'main_data',data:db}); }catch(err){} }; } catch(e){}
         loadConfigUI(); renderPatSelect(); if(db.curr) loadPatient(); else newPatient(); }catch(e){} }
     async function uploadToDrive(isNew=false) { let t=null; try{t=gapi.client.getToken();}catch(e){} if(!t) return; updateGlobalSyncStatus('syncing'); let _payload=JSON.stringify(db); const _cp=localStorage.getItem('sf_cloud_pass'); if(_cp){ try{ _payload=JSON.stringify(await sfEncrypt(_payload,_cp)); }catch(e){} } const bnd='31415926535897'; const body="\r\n--"+bnd+"\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n{\"name\":\"SmileFlow_Database.json\",\"mimeType\":\"application/json\"}\r\n--"+bnd+"\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n"+_payload+"\r\n--"+bnd+"--"; let url=isNew?'https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart':`https://www.googleapis.com/upload/drive/v3/files/${driveFileId}?uploadType=multipart`; try { let res=await fetch(url,{method:isNew?'POST':'PATCH',headers:new Headers({'Authorization':'Bearer '+t.access_token,'Content-Type':'multipart/related; boundary='+bnd}),body:body}); let val=await res.json(); if(res.ok){if(isNew){driveFileId=val.id; localStorage.setItem('sf_drive_file_id',driveFileId);} setTimeout(()=>{updateGlobalSyncStatus('online'); checkTopAlert();},1000);} else throw new Error(); }catch(e){updateGlobalSyncStatus('offline'); setDaniStatus('error');} }
 
@@ -14094,7 +14104,7 @@ function sfSaveOK() {
 function saveDB() {
     if (!db) return;
     db.lastMod = Date.now(); // sello de tiempo: protege contra sobrescritura por copias viejas de Drive
-    const req = indexedDB.open('SmileFlowDB_DentiLike', 1);
+    const req = sfOpenMainDB();
     req.onerror = () => sfSaveError('no se pudo abrir la base local');
     req.onblocked = () => sfSaveError('base bloqueada por otra pestaña abierta');
     req.onsuccess = (e) => {
