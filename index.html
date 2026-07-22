@@ -3509,7 +3509,7 @@ let db = null;
 // Abre la base principal garantizando el store 'clinica'. Versión 2: repara
 // bases que quedaron creadas vacías (sin store) por aperturas previas sin upgrade.
 function sfOpenMainDB(){
-    const r = indexedDB.open('SmileFlowDB_DentiLike', 2);
+    const r = indexedDB.open('SmileFlowDB_DentiLike'); // sin versión: nunca fuerza upgrade ni bloquea
     r.onupgradeneeded = (e) => {
         const d = e.target.result;
         if(!d.objectStoreNames.contains('clinica')) d.createObjectStore('clinica', { keyPath: 'id' });
@@ -3564,10 +3564,21 @@ async function initDB() {
         }, 8000);
         const listo = () => clearTimeout(salvavidas);
         req.onerror = (e) => { listo(); sfPantallaError('No se pudo abrir la base de datos', 'El navegador bloqueó el almacenamiento local. Si abriste el archivo descargado en vez del sitio web, ese es el motivo.', true); reject(e); };
-        req.onblocked = () => { listo(); sfPantallaError('Hay otra pestaña abierta', 'SmileFlow está abierto en otra pestaña o ventana. Ciérrala y recarga esta página.', false); reject(new Error('blocked')); };
+        req.onblocked = () => { console.warn('IDB open blocked; ignorado (apertura sin cambio de versión).'); };
         // El store 'clinica' lo garantiza sfOpenMainDB() (con guardia, sin duplicar).
         req.onsuccess = (e) => {
             const dbInstance = e.target.result;
+            if(!dbInstance.objectStoreNames.contains('clinica')) {
+                // La base existe pero sin el store (quedó vacía). No hay datos: recrear limpia.
+                dbInstance.close();
+                const del = indexedDB.deleteDatabase('SmileFlowDB_DentiLike');
+                del.onsuccess = del.onerror = del.onblocked = () => {
+                    const r2 = sfOpenMainDB();
+                    r2.onerror = () => { listo(); sfPantallaError('No se pudo iniciar', 'No se pudo preparar la base local. Recarga la página.', true); reject(new Error('recreate')); };
+                    r2.onsuccess = (ev2) => { listo(); try { ev2.target.result.transaction('clinica','readwrite').objectStore('clinica').put({ id:'main_data', data: db }); } catch(_){} resolve(); };
+                };
+                return;
+            }
             try {
                 const tx = dbInstance.transaction('clinica', 'readwrite');
                 tx.onerror = () => { listo(); sfPantallaError('Error al leer tus datos', 'No se pudo leer la base local. Intenta recargar; si sigue, restaura tu último respaldo.', false); reject(new Error('tx error')); };
