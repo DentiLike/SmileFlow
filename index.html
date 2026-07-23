@@ -3534,6 +3534,21 @@ function sfPantallaError(titulo, detalle, mostrarUrl) {
     </div>`;
 }
 
+function arrancarDegradado(motivo){
+    try { console.warn('SmileFlow en modo temporal (sin persistencia):', motivo); } catch(_){}
+    const mostrar = () => {
+        try {
+            if(document.getElementById('sfNoPersistBar')) return;
+            const bar = document.createElement('div');
+            bar.id = 'sfNoPersistBar';
+            bar.style.cssText = 'position:fixed; top:0; left:0; right:0; z-index:100000; background:#b45309; color:white; padding:10px 40px 10px 14px; font:600 12.5px/1.45 -apple-system,BlinkMacSystemFont,Roboto,sans-serif; text-align:center;';
+            bar.innerHTML = '⚠️ Este navegador no guarda datos de forma estable (común dentro de Facebook). La app funciona, pero para no perder información ábrela en <b>Chrome / Safari</b> o instálala desde el menú del navegador. <span onclick="this.parentNode.remove()" style="position:absolute; right:12px; top:7px; cursor:pointer; font-size:16px;">✕</span>';
+            document.body.prepend(bar);
+        } catch(_){}
+    };
+    if(document.body) mostrar(); else document.addEventListener('DOMContentLoaded', mostrar);
+}
+
 async function initDB() {
     // Aviso (no bloqueo): si se abre como archivo suelto, el navegador limita el almacenamiento
     const proto = location.protocol;
@@ -3554,16 +3569,16 @@ async function initDB() {
         let req;
         try { req = sfOpenMainDB(); }
         catch(err) {
-            sfPantallaError('No se pudo abrir la base de datos', 'El navegador bloqueó el almacenamiento local.<br><br>Si estás en <b>modo incógnito</b>, ciérralo y abre la app normal. Detalle: ' + (err.message||err), true);
-            return reject(err);
+            arrancarDegradado('open throw: ' + (err.message||err));
+            return resolve();
         }
         // Salvavidas: si IndexedDB no responde en 8 s, no dejar la pantalla en blanco
         const salvavidas = setTimeout(() => {
-            sfPantallaError('La base de datos no respondió', 'El almacenamiento del navegador no respondió. Cierra otras pestañas de SmileFlow que tengas abiertas y vuelve a intentar.', true);
-            reject(new Error('timeout indexedDB'));
+            arrancarDegradado('timeout');
+            resolve();
         }, 8000);
         const listo = () => clearTimeout(salvavidas);
-        req.onerror = (e) => { listo(); sfPantallaError('No se pudo abrir la base de datos', 'El navegador bloqueó el almacenamiento local. Si abriste el archivo descargado en vez del sitio web, ese es el motivo.', true); reject(e); };
+        req.onerror = (e) => { listo(); arrancarDegradado('open error'); resolve(); };
         req.onblocked = () => { console.warn('IDB open blocked; ignorado (apertura sin cambio de versión).'); };
         // El store 'clinica' lo garantiza sfOpenMainDB() (con guardia, sin duplicar).
         req.onsuccess = (e) => {
@@ -3574,17 +3589,17 @@ async function initDB() {
                 const del = indexedDB.deleteDatabase('SmileFlowDB_DentiLike');
                 del.onsuccess = del.onerror = del.onblocked = () => {
                     const r2 = sfOpenMainDB();
-                    r2.onerror = () => { listo(); sfPantallaError('No se pudo iniciar', 'No se pudo preparar la base local. Recarga la página.', true); reject(new Error('recreate')); };
+                    r2.onerror = () => { listo(); arrancarDegradado('recreate error'); resolve(); };
                     r2.onsuccess = (ev2) => { listo(); try { ev2.target.result.transaction('clinica','readwrite').objectStore('clinica').put({ id:'main_data', data: db }); } catch(_){} resolve(); };
                 };
                 return;
             }
             try {
                 const tx = dbInstance.transaction('clinica', 'readwrite');
-                tx.onerror = () => { listo(); sfPantallaError('Error al leer tus datos', 'No se pudo leer la base local. Intenta recargar; si sigue, restaura tu último respaldo.', false); reject(new Error('tx error')); };
+                tx.onerror = () => { listo(); arrancarDegradado('tx error'); resolve(); };
                 const store = tx.objectStore('clinica');
                 const getReq = store.get('main_data');
-                getReq.onerror = () => { listo(); sfPantallaError('Error al leer tus datos', 'No se pudieron leer los datos guardados.', false); reject(new Error('get error')); };
+                getReq.onerror = () => { listo(); arrancarDegradado('get error'); resolve(); };
                 getReq.onsuccess = () => {
                     listo();
                     if (getReq.result) {
@@ -3598,7 +3613,7 @@ async function initDB() {
                         resolve();
                     }
                 };
-            } catch(err) { listo(); sfPantallaError('No se pudo iniciar', 'Ocurrió un error al abrir tus datos: ' + (err.message||err), true); reject(err); }
+            } catch(err) { listo(); arrancarDegradado('tx throw: ' + (err.message||err)); resolve(); }
         };
     });
 }
