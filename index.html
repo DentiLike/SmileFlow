@@ -91,11 +91,11 @@
         .search-input { border: none; background: transparent; outline: none; width: 100%; font-size: 0.95rem; font-weight: 500; color: var(--text); }
         .search-select { border: none; background: white; padding: 0.4rem; border-radius: 4px; font-weight: 700; color: var(--primary-dark); outline: none; cursor: pointer; flex-shrink: 0; max-width: 200px; box-shadow: var(--shadow-sm); }
         
-        .topbar-actions { display: flex; align-items: center; gap: 1rem; }
-        .topbar-actions select { border: 1px solid var(--border); padding: 0.5rem; border-radius: var(--radius-md); font-weight: 600; color: var(--text); outline: none; cursor: pointer; background: white; }
+        .topbar-actions { display: flex; align-items: center; gap: 0.55rem; flex-shrink: 0; }
+        .topbar-actions select { border: 1px solid var(--border); padding: 0.5rem; border-radius: var(--radius-md); font-weight: 600; color: var(--text); outline: none; cursor: pointer; background: white; max-width: 190px; text-overflow: ellipsis; }
 
         /* INDICADOR DE NUBE */
-        .sync-badge { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.4rem 0.8rem; border-radius: 20px; font-weight: 800; font-size: 0.8rem; cursor: pointer; transition: all 0.3s; border: 2px solid transparent;}
+        .sync-badge { display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.4rem 0.75rem; border-radius: 20px; font-weight: 800; font-size: 0.8rem; cursor: pointer; transition: all 0.3s; border: 2px solid transparent; white-space: nowrap; flex-shrink: 0; }
         .sync-badge.offline { background: #fee2e2; color: #dc2626; border-color: #fca5a5; }
         .sync-badge.syncing { background: #fef3c7; color: #d97706; border-color: #fde047; }
         .sync-badge.online { background: #dcfce7; color: #059669; border-color: #86efac; }
@@ -239,8 +239,23 @@
             .sidebar.open { transform: translateX(0); }
             .menu-toggle { display: block; }
             .mobile-overlay.open { display: block; }
-            .topbar { padding: 0 1rem; }
+            .topbar { padding: 0 1rem; gap: 0.5rem; }
             .content-area { padding: 1rem; padding-bottom: 130px; }
+        }
+
+        /* Barra superior compacta en pantallas chicas: los badges pasan a solo icono */
+        @media(max-width: 760px) {
+            .topbar { padding: 0 0.6rem; gap: 0.4rem; }
+            .topbar-actions { gap: 0.35rem; }
+            .bdg-txt { display: none; }
+            .sync-badge { padding: 0.45rem 0.6rem; gap: 0; font-size: 0.9rem; }
+            .topbar-appearance { display: none !important; }
+            .topbar-actions select { max-width: 108px; font-size: 0.78rem; padding: 0.4rem; }
+            .search-area { padding: 0.3rem 0.6rem; gap: 0.4rem; min-width: 0; flex-shrink: 1; }
+            /* La barra se acomoda en dos renglones: así nada queda fuera de pantalla */
+            .topbar { flex-wrap: wrap; min-height: auto; padding-top: 0.45rem; padding-bottom: 0.45rem; }
+            .topbar > div:first-child { min-width: 0; flex: 1 1 100%; }
+            .topbar-actions { flex: 1 1 100%; justify-content: flex-start; margin-top: 0.35rem; }
         }
 
         /* MODO NOCTURNO Y TABLET (NATIVO) */
@@ -668,10 +683,10 @@ window._pdfReady=true;
 </div>
 <div class="topbar-actions">
 <div class="sync-badge offline" id="globalSyncStatus" onclick="openSection('s-admin-sys', document.querySelector('.nav-item[onclick*=\'s-admin-sys\']'))" title="Ir a configuración de Nube">
-<i class="fa-solid fa-cloud-xmark"></i> Offline
+<i class="fa-solid fa-cloud-xmark"></i> <span class="bdg-txt">Offline</span>
                 </div>
 <div class="sync-badge online" id="sfLocalBadge" onclick="sfPanelRespaldos()" title="Estado de tus respaldos">
-<i class="fa-solid fa-shield-halved"></i> Protegido
+<i class="fa-solid fa-shield-halved"></i> <span class="bdg-txt">Protegido</span>
                 </div>
 <!-- Controles de Apariencia (Topbar) -->
 <div class="topbar-appearance" style="display:flex; align-items:center; gap:0.3rem; padding:0.3rem; background:#f1f5f9; border-radius:24px; border:1px solid var(--border);">
@@ -3532,7 +3547,7 @@ Una vez autorizado tu correo: ve a <b>Configuración → Sistema y Nube</b>, toc
                 tip = 'Respaldo de hace ' + (dias === 0 ? 'hoy' : dias + ' día(s)') + '. Toca para ver el detalle.';
             }
             el.className = 'sync-badge ' + clase;
-            el.innerHTML = '<i class="fa-solid ' + icono + '"></i> ' + texto;
+            el.innerHTML = '<i class="fa-solid ' + icono + '"></i> <span class="bdg-txt">' + texto + '</span>';
             el.title = tip;
         } catch(e){}
     }
@@ -3987,6 +4002,80 @@ db = {
         openSection(seccion);
     }
 
+    // ===== DETALLE DE LAS TARJETAS DEL TABLERO =====
+    // Al tocar una tarjeta se abre la lista concreta (quiénes son).
+    function sfAbrirPacienteDesdeKPI(id){
+        try {
+            const ov = document.querySelector('div[style*="z-index:99999"]');
+            if(ov) ov.remove();
+            if(!db.pats || !db.pats[id]) return;
+            const sel = $('pSelect');
+            if(sel){ sel.value = id; loadPatient(); }
+            else { db.curr = id; saveDB(); loadPatient(); }
+        } catch(e){ console.warn('abrir paciente', e); }
+    }
+
+    function sfDetalleKPI(tipo){
+        try {
+            const hoy = new Date().toISOString().split('T')[0];
+            const hoy0 = new Date(); hoy0.setHours(0,0,0,0);
+            const fmtH = h => { if(!h) return ''; let [hh,mm]=h.split(':'); let H=parseInt(hh), ap=H>=12?'PM':'AM'; H=H%12||12; return H+':'+mm+' '+ap; };
+            const dinero = n => '$' + (n||0).toLocaleString('es-MX');
+            const cfg = {
+                citas:      { t:'Citas de hoy',            ic:'fa-calendar-check',   c:'#1f5b9e' },
+                pendientes: { t:'Pendientes y avisos',     ic:'fa-thumbtack',        c:'#b45309' },
+                endo:       { t:'Endodoncias activas',     ic:'fa-diagram-project',  c:'#7c3aed' },
+                protesis:   { t:'Prótesis activas',        ic:'fa-crown',            c:'#b45309' },
+                lab:        { t:'Trabajos en laboratorio', ic:'fa-truck-fast',       c:'#0e7490' },
+                adeudo:     { t:'Pacientes con adeudo',    ic:'fa-user-clock',       c:'#dc2626' }
+            }[tipo] || { t:'Detalle', ic:'fa-list', c:'#475569' };
+
+            const filas = [];
+            Object.values(db.pats || {}).forEach(p => {
+                if(tipo === 'citas'){
+                    if(p.nextAppt === hoy) filas.push({ id:p.id, n:p.name, d: fmtH(p.nextApptTime) || 'Sin hora', orden: p.nextApptTime || '99:99' });
+                } else if(tipo === 'pendientes'){
+                    if(p.alert && p.alert.trim()) filas.push({ id:p.id, n:p.name, d:p.alert });
+                } else if(tipo === 'endo'){
+                    (p.endos || []).forEach(e => { if(e.estado !== 'Terminado') filas.push({ id:p.id, n:p.name, d:(e.diente? 'Diente '+e.diente+' · ':'') + (e.estado || 'En proceso') }); });
+                } else if(tipo === 'protesis'){
+                    (p.protesis || []).forEach(pr => { if(!(pr.etapas && pr.etapas.cementacion && pr.etapas.cementacion.done)) filas.push({ id:p.id, n:p.name, d:(pr.tipo || 'Prótesis') + (pr.diente? ' · Diente '+pr.diente : '') }); });
+                } else if(tipo === 'lab'){
+                    (p.ordenesLab || []).forEach(o => {
+                        if(/Recibido/i.test(o.fase||'')) return;
+                        let vencido = false;
+                        if(o.fechaEntrega){ const d=new Date(o.fechaEntrega+'T12:00:00'); d.setHours(0,0,0,0); vencido = d < hoy0; }
+                        filas.push({ id:p.id, n:p.name, d:(o.trabajo || o.tipo || 'Trabajo') + ' · ' + (o.fase || 'En proceso') + (o.fechaEntrega ? ' · entrega ' + new Date(o.fechaEntrega+'T12:00:00').toLocaleDateString('es-MX') : ''), alerta: vencido, orden: o.fechaEntrega || '9999' });
+                    });
+                } else if(tipo === 'adeudo'){
+                    const costo = parseFloat(p.costoTotal) || 0;
+                    const abonado = (p.abonos || []).reduce((s,a)=>s+(parseFloat(a.monto)||0),0);
+                    const deuda = costo - abonado;
+                    if(deuda > 0) filas.push({ id:p.id, n:p.name, d:'Debe ' + dinero(deuda) + ' de ' + dinero(costo), orden: -deuda });
+                }
+            });
+            filas.sort((a,b)=>{
+                if(a.orden !== undefined && b.orden !== undefined) return (a.orden > b.orden) ? 1 : (a.orden < b.orden ? -1 : 0);
+                return (a.n||'').localeCompare(b.n||'');
+            });
+
+            const { body } = sfOverlay('<i class="fa-solid ' + cfg.ic + '"></i> ' + cfg.t, cfg.c);
+            if(!filas.length){
+                body.innerHTML = '<p style="color:#64748b; text-align:center; padding:1.2rem 0;"><i class="fa-regular fa-circle-check" style="font-size:1.8rem; display:block; margin-bottom:8px; opacity:0.5;"></i>Nada pendiente por aquí.</p>';
+                return;
+            }
+            let h = '<p style="color:#64748b; font-size:0.86rem; margin:0 0 0.9rem;">' + filas.length + ' resultado(s). Toca un paciente para abrir su expediente.</p>';
+            filas.forEach(f => {
+                const col = f.alerta ? '#dc2626' : cfg.c;
+                h += '<div onclick="sfAbrirPacienteDesdeKPI(\'' + f.id + '\')" style="display:flex; justify-content:space-between; align-items:center; gap:0.8rem; border:1px solid var(--border); border-left:4px solid ' + col + '; border-radius:10px; padding:0.7rem 0.9rem; margin-bottom:0.55rem; cursor:pointer;">'
+                   + '<div><div style="font-weight:800; color:var(--text,#0f172a);">' + (f.n || 'Sin nombre') + '</div>'
+                   + '<div style="font-size:0.83rem; color:' + (f.alerta ? '#dc2626' : '#64748b') + '; margin-top:2px;">' + (f.alerta ? '⚠️ VENCIDO · ' : '') + (f.d || '') + '</div></div>'
+                   + '<i class="fa-solid fa-chevron-right" style="color:#cbd5e1;"></i></div>';
+            });
+            body.innerHTML = h;
+        } catch(e){ console.warn('detalle KPI', e); }
+    }
+
     function renderInicio() {
         // Saludo según hora
         const h = new Date().getHours();
@@ -4048,21 +4137,21 @@ db = {
             labActivos++;
             if(o.fechaEntrega){ const d=new Date(o.fechaEntrega+'T12:00:00'); d.setHours(0,0,0,0); if(d < _hoy0) labVencidos++; }
         }); });
-        const tarjeta = (icon, valor, etiqueta, color, bg) => `
-            <div style="background:${bg}; border:1px solid ${color}33; border-radius:12px; padding:1rem; text-align:center;">
+        const tarjeta = (icon, valor, etiqueta, color, bg, tipo) => `
+            <div ${tipo?`onclick="sfDetalleKPI('${tipo}')" title="Toca para ver el detalle"`:''} style="background:${bg}; border:1px solid ${color}33; border-radius:12px; padding:1rem; text-align:center; ${tipo?'cursor:pointer; transition:transform .12s, box-shadow .12s;':''}" ${tipo?'onmouseover="this.style.transform=\'translateY(-2px)\';this.style.boxShadow=\'0 6px 14px rgba(0,0,0,0.10)\';" onmouseout="this.style.transform=\'\';this.style.boxShadow=\'\';"':''}>
                 <div style="color:${color}; font-size:1.3rem; margin-bottom:2px;"><i class="fa-solid ${icon}"></i></div>
                 <div style="font-size:1.5rem; font-weight:900; color:${color}; line-height:1;">${valor}</div>
                 <div style="font-size:0.72rem; color:#64748b; font-weight:700; margin-top:3px; text-transform:uppercase; letter-spacing:0.3px;">${etiqueta}</div>
             </div>`;
         if($('inicioResumen')) {
             $('inicioResumen').innerHTML =
-                tarjeta('fa-calendar-check', citasHoy.length, 'Citas hoy', '#1f5b9e', '#eff6ff') +
-                tarjeta('fa-thumbtack', totalPend, 'Pendientes', '#b45309', '#fffbeb') +
-                tarjeta('fa-diagram-project', endoActivas, 'Endo activas', '#7c3aed', '#faf5ff') +
-                tarjeta('fa-crown', protActivas, 'Prótesis activas', '#b45309', '#fffbeb') +
-                tarjeta('fa-truck-fast', labActivos + (labVencidos?' ⚠️':''), 'En laboratorio', labVencidos?'#dc2626':'#0e7490', labVencidos?'#fef2f2':'#ecfeff') +
-                tarjeta('fa-user-clock', conAdeudo, 'Con adeudo', '#dc2626', '#fef2f2') +
-                tarjeta('fa-sack-dollar', fmt(porCobrar), 'Por cobrar', '#059669', '#f0fdf4');
+                tarjeta('fa-calendar-check', citasHoy.length, 'Citas hoy', '#1f5b9e', '#eff6ff', 'citas') +
+                tarjeta('fa-thumbtack', totalPend, 'Pendientes', '#b45309', '#fffbeb', 'pendientes') +
+                tarjeta('fa-diagram-project', endoActivas, 'Endo activas', '#7c3aed', '#faf5ff', 'endo') +
+                tarjeta('fa-crown', protActivas, 'Prótesis activas', '#b45309', '#fffbeb', 'protesis') +
+                tarjeta('fa-truck-fast', labActivos + (labVencidos?' ⚠️':''), 'En laboratorio', labVencidos?'#dc2626':'#0e7490', labVencidos?'#fef2f2':'#ecfeff', 'lab') +
+                tarjeta('fa-user-clock', conAdeudo, 'Con adeudo', '#dc2626', '#fef2f2', 'adeudo') +
+                tarjeta('fa-sack-dollar', fmt(porCobrar), 'Por cobrar', '#059669', '#f0fdf4', 'adeudo');
         }
 
         renderPromosBanner();
@@ -14267,7 +14356,7 @@ Reglas: español de México; terminología dental correcta; máximo 6 líneas; u
     }
 
     // --- GOOGLE DRIVE SYNC ---
-    function updateGlobalSyncStatus(s) { const b = $('globalSyncStatus'); if(!b) return; b.className = 'sync-badge ' + s; b.innerHTML = s === 'offline' ? '<i class="fa-solid fa-cloud-xmark"></i> Offline' : (s === 'syncing' ? '<i class="fa-solid fa-arrows-rotate fa-spin"></i> Sync...' : '<i class="fa-solid fa-cloud-check"></i> En Nube'); }
+    function updateGlobalSyncStatus(s) { const b = $('globalSyncStatus'); if(!b) return; b.className = 'sync-badge ' + s; b.innerHTML = s === 'offline' ? '<i class="fa-solid fa-cloud-xmark"></i> <span class="bdg-txt">Offline</span>' : (s === 'syncing' ? '<i class="fa-solid fa-arrows-rotate fa-spin"></i> <span class="bdg-txt">Sync...</span>' : '<i class="fa-solid fa-cloud-check"></i> <span class="bdg-txt">En Nube</span>'); }
     function showConnectedUI() { if($('btnAuthAdmin')) $('btnAuthAdmin').style.display='none'; if($('btnSyncNow')) $('btnSyncNow').style.display='block'; if($('btnSignout')) $('btnSignout').style.display='inline-block'; updateGlobalSyncStatus('online'); }
     
     const CLIENT_ID = localStorage.getItem('sf_gclient') || '798639911007-sv5lg6p0qbmfkqj35uvdi8s8dmhfp8jg.apps.googleusercontent.com'; const SCOPES = 'https://www.googleapis.com/auth/drive.file'; let tokenClient; let gisInited = false; let driveFileId = localStorage.getItem('sf_drive_file_id') || null;
