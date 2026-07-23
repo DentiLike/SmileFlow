@@ -3233,6 +3233,38 @@ SmileFlow <b>no es un Expediente Clínico Electrónico certificado</b> conforme 
 </div>
 </div>
 <div style="margin-bottom: 2rem;">
+<h4 id="help-respaldo" style="color:#0f172a; font-size:1.1rem; border-bottom:2px solid #e2e8f0; padding-bottom:0.5rem; margin-bottom:1rem;"><i class="fa-solid fa-shield-halved" style="color:#059669;"></i> Respaldos: protege la información de tus pacientes</h4>
+<div style="background:#fffbeb; border:1px solid #fde68a; border-radius:8px; padding:0.8rem 1rem; margin-bottom:1rem; font-size:0.88rem; color:#92400e; line-height:1.6;"><b><i class="fa-solid fa-triangle-exclamation"></i> Lo más importante que debes saber:</b> tus datos viven en <b>este dispositivo</b>. Si se pierde, se daña o borras los datos del navegador, la información se va con él. El respaldo es tu única red de seguridad real.</div>
+<p style="line-height:1.6; color:#475569;">Tienes tres formas de respaldar, y no son excluyentes. Lo ideal es usar al menos dos.</p>
+
+<div style="border:1px solid var(--border); border-left:4px solid #059669; border-radius:10px; padding:1rem 1.2rem; margin-bottom:0.8rem;">
+<div style="font-weight:800; color:#047857; margin-bottom:0.4rem;">1. Copia manual (la más simple y confiable)</div>
+<div style="font-size:0.9rem; color:#475569; line-height:1.7;">Descarga un archivo con toda tu información y guárdalo donde quieras: tu Google Drive, una USB o el disco de tu computadora.
+<ol style="margin:0.5rem 0 0.5rem 1.1rem;"><li>Ve a <b>Configuración → Sistema y Nube</b>.</li><li>Toca <b>"Descargar Copia de Seguridad"</b>.</li><li>Se descarga un archivo <b>.json</b> con la fecha del día.</li><li>Súbelo a tu Google Drive (o cópialo a una USB). <b>Ese archivo es tu respaldo.</b></li></ol>
+<i style="font-size:0.85rem;">Puedes protegerlo con contraseña al descargarlo. Si lo haces, <b>guarda bien esa contraseña</b>: sin ella el archivo no se puede recuperar.</i></div>
+<button class="btn" onclick="backupDB()" style="background:#059669; color:white; font-weight:800; padding:0.6rem 1rem; margin-top:0.7rem;"><i class="fa-solid fa-download"></i> Descargar copia ahora</button>
+</div>
+
+<div style="border:1px solid var(--border); border-left:4px solid #2563eb; border-radius:10px; padding:1rem 1.2rem; margin-bottom:0.8rem;">
+<div style="font-weight:800; color:#1d4ed8; margin-bottom:0.4rem;">2. Carpeta automática en tu computadora</div>
+<div style="font-size:0.9rem; color:#475569; line-height:1.7;">Eliges una carpeta una sola vez y SmileFlow va dejando copias ahí solo, conforme trabajas. Si eliges una carpeta sincronizada con Google Drive o OneDrive, tus respaldos suben a la nube automáticamente.
+<ol style="margin:0.5rem 0 0.5rem 1.1rem;"><li>Ve a <b>Configuración → Sistema y Nube</b>.</li><li>Toca <b>"Elegir carpeta de respaldo"</b> y selecciona la carpeta.</li><li>Acepta el permiso que pide el navegador.</li></ol>
+<i style="font-size:0.85rem;">Disponible en Chrome/Edge de computadora. En celular usa las opciones 1 y 3.</i></div>
+</div>
+
+<div style="border:1px solid var(--border); border-left:4px solid #b45309; border-radius:10px; padding:1rem 1.2rem; margin-bottom:0.8rem;">
+<div style="font-weight:800; color:#b45309; margin-bottom:0.4rem;">3. Google Drive (sincronización)</div>
+<div style="font-size:0.9rem; color:#475569; line-height:1.7;">Conectas tu cuenta de Google y la app sube tu información a <b>tu propio Drive</b> (no a un servidor de Dentilike).
+<ol style="margin:0.5rem 0 0.5rem 1.1rem;"><li>Ve a <b>Configuración → Sistema y Nube</b>.</li><li>Toca <b>"Conectar Cuenta de Google"</b> y autoriza el acceso.</li><li>A partir de ahí sube copias solo, cuando hay internet.</li></ol></div>
+<button class="btn btn-outline" onclick="openSection('s-admin-sys')" style="border-color:#b45309; color:#b45309; font-weight:800; padding:0.6rem 1rem; margin-top:0.5rem;"><i class="fa-solid fa-gear"></i> Ir a Sistema y Nube</button>
+</div>
+
+<div style="background:#f5f3ff; border:1px solid #ddd6fe; border-radius:8px; padding:0.9rem 1.1rem; font-size:0.88rem; color:#4c1d95; line-height:1.7;">
+<b><i class="fa-solid fa-circle-info"></i> Además, la app se protege sola:</b> crea <b>puntos de guardado automáticos</b> a los que puedes volver, y lleva una <b>bitácora</b> de cambios verificable. Los encuentras en <b>Configuración → Sistema y Nube</b>. Aun así, <b>no sustituyen tu respaldo</b>: viven en este mismo dispositivo.
+</div>
+<p style="line-height:1.6; color:#475569; margin-top:1rem;"><b>Recomendación:</b> descarga una copia manual al menos <b>una vez por semana</b> y guárdala en tu Drive. Toma 10 segundos y es lo que te salva ante un robo, un celular mojado o un navegador que borra datos.</p>
+</div>
+<div style="margin-bottom: 2rem;">
 <h4 id="help-nube" style="color:#0f172a; font-size:1.1rem; border-bottom:2px solid #e2e8f0; padding-bottom:0.5rem; margin-bottom:1rem;"><i class="fa-brands fa-google-drive"></i> 1. Sincronización en la Nube y Privacidad</h4>
 <p style="line-height:1.6; color:#475569;">SmileFlow opera bajo una estricta política de confidencialidad médica. <b>ACLARACIÓN IMPORTANTE: Esto NO es data mining ni robo de información.</b> No almacenamos tus expedientes en servidores externos. Al sincronizar, se crea una bóveda encriptada exclusivamente en tu Google Drive personal.</p>
 <p style="line-height:1.6; color:#475569;"><i>Nota: Por motivos de seguridad, para habilitar el acceso a la sincronización en la nube, por favor envía un correo a <b>soporte@dentilike.com.mx</b> y te proporcionaremos los accesos y pasos a seguir.</i></p>
@@ -3547,7 +3579,32 @@ function sfNavCtx(){
     return { app, esApp: !!app };
 }
 
-// Aviso único (barra + Dr. Mikes Molares). No bloquea el uso de la app.
+// Abre la app en Chrome (Android/iOS) o, si no se puede, copia el enlace.
+function sfCopiarEnlaceApp(){
+    const full = 'https://app.dentilike.com.mx';
+    const msg = 'Copia este enlace y \u00e1brelo en Chrome o Safari:\n\n' + full + '\n\nTambi\u00e9n puedes usar el men\u00fa (\u22ee o \u22ef) de esta ventana y elegir "Abrir en el navegador".';
+    try {
+        if(navigator.clipboard && navigator.clipboard.writeText){
+            navigator.clipboard.writeText(full).then(()=>alert('\u2705 Enlace copiado.\n\n'+msg)).catch(()=>alert(msg));
+            return;
+        }
+    } catch(_){}
+    alert(msg);
+}
+function sfAbrirEnChrome(){
+    const host = 'app.dentilike.com.mx';
+    const ua = navigator.userAgent || '';
+    let destino = null;
+    if(/Android/i.test(ua))                 destino = 'intent://' + host + '/#Intent;scheme=https;package=com.android.chrome;end';
+    else if(/iPhone|iPad|iPod/i.test(ua))   destino = 'googlechromes://' + host;
+    if(!destino){ sfCopiarEnlaceApp(); return; }
+    // Si en 1.5 s seguimos aqu\u00ed, es que no se pudo abrir Chrome: ofrecer copiar el enlace.
+    const fallback = setTimeout(() => { if(!document.hidden) sfCopiarEnlaceApp(); }, 1500);
+    document.addEventListener('visibilitychange', () => { if(document.hidden) clearTimeout(fallback); }, { once:true });
+    try { window.location.href = destino; } catch(_){ clearTimeout(fallback); sfCopiarEnlaceApp(); }
+}
+
+// Aviso \u00fanico (barra + Dr. Mikes Molares). No bloquea el uso de la app.
 function sfAvisoAlmacenamiento(texto, textoAvatar){
     const mostrar = () => {
         try {
@@ -3555,10 +3612,16 @@ function sfAvisoAlmacenamiento(texto, textoAvatar){
             const bar = document.createElement('div');
             bar.id = 'sfNoPersistBar';
             bar.style.cssText = 'position:fixed; top:0; left:0; right:0; z-index:100000; background:#b45309; color:white; padding:10px 40px 10px 14px; font:600 12.5px/1.45 -apple-system,BlinkMacSystemFont,Roboto,sans-serif; text-align:center;';
-            bar.innerHTML = texto + ' <span onclick="this.parentNode.remove()" style="position:absolute; right:12px; top:7px; cursor:pointer; font-size:16px;">\u2715</span>';
+            const btn = 'display:inline-block; background:white; color:#b45309; padding:6px 12px; border-radius:8px; font-weight:800; font-size:12px; text-decoration:none; cursor:pointer; margin:0 4px;';
+            bar.innerHTML = texto
+                + '<div style="margin-top:7px;">'
+                + '<span onclick="sfAbrirEnChrome()" style="' + btn + '">\ud83c\udf10 Abrir en Chrome</span>'
+                + '<span onclick="instalarPWA()" style="' + btn + '">\ud83d\udcf2 Instalar la app</span>'
+                + '</div>'
+                + '<span onclick="this.parentNode.remove()" style="position:absolute; right:12px; top:7px; cursor:pointer; font-size:16px;">\u2715</span>';
             document.body.prepend(bar);
         } catch(_){}
-        // Que el Dr. Mikes Molares lo diga también
+        // Que el Dr. Mikes Molares lo diga tambi\u00e9n
         try { setTimeout(() => { if(typeof daniSpeak === 'function') daniSpeak(textoAvatar, 12000, 'warn'); }, 2500); } catch(_){}
     };
     if(document.body) mostrar(); else document.addEventListener('DOMContentLoaded', mostrar);
@@ -13897,8 +13960,32 @@ Reglas: español de México; terminología dental correcta; máximo 6 líneas; u
     }
 
     // Recordatorio por TIEMPO: si pasaron +7 días desde el último respaldo
+    // Guía inicial de respaldo: se muestra UNA vez a quien nunca ha respaldado.
+    function sfGuiaRespaldo(){
+        try {
+            const { body } = sfOverlay('<i class="fa-solid fa-shield-halved"></i> Protege tu información', '#047857');
+            body.innerHTML =
+              '<p style="color:#475569; font-size:0.92rem; line-height:1.65; margin:0 0 1rem;">Tus datos se guardan <b>en este dispositivo</b>. Si se pierde o se daña, la información se va con él. Crear un respaldo toma 10 segundos y es tu única red de seguridad real.</p>'
+            + '<div style="border:1px solid var(--border); border-left:4px solid #059669; border-radius:10px; padding:0.9rem 1.1rem; margin-bottom:0.7rem;">'
+            + '<div style="font-weight:800; color:#047857;">Opción rápida: descarga una copia</div>'
+            + '<div style="font-size:0.87rem; color:#475569; line-height:1.6; margin-top:3px;">Se descarga un archivo con toda tu información. Guárdalo en tu Google Drive o en una USB. Repítelo cada semana.</div></div>'
+            + '<div style="border:1px solid var(--border); border-left:4px solid #2563eb; border-radius:10px; padding:0.9rem 1.1rem; margin-bottom:1rem;">'
+            + '<div style="font-weight:800; color:#1d4ed8;">Opción automática: carpeta o Google Drive</div>'
+            + '<div style="font-size:0.87rem; color:#475569; line-height:1.6; margin-top:3px;">En <b>Configuración → Sistema y Nube</b> puedes elegir una carpeta (se respalda solo) o conectar tu cuenta de Google.</div></div>'
+            + '<div style="display:flex; gap:0.5rem; flex-wrap:wrap;">'
+            + '<button class="btn" onclick="localStorage.setItem(\'sf_guia_resp\',\'1\'); backupDB();" style="background:#059669; color:white; font-weight:800; padding:0.7rem 1rem; flex:1;"><i class="fa-solid fa-download"></i> Descargar copia ahora</button>'
+            + '<button class="btn btn-outline" onclick="localStorage.setItem(\'sf_guia_resp\',\'1\'); this.closest(\'div[style*=fixed]\').remove(); openSection(\'s-ayuda\');" style="border-color:#475569; color:#475569; font-weight:800; padding:0.7rem 1rem;">Ver la guía completa</button>'
+            + '</div>'
+            + '<div style="text-align:center; margin-top:0.8rem;"><span onclick="localStorage.setItem(\'sf_guia_resp\',\'1\'); this.closest(\'div[style*=fixed]\').remove();" style="font-size:0.82rem; color:#94a3b8; cursor:pointer; text-decoration:underline;">Ahora no, recordármelo después</span></div>';
+        } catch(e){ console.warn('guia respaldo', e); }
+    }
+
     function checkBackupReminder() {
         const last = localStorage.getItem('sf_last_backup');
+        // Nunca ha respaldado y no ha visto la guía: mostrarla una sola vez.
+        if(!last && !localStorage.getItem('sf_guia_resp')) {
+            setTimeout(() => { try { sfGuiaRespaldo(); } catch(e){} }, 7000);
+        }
         if(!last) {
             // Nunca ha respaldado y ya tiene pacientes
             const numPats = db && db.pats ? Object.keys(db.pats).length : 0;
