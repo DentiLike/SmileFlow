@@ -670,6 +670,9 @@ window._pdfReady=true;
 <div class="sync-badge offline" id="globalSyncStatus" onclick="openSection('s-admin-sys', document.querySelector('.nav-item[onclick*=\'s-admin-sys\']'))" title="Ir a configuración de Nube">
 <i class="fa-solid fa-cloud-xmark"></i> Offline
                 </div>
+<div class="sync-badge online" id="sfLocalBadge" onclick="sfPanelRespaldos()" title="Estado de tus respaldos">
+<i class="fa-solid fa-shield-halved"></i> Protegido
+                </div>
 <!-- Controles de Apariencia (Topbar) -->
 <div class="topbar-appearance" style="display:flex; align-items:center; gap:0.3rem; padding:0.3rem; background:#f1f5f9; border-radius:24px; border:1px solid var(--border);">
 <button class="tb-icon" id="tbDarkMode" onclick="toggleDarkModeTopbar()" title="Modo oscuro/claro" style="width:34px; height:34px; border:none; background:transparent; border-radius:50%; cursor:pointer; color:#64748b; display:inline-flex; align-items:center; justify-content:center; transition:all 0.2s; font-size:0.95rem;">
@@ -692,6 +695,14 @@ window._pdfReady=true;
 <main class="content-area">
 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem; border-bottom: 2px solid var(--border); padding-bottom:1rem;">
 <h2 id="lblId" style="color:var(--primary-dark); margin:0; font-size:1.6rem; font-weight:800;"><i class="fa-solid fa-address-card"></i> Nuevo Paciente</h2>
+</div>
+<!-- Acceso rápido del paciente: acciones de cada cita, sin escarbar el menú -->
+<div id="sfQuickBar" style="display:none; flex-wrap:wrap; gap:0.5rem; margin:-0.9rem 0 1.3rem 0;">
+<button onclick="sfQuickGo('s-nota-gen')" style="border:none; border-radius:10px; padding:0.55rem 0.9rem; font-weight:800; font-size:0.85rem; cursor:pointer; display:inline-flex; align-items:center; gap:0.4rem; white-space:nowrap; background:#1f5b9e; color:white;" title="Nota clínica de hoy"><i class="fa-solid fa-notes-medical"></i> Nota</button>
+<button onclick="sfQuickGo('s-receta')" style="border:none; border-radius:10px; padding:0.55rem 0.9rem; font-weight:800; font-size:0.85rem; cursor:pointer; display:inline-flex; align-items:center; gap:0.4rem; white-space:nowrap; background:#7c3aed; color:white;" title="Emitir receta"><i class="fa-solid fa-prescription"></i> Receta</button>
+<button onclick="sfQuickGo('s-odontograma')" style="border:none; border-radius:10px; padding:0.55rem 0.9rem; font-weight:800; font-size:0.85rem; cursor:pointer; display:inline-flex; align-items:center; gap:0.4rem; white-space:nowrap; background:#0891b2; color:white;" title="Odontograma"><i class="fa-solid fa-teeth-open"></i> Odontograma</button>
+<button onclick="sfQuickGo('s-tratamientos')" style="border:none; border-radius:10px; padding:0.55rem 0.9rem; font-weight:800; font-size:0.85rem; cursor:pointer; display:inline-flex; align-items:center; gap:0.4rem; white-space:nowrap; background:#059669; color:white;" title="Plan de tratamiento"><i class="fa-solid fa-list-check"></i> Plan</button>
+<button onclick="sfQuickGo('s-perfil','listaAbonos')" style="border:none; border-radius:10px; padding:0.55rem 0.9rem; font-weight:800; font-size:0.85rem; cursor:pointer; display:inline-flex; align-items:center; gap:0.4rem; white-space:nowrap; background:#b45309; color:white;" title="Registrar abono o cobro"><i class="fa-solid fa-cash-register"></i> Cobro</button>
 </div>
 <div class="app-section active" id="s-inicio">
 <div style="background:linear-gradient(135deg, var(--primary), var(--secondary)); color:white; border-radius:14px; padding:1.2rem 1.5rem; margin-bottom:1.2rem; box-shadow:0 6px 16px rgba(31,91,158,0.22); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.8rem;">
@@ -3253,9 +3264,11 @@ SmileFlow <b>no es un Expediente Clínico Electrónico certificado</b> conforme 
 </div>
 
 <div style="border:1px solid var(--border); border-left:4px solid #b45309; border-radius:10px; padding:1rem 1.2rem; margin-bottom:0.8rem;">
-<div style="font-weight:800; color:#b45309; margin-bottom:0.4rem;">3. Google Drive (sincronización)</div>
-<div style="font-size:0.9rem; color:#475569; line-height:1.7;">Conectas tu cuenta de Google y la app sube tu información a <b>tu propio Drive</b> (no a un servidor de Dentilike).
-<ol style="margin:0.5rem 0 0.5rem 1.1rem;"><li>Ve a <b>Configuración → Sistema y Nube</b>.</li><li>Toca <b>"Conectar Cuenta de Google"</b> y autoriza el acceso.</li><li>A partir de ahí sube copias solo, cuando hay internet.</li></ol></div>
+<div style="font-weight:800; color:#b45309; margin-bottom:0.4rem;">3. Google Drive (sincronización) <span style="background:#fef3c7; color:#92400e; font-size:0.7rem; padding:2px 8px; border-radius:6px; margin-left:4px;">EN DESARROLLO</span></div>
+<div style="font-size:0.9rem; color:#475569; line-height:1.7;">Conecta tu cuenta de Google y la app sube tu información a <b>tu propio Drive</b> (no a un servidor de Dentilike).
+<div style="background:#fffbeb; border:1px solid #fde68a; border-radius:8px; padding:0.8rem 1rem; margin:0.7rem 0; color:#92400e;"><b><i class="fa-solid fa-envelope"></i> Importante — solicita el acceso primero:</b> esta función está en fase de desarrollo y el acceso se habilita cuenta por cuenta. <b>Antes de intentar conectarte</b>, escribe a <b>soporte@dentilike.com.mx</b> para recibir las instrucciones y que autoricemos tu correo. Si intentas conectar sin ese paso, Google mostrará una pantalla de advertencia y no funcionará.</div>
+Una vez autorizado tu correo: ve a <b>Configuración → Sistema y Nube</b>, toca <b>"Conectar Cuenta de Google"</b> y acepta los permisos. A partir de ahí sube copias solo, cuando hay internet.</div>
+<a href="mailto:soporte@dentilike.com.mx?subject=Solicito%20acceso%20a%20sincronizaci%C3%B3n%20con%20Google%20Drive%20(SmileFlow)" class="btn" style="display:inline-block; background:#b45309; color:white; font-weight:800; padding:0.6rem 1rem; margin-top:0.5rem; text-decoration:none;"><i class="fa-solid fa-envelope"></i> Solicitar acceso por correo</a>
 <button class="btn btn-outline" onclick="openSection('s-admin-sys')" style="border-color:#b45309; color:#b45309; font-weight:800; padding:0.6rem 1rem; margin-top:0.5rem;"><i class="fa-solid fa-gear"></i> Ir a Sistema y Nube</button>
 </div>
 
@@ -3458,6 +3471,160 @@ SmileFlow <b>no es un Expediente Clínico Electrónico certificado</b> conforme 
     function toggleSidebar() { $('sidebar').classList.toggle('open'); $('mobileOverlay').classList.toggle('open'); }
     function toggleSubmenu(el) { el.parentElement.classList.toggle('open'); }
     
+    // --- ACCESO RÁPIDO DEL PACIENTE ---
+    // Salta a la acción sin recorrer el menú; si hay ancla, baja hasta ella.
+    function sfQuickGo(sec, ancla){
+        try {
+            const nav = document.querySelector('#sidebar [onclick*="' + sec + '"]');
+            openSection(sec, nav);
+            if(ancla) setTimeout(() => { const el = document.getElementById(ancla); if(el) el.scrollIntoView({ behavior:'smooth', block:'center' }); }, 150);
+        } catch(e){ console.warn('quickgo', e); }
+    }
+    // Solo tiene sentido con un paciente abierto.
+    function sfQuickBar(){
+        try {
+            const bar = document.getElementById('sfQuickBar');
+            if(!bar) return;
+            const hay = !!(db && db.curr && db.pats && db.pats[db.curr]);
+            bar.style.display = hay ? 'flex' : 'none';
+        } catch(e){}
+    }
+
+    // ================= RESPALDOS: SEMÁFORO Y PANEL =================
+    // Habla en consecuencias ("Protegido" / "En riesgo"), no en términos técnicos.
+    let _sfCarpetaCache = { configurada:false, permiso:false, nombre:'' };
+
+    async function sfCarpetaEstado(){
+        try {
+            if(typeof sfFSSoportado !== 'function' || !sfFSSoportado()) return { soportado:false, configurada:false, permiso:false, nombre:'' };
+            const h = await sfIdbGet('fs_dir');
+            if(!h) return { soportado:true, configurada:false, permiso:false, nombre:'' };
+            let perm = 'denied';
+            try { perm = await h.queryPermission({ mode:'readwrite' }); } catch(_){}
+            return { soportado:true, configurada:true, permiso: perm === 'granted', nombre: h.name || 'carpeta elegida' };
+        } catch(e){ return { soportado:false, configurada:false, permiso:false, nombre:'' }; }
+    }
+
+    function sfDiasDesdeRespaldo(){
+        const last = localStorage.getItem('sf_last_backup');
+        if(!last) return null;
+        return Math.floor((Date.now() - new Date(last).getTime()) / 86400000);
+    }
+
+    function sfActualizarBadgeLocal(){
+        try {
+            const el = document.getElementById('sfLocalBadge');
+            if(!el) return;
+            const dias = sfDiasDesdeRespaldo();
+            const carpetaFalla = _sfCarpetaCache.configurada && !_sfCarpetaCache.permiso;
+            let clase, icono, texto, tip;
+            if(_sfSaveFailed){
+                clase='offline'; icono='fa-circle-exclamation'; texto='En riesgo';
+                tip='No se pudieron guardar tus últimos cambios. Toca para ver qué hacer.';
+            } else if(dias === null){
+                clase='syncing'; icono='fa-shield-halved'; texto='Sin respaldo';
+                tip='Aún no has creado ningún respaldo. Toca para protegerte.';
+            } else if(dias >= 7 || carpetaFalla){
+                clase='syncing'; icono='fa-shield-halved'; texto = carpetaFalla ? 'Revisar carpeta' : 'Respaldo viejo';
+                tip = carpetaFalla ? 'Tu carpeta de respaldo dejó de escribir. Toca para reactivarla.' : ('Tu último respaldo fue hace ' + dias + ' días. Toca para descargar uno nuevo.');
+            } else {
+                clase='online'; icono='fa-shield-halved'; texto='Protegido';
+                tip = 'Respaldo de hace ' + (dias === 0 ? 'hoy' : dias + ' día(s)') + '. Toca para ver el detalle.';
+            }
+            el.className = 'sync-badge ' + clase;
+            el.innerHTML = '<i class="fa-solid ' + icono + '"></i> ' + texto;
+            el.title = tip;
+        } catch(e){}
+    }
+
+    async function sfRefrescarEstadoRespaldo(){
+        _sfCarpetaCache = await sfCarpetaEstado();
+        sfActualizarBadgeLocal();
+    }
+
+    function sfFila(ok, titulo, detalle, botones){
+        const color = ok ? '#059669' : '#b45309';
+        const icono = ok ? 'fa-circle-check' : 'fa-circle-dot';
+        return '<div style="display:flex; gap:0.7rem; align-items:flex-start; border:1px solid var(--border); border-left:4px solid ' + color + '; border-radius:10px; padding:0.8rem 1rem; margin-bottom:0.6rem;">'
+             + '<i class="fa-solid ' + icono + '" style="color:' + color + '; margin-top:3px;"></i>'
+             + '<div style="flex:1;"><div style="font-weight:800; color:var(--text,#0f172a); font-size:0.92rem;">' + titulo + '</div>'
+             + '<div style="font-size:0.84rem; color:#64748b; margin-top:2px; line-height:1.5;">' + detalle + '</div>'
+             + (botones ? '<div style="margin-top:0.5rem; display:flex; gap:0.4rem; flex-wrap:wrap;">' + botones + '</div>' : '')
+             + '</div></div>';
+    }
+
+    async function sfPanelRespaldos(){
+        const { body } = sfOverlay('<i class="fa-solid fa-shield-halved"></i> Mis respaldos', '#047857');
+        body.innerHTML = '<p style="color:#64748b; font-size:0.9rem;">Revisando tu protección…</p>';
+        const carp = await sfCarpetaEstado();
+        _sfCarpetaCache = carp;
+        const dias = sfDiasDesdeRespaldo();
+        const bs = 'border:none; border-radius:8px; padding:0.45rem 0.8rem; font-weight:800; font-size:0.8rem; cursor:pointer;';
+
+        let h = '<p style="color:#475569; font-size:0.9rem; line-height:1.6; margin:0 0 1rem;">Esto es lo que protege la información de tus pacientes. Lo que tenga <b>círculo naranja</b> es lo que te falta.</p>';
+
+        h += sfFila(!_sfSaveFailed, 'Guardado en este dispositivo',
+              _sfSaveFailed ? 'Hay un problema: tus últimos cambios NO se guardaron. Descarga una copia ahora mismo.' : 'Tus cambios se están guardando correctamente.', '');
+
+        h += sfFila(dias !== null && dias < 7, 'Copia de seguridad descargada',
+              dias === null ? 'Nunca has descargado una copia. Es tu red de seguridad si pierdes el dispositivo.'
+                            : ('Última copia: hace ' + (dias === 0 ? 'menos de un día' : dias + ' día(s)') + '. Lo ideal es una por semana.'),
+              '<button onclick="backupDB(); setTimeout(sfRefrescarEstadoRespaldo,1500);" style="' + bs + ' background:#059669; color:white;"><i class="fa-solid fa-download"></i> Descargar copia</button>');
+
+        if(carp.soportado){
+            h += sfFila(carp.configurada && carp.permiso, 'Carpeta automática en esta computadora',
+                  !carp.configurada ? 'No configurada. Si eliges una carpeta, la app deja copias ahí sola mientras trabajas.'
+                  : (carp.permiso ? ('Activa en la carpeta "' + carp.nombre + '". Se respalda sola.')
+                                  : ('El navegador retiró el permiso de la carpeta "' + carp.nombre + '". <b>No se está respaldando.</b> Toca Reactivar.')),
+                  !carp.configurada
+                    ? '<button onclick="sfCarpetaElegir(); setTimeout(sfRefrescarEstadoRespaldo,2000);" style="' + bs + ' background:#2563eb; color:white;"><i class="fa-solid fa-folder-open"></i> Elegir carpeta</button>'
+                    : (!carp.permiso ? '<button onclick="sfCarpetaEscribir(true).then(()=>sfRefrescarEstadoRespaldo());" style="' + bs + ' background:#b45309; color:white;"><i class="fa-solid fa-rotate"></i> Reactivar permiso</button>' : ''));
+        } else {
+            h += sfFila(false, 'Carpeta automática', 'No disponible en este dispositivo (solo en Chrome/Edge de computadora). Usa la copia descargada.', '');
+        }
+
+        h += sfFila(false, 'Google Drive <span style="background:#fef3c7; color:#92400e; font-size:0.65rem; padding:1px 6px; border-radius:5px;">EN DESARROLLO</span>',
+              'El acceso se habilita cuenta por cuenta. Escribe a soporte@dentilike.com.mx antes de intentar conectarte.',
+              '<a href="mailto:soporte@dentilike.com.mx?subject=Solicito%20acceso%20a%20Google%20Drive%20(SmileFlow)" style="' + bs + ' background:#b45309; color:white; text-decoration:none; display:inline-block;"><i class="fa-solid fa-envelope"></i> Solicitar acceso</a>');
+
+        h += '<div style="border-top:1px solid var(--border); margin-top:1rem; padding-top:1rem;">'
+           + '<div style="font-weight:800; color:#334155; font-size:0.9rem; margin-bottom:0.4rem;"><i class="fa-solid fa-clipboard-check"></i> ¿Tu respaldo sirve?</div>'
+           + '<div style="font-size:0.84rem; color:#64748b; line-height:1.55; margin-bottom:0.6rem;">Revisa un archivo de respaldo sin tocar tus datos actuales. Te dice cuántos pacientes contiene y de qué fecha es.</div>'
+           + '<input type="file" accept=".json" id="sfChkFile" onchange="sfComprobarRespaldo(this)" style="font-size:0.82rem;"/>'
+           + '<div id="sfChkRes" style="margin-top:0.6rem; font-size:0.86rem;"></div></div>';
+
+        body.innerHTML = h;
+        sfActualizarBadgeLocal();
+    }
+
+    function sfComprobarRespaldo(input){
+        const f = input.files && input.files[0];
+        const out = document.getElementById('sfChkRes');
+        if(!f || !out) return;
+        const caja = (color, bg, txt) => '<div style="background:' + bg + '; border:1px solid ' + color + '; color:' + color + '; border-radius:8px; padding:0.7rem 0.9rem; line-height:1.55;">' + txt + '</div>';
+        out.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Revisando…';
+        const r = new FileReader();
+        r.onload = async e => {
+            let obj;
+            try { obj = JSON.parse(e.target.result); }
+            catch(_){ out.innerHTML = caja('#dc2626','#fef2f2','❌ Este archivo no es un respaldo de SmileFlow (no se pudo leer).'); return; }
+            if(obj && obj.sf_enc){
+                const pass = prompt('Este respaldo está protegido con contraseña.\nEscríbela para comprobarlo:');
+                if(!pass){ out.innerHTML = caja('#b45309','#fffbeb','🔒 Respaldo protegido con contraseña. Sin ella no se puede comprobar su contenido.'); return; }
+                try { obj = JSON.parse(await sfDecrypt(obj, pass.trim())); }
+                catch(_){ out.innerHTML = caja('#dc2626','#fef2f2','❌ Contraseña incorrecta o archivo dañado.'); return; }
+            }
+            const v = validarRespaldo(obj);
+            const fecha = obj && obj.lastMod ? new Date(obj.lastMod).toLocaleString('es-MX') : 'sin fecha registrada';
+            if(v.ok){
+                out.innerHTML = caja('#059669','#f0fdf4', '✅ <b>Respaldo válido.</b><br>Pacientes: <b>' + v.resumen.pacientes + '</b> · Doctores: ' + v.resumen.doctores + '<br>Clínica: ' + v.resumen.clinica + '<br>Fecha de los datos: ' + fecha);
+            } else {
+                out.innerHTML = caja('#dc2626','#fef2f2', '❌ <b>Este respaldo tiene problemas:</b><br>• ' + v.problemas.join('<br>• ') + '<br><br>No lo uses como tu única copia.');
+            }
+        };
+        r.readAsText(f);
+    }
+
     function openSection(targetId, btn) {
         document.querySelectorAll('.app-section').forEach(s => s.classList.remove('active'));
         $(targetId).classList.add('active');
@@ -9478,7 +9645,7 @@ ${patientText}`;
     // --- GESTIÓN DE PACIENTES ---
     function checkAge() { const a=$('pAge').value; if($('divGuardian')) $('divGuardian').classList.toggle('hidden', a===''||a>=18); }
     
-    function newPatient() { db.curr=null; saveDB(); $('pSelect').value=''; $('lblId').innerHTML='<i class="fa-solid fa-address-card"></i> Nuevo Px'; ['pName','pBirth','pAge','pGuardian','pPhone','pEmail','pAddress','pSum','pAlert','pBrackets'].forEach(id=>{if($(id))$(id).value='';}); ['pRetra','pFactReq','pHasAl','pAlPen','pAlAin','pAlLat','pAlSulfa'].forEach(id=>{if($(id))$(id).checked=false;}); if($('pAlOther')) $('pAlOther').value=''; if($('pCostoTotal'))$('pCostoTotal').value='';if($('pNotaPago'))$('pNotaPago').value=''; if($('listaAbonos'))$('listaAbonos').innerHTML=''; recalcSaldo(); clearMedHistory(); if($('pCakeIcon')) $('pCakeIcon').style.display='none'; autoLoadWaDate(); checkAge(); toggleAllergies(); loadTreats({}); renderOdonto(); renderTimeline(); setAlertLabel(null); if($('txtReceta')) $('txtReceta').value=''; if($('chkAntibiotico')) $('chkAntibiotico').checked=false; loadFacturacion({}); renderMedsList(); }
+    function newPatient() { db.curr=null; saveDB(); $('pSelect').value=''; $('lblId').innerHTML='<i class="fa-solid fa-address-card"></i> Nuevo Px'; ['pName','pBirth','pAge','pGuardian','pPhone','pEmail','pAddress','pSum','pAlert','pBrackets'].forEach(id=>{if($(id))$(id).value='';}); ['pRetra','pFactReq','pHasAl','pAlPen','pAlAin','pAlLat','pAlSulfa'].forEach(id=>{if($(id))$(id).checked=false;}); if($('pAlOther')) $('pAlOther').value=''; if($('pCostoTotal'))$('pCostoTotal').value='';if($('pNotaPago'))$('pNotaPago').value=''; if($('listaAbonos'))$('listaAbonos').innerHTML=''; recalcSaldo(); clearMedHistory(); if($('pCakeIcon')) $('pCakeIcon').style.display='none'; autoLoadWaDate(); checkAge(); toggleAllergies(); loadTreats({}); renderOdonto(); renderTimeline(); setAlertLabel(null); if($('txtReceta')) $('txtReceta').value=''; if($('chkAntibiotico')) $('chkAntibiotico').checked=false; loadFacturacion({}); renderMedsList(); try{ sfQuickBar(); }catch(e){} }
     
     function savePatientAlert() { if(!db.curr) return; db.pats[db.curr].alert=$('pAlert').value; db.pats[db.curr].alertDate=new Date().toISOString().split('T')[0]; saveDB(); setAlertLabel(db.pats[db.curr].alertDate); }
 
@@ -11237,7 +11404,7 @@ Reglas: español de México; terminología dental correcta; máximo 6 líneas; u
 
     function savePatient() { const n=$('pName').value.trim(); if(!n) return alert("Falta Nombre."); const dId='Px-'+n; if(!db.curr){ db.curr='p_'+Date.now(); db.pats[db.curr]={id:db.curr,displayId:dId,notas:[],treats:{},alertDate:new Date().toISOString().split('T')[0],factReq:false,factData:{},odonto:{}}; }else db.pats[db.curr].displayId=dId; let p=db.pats[db.curr]; p.name=n;p.birth=$('pBirth').value;p.age=$('pAge').value;p.guardian=$('pGuardian').value;p.phone=$('pPhone').value;p.email=$('pEmail').value;p.address=$('pAddress').value;p.sum=$('pSum').value;p.brackets=$('pBrackets').value;p.retra=$('pRetra').checked;p.factReq=$('pFactReq').checked;p.hasAl=$('pHasAl').checked;p.alPen=$('pAlPen').checked;p.alAin=$('pAlAin').checked;p.alLat=$('pAlLat').checked;p.alSulfa=$('pAlSulfa').checked;p.alOther=$('pAlOther').value; p.costoTotal=$('pCostoTotal')?$('pCostoTotal').value:'';p.notaPago=$('pNotaPago')?$('pNotaPago').value:''; saveMedHistory(p); saveTreats(p); saveDB(); renderPatSelect(); $('lblId').innerHTML=`<i class="fa-solid fa-address-card"></i> ${dId}`; renderPendingTreatsMain(p); renderMedsList(); renderAgendaList(); if(typeof daniSpeak === 'function') daniSpeak("💾 Px guardado."); }
     
-    function loadPatient() { const v=$('pSelect').value; if(!v) return newPatient(); db.curr=v; saveDB(); const p=db.pats[v]; $('lblId').innerHTML=`<i class="fa-solid fa-address-card"></i> ${p.displayId}`; $('pName').value=p.name||'';$('pBirth').value=p.birth||'';$('pGuardian').value=p.guardian||'';$('pPhone').value=p.phone||'';$('pEmail').value=p.email||'';$('pAddress').value=p.address||'';$('pSum').value=p.sum||'';$('pAlert').value=p.alert||'';$('pBrackets').value=p.brackets||'';$('pRetra').checked=p.retra||false;$('pFactReq').checked=p.factReq||false;$('pHasAl').checked=p.hasAl||false;$('pAlPen').checked=p.alPen||false;$('pAlAin').checked=p.alAin||false;$('pAlLat').checked=p.alLat||false;$('pAlSulfa').checked=p.alSulfa||false;$('pAlOther').value=p.alOther||''; if($('pCostoTotal'))$('pCostoTotal').value=p.costoTotal||'';if($('pNotaPago'))$('pNotaPago').value=p.notaPago||''; renderAbonos(); loadMedHistory(p); calcPatientAge(); autoLoadWaDate(); toggleAllergies(); loadTreats(p); renderOdonto(); renderTimeline(); setAlertLabel(p.alertDate); if($('txtReceta'))$('txtReceta').value=''; if($('chkAntibiotico'))$('chkAntibiotico').checked=false; loadFacturacion(p); renderMedsList(); openSection('s-perfil', document.querySelector('.nav-item.active')); autoAbrirAbonosSiDeuda(); window._resenaSug=false; try{ checkResenaSugerencia(); }catch(e){} }
+    function loadPatient() { const v=$('pSelect').value; if(!v) return newPatient(); db.curr=v; saveDB(); const p=db.pats[v]; $('lblId').innerHTML=`<i class="fa-solid fa-address-card"></i> ${p.displayId}`; $('pName').value=p.name||'';$('pBirth').value=p.birth||'';$('pGuardian').value=p.guardian||'';$('pPhone').value=p.phone||'';$('pEmail').value=p.email||'';$('pAddress').value=p.address||'';$('pSum').value=p.sum||'';$('pAlert').value=p.alert||'';$('pBrackets').value=p.brackets||'';$('pRetra').checked=p.retra||false;$('pFactReq').checked=p.factReq||false;$('pHasAl').checked=p.hasAl||false;$('pAlPen').checked=p.alPen||false;$('pAlAin').checked=p.alAin||false;$('pAlLat').checked=p.alLat||false;$('pAlSulfa').checked=p.alSulfa||false;$('pAlOther').value=p.alOther||''; if($('pCostoTotal'))$('pCostoTotal').value=p.costoTotal||'';if($('pNotaPago'))$('pNotaPago').value=p.notaPago||''; renderAbonos(); loadMedHistory(p); calcPatientAge(); autoLoadWaDate(); toggleAllergies(); loadTreats(p); renderOdonto(); renderTimeline(); setAlertLabel(p.alertDate); if($('txtReceta'))$('txtReceta').value=''; if($('chkAntibiotico'))$('chkAntibiotico').checked=false; loadFacturacion(p); renderMedsList(); openSection('s-perfil', document.querySelector('.nav-item.active')); autoAbrirAbonosSiDeuda(); window._resenaSug=false; try{ checkResenaSugerencia(); }catch(e){} try{ sfQuickBar(); }catch(e){} }
 
     function autoAbrirAbonosSiDeuda() {
         try {
@@ -13971,7 +14138,7 @@ Reglas: español de México; terminología dental correcta; máximo 6 líneas; u
             + '<div style="font-size:0.87rem; color:#475569; line-height:1.6; margin-top:3px;">Se descarga un archivo con toda tu información. Guárdalo en tu Google Drive o en una USB. Repítelo cada semana.</div></div>'
             + '<div style="border:1px solid var(--border); border-left:4px solid #2563eb; border-radius:10px; padding:0.9rem 1.1rem; margin-bottom:1rem;">'
             + '<div style="font-weight:800; color:#1d4ed8;">Opción automática: carpeta o Google Drive</div>'
-            + '<div style="font-size:0.87rem; color:#475569; line-height:1.6; margin-top:3px;">En <b>Configuración → Sistema y Nube</b> puedes elegir una carpeta (se respalda solo) o conectar tu cuenta de Google.</div></div>'
+            + '<div style="font-size:0.87rem; color:#475569; line-height:1.6; margin-top:3px;">En <b>Configuración → Sistema y Nube</b> puedes elegir una carpeta y se respalda solo. <i>La sincronización con Google Drive está en desarrollo: solicita el acceso a soporte@dentilike.com.mx.</i></div></div>'
             + '<div style="display:flex; gap:0.5rem; flex-wrap:wrap;">'
             + '<button class="btn" onclick="localStorage.setItem(\'sf_guia_resp\',\'1\'); backupDB();" style="background:#059669; color:white; font-weight:800; padding:0.7rem 1rem; flex:1;"><i class="fa-solid fa-download"></i> Descargar copia ahora</button>'
             + '<button class="btn btn-outline" onclick="localStorage.setItem(\'sf_guia_resp\',\'1\'); this.closest(\'div[style*=fixed]\').remove(); openSection(\'s-ayuda\');" style="border-color:#475569; color:#475569; font-weight:800; padding:0.7rem 1rem;">Ver la guía completa</button>'
@@ -14246,11 +14413,13 @@ function sfSaveError(msg) {
         bar.style.display = 'block';
     }
     if(typeof daniSpeak === 'function') daniSpeak('🚨 ¡Atención! No pude guardar tus cambios en este dispositivo. Descarga un respaldo antes de cerrar la app para no perder información.', 15000, 'warn');
+    try { sfActualizarBadgeLocal(); } catch(e){}
     console.error('SmileFlow saveDB error:', msg);
 }
 function sfSaveOK() {
     if(!_sfSaveFailed) return;
     _sfSaveFailed = false;
+    try { sfActualizarBadgeLocal(); } catch(e){}
     const bar = document.getElementById('topSaveAlert');
     if(bar) bar.style.display = 'none';
 }
@@ -14339,6 +14508,7 @@ function saveDB() {
         try { buildTreats(); } catch(e) { console.error("Error Tratamientos", e); }
         try { ensureOdontoRED(); } catch(e) { console.error("Error OdontoRED", e); }
         try { checkBackupReminder(); } catch(e) { console.error("Error BackupReminder", e); }
+        try { sfRefrescarEstadoRespaldo(); setInterval(sfRefrescarEstadoRespaldo, 120000); } catch(e) {}
         try { const _ai=$('astImg'); if(_ai && !window._avatarBase) window._avatarBase=_ai.src; } catch(e){}
         try { refreshAvatarOnline(); } catch(e) { console.error("Error AvatarOnline", e); }
         if(db.curr) { loadPatient(); }
