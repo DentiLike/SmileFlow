@@ -3534,19 +3534,60 @@ function sfPantallaError(titulo, detalle, mostrarUrl) {
     </div>`;
 }
 
-function arrancarDegradado(motivo){
-    try { console.warn('SmileFlow en modo temporal (sin persistencia):', motivo); } catch(_){}
+// Detecta el contexto del navegador para dar un aviso correcto (no genérico).
+function sfNavCtx(){
+    const ua = (navigator.userAgent||'');
+    let app = null;
+    if(/FBAN|FBAV|FB_IAB/i.test(ua))      app = 'Facebook';
+    else if(/Instagram/i.test(ua))        app = 'Instagram';
+    else if(/Messenger/i.test(ua))        app = 'Messenger';
+    else if(/\bLine\//i.test(ua))         app = 'LINE';
+    else if(/TikTok|musical_ly/i.test(ua))app = 'TikTok';
+    else if(/Twitter/i.test(ua))          app = 'X (Twitter)';
+    return { app, esApp: !!app };
+}
+
+// Aviso único (barra + Dr. Mikes Molares). No bloquea el uso de la app.
+function sfAvisoAlmacenamiento(texto, textoAvatar){
     const mostrar = () => {
         try {
             if(document.getElementById('sfNoPersistBar')) return;
             const bar = document.createElement('div');
             bar.id = 'sfNoPersistBar';
             bar.style.cssText = 'position:fixed; top:0; left:0; right:0; z-index:100000; background:#b45309; color:white; padding:10px 40px 10px 14px; font:600 12.5px/1.45 -apple-system,BlinkMacSystemFont,Roboto,sans-serif; text-align:center;';
-            bar.innerHTML = '⚠️ Este navegador no guarda datos de forma estable (común dentro de Facebook). La app funciona, pero para no perder información ábrela en <b>Chrome / Safari</b> o instálala desde el menú del navegador. <span onclick="this.parentNode.remove()" style="position:absolute; right:12px; top:7px; cursor:pointer; font-size:16px;">✕</span>';
+            bar.innerHTML = texto + ' <span onclick="this.parentNode.remove()" style="position:absolute; right:12px; top:7px; cursor:pointer; font-size:16px;">\u2715</span>';
             document.body.prepend(bar);
         } catch(_){}
+        // Que el Dr. Mikes Molares lo diga también
+        try { setTimeout(() => { if(typeof daniSpeak === 'function') daniSpeak(textoAvatar, 12000, 'warn'); }, 2500); } catch(_){}
     };
     if(document.body) mostrar(); else document.addEventListener('DOMContentLoaded', mostrar);
+}
+
+// Arranque en modo temporal: la app SIEMPRE abre, aunque el almacenamiento falle.
+function arrancarDegradado(motivo){
+    try { console.warn('SmileFlow en modo temporal (sin persistencia):', motivo); } catch(_){}
+    const ctx = sfNavCtx();
+    const donde = ctx.esApp ? ('el navegador de <b>' + ctx.app + '</b>') : 'este navegador o el <b>modo incógnito</b>';
+    sfAvisoAlmacenamiento(
+        '\u26a0\ufe0f Estás usando ' + donde + ', que no guarda datos de forma estable. La app funciona, pero <b>lo que captures puede perderse</b>. Ábrela en <b>Chrome / Safari</b> o instálala desde el menú del navegador.',
+        ctx.esApp
+            ? ('\u26a0\ufe0f Ojo: abriste SmileFlow dentro de ' + ctx.app + '. Aquí el navegador borra los datos al cerrar. Ábrela en Chrome o Safari e instálala para no perder tu información.')
+            : '\u26a0\ufe0f Ojo: este navegador (o el modo incógnito) no guarda los datos al cerrar. Ábrela en una ventana normal de Chrome o Safari e instálala para trabajar seguro.'
+    );
+}
+
+// Aviso preventivo: aunque el almacenamiento funcione, dentro de apps como
+// Facebook o Instagram los datos se borran al cerrar. Mejor avisar antes.
+function sfChequeoNavegador(){
+    try {
+        const ctx = sfNavCtx();
+        if(!ctx.esApp) return;
+        sfAvisoAlmacenamiento(
+            '\u26a0\ufe0f Abriste SmileFlow dentro de <b>' + ctx.app + '</b>. Ese navegador puede borrar tus datos al cerrar. Para trabajar seguro, ábrela en <b>Chrome / Safari</b> e instálala desde el menú del navegador.',
+            '\u26a0\ufe0f Estás dentro de ' + ctx.app + '. Aquí tus datos pueden borrarse al cerrar: ábrela en Chrome o Safari e instálala para no perder información.'
+        );
+    } catch(_){}
 }
 
 async function initDB() {
@@ -14206,6 +14247,7 @@ function saveDB() {
     // ----------------------------------------------
     
     await initDB(); 
+        try { sfChequeoNavegador(); } catch(e) {}
         try { loadConfigUI(); } catch(e) { console.error("Error UI Inicial", e); }
         try { buildTreats(); } catch(e) { console.error("Error Tratamientos", e); }
         try { ensureOdontoRED(); } catch(e) { console.error("Error OdontoRED", e); }
