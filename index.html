@@ -91,8 +91,8 @@
         .search-input { border: none; background: transparent; outline: none; width: 100%; font-size: 0.95rem; font-weight: 500; color: var(--text); }
         .search-select { border: none; background: white; padding: 0.4rem; border-radius: 4px; font-weight: 700; color: var(--primary-dark); outline: none; cursor: pointer; flex-shrink: 0; max-width: 200px; box-shadow: var(--shadow-sm); }
         
-        .topbar-actions { display: flex; align-items: center; gap: 0.55rem; flex-shrink: 0; }
-        .topbar-actions select { border: 1px solid var(--border); padding: 0.5rem; border-radius: var(--radius-md); font-weight: 600; color: var(--text); outline: none; cursor: pointer; background: white; max-width: 190px; text-overflow: ellipsis; }
+        .topbar-actions { display: flex; align-items: center; gap: 1rem; }
+        .topbar-actions select { border: 1px solid var(--border); padding: 0.5rem; border-radius: var(--radius-md); font-weight: 600; color: var(--text); outline: none; cursor: pointer; background: white; }
 
         /* INDICADOR DE NUBE */
         .sync-badge { display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.4rem 0.75rem; border-radius: 20px; font-weight: 800; font-size: 0.8rem; cursor: pointer; transition: all 0.3s; border: 2px solid transparent; white-space: nowrap; flex-shrink: 0; }
@@ -239,23 +239,8 @@
             .sidebar.open { transform: translateX(0); }
             .menu-toggle { display: block; }
             .mobile-overlay.open { display: block; }
-            .topbar { padding: 0 1rem; gap: 0.5rem; }
+            .topbar { padding: 0 1rem; }
             .content-area { padding: 1rem; padding-bottom: 130px; }
-        }
-
-        /* Barra superior compacta en pantallas chicas: los badges pasan a solo icono */
-        @media(max-width: 760px) {
-            .topbar { padding: 0 0.6rem; gap: 0.4rem; }
-            .topbar-actions { gap: 0.35rem; }
-            .bdg-txt { display: none; }
-            .sync-badge { padding: 0.45rem 0.6rem; gap: 0; font-size: 0.9rem; }
-            .topbar-appearance { display: none !important; }
-            .topbar-actions select { max-width: 108px; font-size: 0.78rem; padding: 0.4rem; }
-            .search-area { padding: 0.3rem 0.6rem; gap: 0.4rem; min-width: 0; flex-shrink: 1; }
-            /* La barra se acomoda en dos renglones: así nada queda fuera de pantalla */
-            .topbar { flex-wrap: wrap; min-height: auto; padding-top: 0.45rem; padding-bottom: 0.45rem; }
-            .topbar > div:first-child { min-width: 0; flex: 1 1 100%; }
-            .topbar-actions { flex: 1 1 100%; justify-content: flex-start; margin-top: 0.35rem; }
         }
 
         /* MODO NOCTURNO Y TABLET (NATIVO) */
@@ -596,6 +581,7 @@ window._pdfReady=true;
 <li class="sub-item" onclick="openSection('s-nota-implante', this)"><i class="fa-solid fa-screwdriver-wrench" style="font-size:0.75rem; margin-right:5px;"></i>Implantología</li>
 <li class="sub-item" onclick="openSection('s-nota-endo', this)"><i class="fa-solid fa-diagram-project" style="font-size:0.75rem; margin-right:5px;"></i>Endodoncia</li>
 <li class="sub-item" onclick="openSection('s-nota-protesis', this)"><i class="fa-solid fa-crown" style="font-size:0.75rem; margin-right:5px;"></i>Prótesis Fija</li>
+<li class="sub-item" onclick="openSection('s-nota-removible', this)"><i class="fa-solid fa-teeth" style="font-size:0.75rem; margin-right:5px;"></i>Prótesis Removible</li>
 </ul>
 </li>
 <li class="nav-group" style="margin-top:0.5rem;">
@@ -1926,6 +1912,93 @@ AVISO PRÓX. CITA (Recordatorio local):
 </div>
 </div>
 
+<!-- ===== PRÓTESIS REMOVIBLE (TOTAL Y PARCIAL) ===== -->
+<div class="app-section" id="s-nota-removible">
+<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; background:white; padding:1.2rem; border-radius:var(--radius-md); border:1px solid var(--border); box-shadow:var(--shadow-sm); border-left:5px solid #0e7490; flex-wrap:wrap; gap:1rem;">
+<div>
+<h3 style="margin:0 0 0.3rem 0; color:#0e7490; font-size:1.3rem; font-weight:800;"><i class="fa-solid fa-teeth"></i> Prótesis Removible</h3>
+<p id="remPacienteLbl" style="color:var(--text-muted); font-size:0.9rem; margin:0;">Selecciona un paciente primero.</p>
+</div>
+<button class="btn" onclick="remNuevo()" style="background:#0e7490; color:white; font-weight:700; font-size:0.85rem;"><i class="fa-solid fa-plus"></i> Nuevo caso</button>
+</div>
+
+<div style="background:white; border:1px solid var(--border); border-radius:12px; padding:1rem; box-shadow:var(--shadow-sm); margin-bottom:1.2rem;">
+<div style="font-weight:800; color:#0e7490; font-size:0.95rem; margin-bottom:0.7rem;"><i class="fa-solid fa-list"></i> Casos registrados</div>
+<div id="remLista"></div>
+</div>
+
+<div id="remForm" style="display:none;">
+<div style="background:white; border:1px solid var(--border); border-radius:12px; padding:1.3rem; box-shadow:var(--shadow-sm);">
+
+<div style="margin-bottom:1.4rem;">
+<div style="font-weight:800; color:#0e7490; font-size:0.95rem; margin-bottom:0.8rem; padding-bottom:0.4rem; border-bottom:2px solid #a5f3fc;"><span style="background:#0e7490; color:white; width:24px; height:24px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; font-size:0.8rem; margin-right:6px;">1</span> Tipo y arcada</div>
+<div class="grid-2" style="gap:0.8rem;">
+<div class="input-group" style="margin:0;"><label>Tipo de prótesis</label><select id="remTipo" class="input-field" onchange="remTipoCheck()" style="margin:0;"><option>Placa total</option><option>Esquelético (PPR)</option><option>Placa parcial acrílica</option><option>Flexible (Valplast)</option><option>Sobredentadura</option><option>Rebase / Reparación</option></select></div>
+<div class="input-group" style="margin:0;"><label>Arcada</label><select id="remArcada" class="input-field" onchange="remTipoCheck()" style="margin:0;"><option>Superior</option><option>Inferior</option><option>Ambas</option></select></div>
+</div>
+<div class="grid-2" style="gap:0.8rem; margin-top:0.6rem;">
+<div class="input-group" style="margin:0;"><label>Material de base</label><select id="remMaterial" class="input-field" style="margin:0;"><option value="">—</option><option>Acrílico termopolimerizable</option><option>Cromo-cobalto</option><option>Nylon flexible</option><option>Acetal</option><option>Otro</option></select></div>
+<div class="input-group" style="margin:0;"><label>Color de dientes (guía Vita)</label><input id="remColor" class="input-field" placeholder="Ej. A2, A3.5..." style="margin:0;"/></div>
+</div>
+</div>
+
+<div id="remBloqueTotal" style="display:none; margin-bottom:1.4rem;">
+<div style="font-weight:800; color:#b45309; font-size:0.95rem; margin-bottom:0.4rem; padding-bottom:0.4rem; border-bottom:2px solid #fde68a;"><span style="background:#b45309; color:white; width:24px; height:24px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; font-size:0.8rem; margin-right:6px;">2</span> Datos de prótesis total</div>
+<p style="font-size:0.75rem; color:#94a3b8; margin:0 0 0.6rem 0;">Estos datos cambian el trabajo del laboratorio: anótalos aunque sea de forma breve.</p>
+<div class="grid-2" style="gap:0.8rem;">
+<div class="input-group" style="margin:0;"><label>Momento de colocación</label><select id="remMomento" class="input-field" style="margin:0;"><option>Convencional (reborde ya cicatrizado)</option><option>Inmediata (se coloca al extraer)</option><option>Provisional / de transición</option></select></div>
+<div class="input-group" style="margin:0;"><label>Retención</label><select id="remRetencion" class="input-field" style="margin:0;"><option>Mucosoportada (sin implantes)</option><option>Sobredentadura sobre 2 implantes</option><option>Sobredentadura sobre 4 implantes</option><option>Sobre implantes (otro número)</option></select></div>
+</div>
+<div class="grid-2" style="gap:0.8rem; margin-top:0.6rem;">
+<div class="input-group" style="margin:0;"><label>Tipo de reborde</label><select id="remReborde" class="input-field" style="margin:0;"><option value="">—</option><option>Favorable (amplio y firme)</option><option>Reabsorbido moderado</option><option>Reabsorbido severo (plano)</option><option>Flácido / con reborde móvil</option><option>Con torus o exostosis</option></select></div>
+<div class="input-group" style="margin:0;"><label>Aditamentos de retención</label><input id="remAditamentos" class="input-field" placeholder="Locators, bola, barra, O-rings..." style="margin:0;"/></div>
+</div>
+<div class="grid-2" style="gap:0.8rem; margin-top:0.6rem;">
+<div class="input-group" style="margin:0;"><label>Dimensión vertical</label><select id="remDV" class="input-field" style="margin:0;"><option value="">—</option><option>Registrada y conforme</option><option>Aumentada respecto a la previa</option><option>Disminuida respecto a la previa</option><option>Pendiente de registrar</option></select></div>
+<div class="input-group" style="margin:0;"><label>Relación intermaxilar</label><select id="remRelacion" class="input-field" style="margin:0;"><option value="">—</option><option>Clase I</option><option>Clase II</option><option>Clase III</option></select></div>
+</div>
+<div class="input-group" style="margin:0; margin-top:0.6rem;"><label>Observaciones del reborde y tejidos</label><input id="remObsReborde" class="input-field" placeholder="Frenillos, inserciones altas, zona de alivio requerida..." style="margin:0;"/></div>
+</div>
+
+<div id="remBloqueParcial" style="margin-bottom:1.4rem;">
+<div style="font-weight:800; color:#7c3aed; font-size:0.95rem; margin-bottom:0.4rem; padding-bottom:0.4rem; border-bottom:2px solid #ddd6fe;"><span style="background:#7c3aed; color:white; width:24px; height:24px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; font-size:0.8rem; margin-right:6px;">2</span> Diseño (parcial)</div>
+<p style="font-size:0.75rem; color:#94a3b8; margin:0 0 0.6rem 0;">La clasificación de Kennedy describe la zona edéntula: <b>I</b> bilateral posterior libre · <b>II</b> unilateral posterior libre · <b>III</b> unilateral con pilar posterior · <b>IV</b> anterior cruzando la línea media.</p>
+<div class="grid-2" style="gap:0.8rem;">
+<div class="input-group" style="margin:0;"><label>Kennedy superior</label><select id="remKennedySup" class="input-field" style="margin:0;"><option value="">No aplica</option><option>Clase I</option><option>Clase II</option><option>Clase III</option><option>Clase IV</option></select></div>
+<div class="input-group" style="margin:0;"><label>Kennedy inferior</label><select id="remKennedyInf" class="input-field" style="margin:0;"><option value="">No aplica</option><option>Clase I</option><option>Clase II</option><option>Clase III</option><option>Clase IV</option></select></div>
+</div>
+<div class="input-group" style="margin:0; margin-top:0.6rem;"><label>Dientes a reponer (FDI)</label><input id="remDientes" class="input-field" placeholder="Ej. 15, 16, 24, 25" style="margin:0;"/></div>
+<div class="input-group" style="margin:0; margin-top:0.6rem;"><label>Retenedores y conector mayor</label><input id="remRetenedores" class="input-field" placeholder="Ganchos circunferenciales en 13 y 23, apoyos oclusales, barra palatina..." style="margin:0;"/></div>
+<div class="input-group" style="margin:0; margin-top:0.6rem;"><label>Dientes pilares</label><input id="remPilares" class="input-field" placeholder="Ej. 13, 23, 34" style="margin:0;"/></div>
+</div>
+
+<div style="margin-bottom:1.4rem;">
+<div style="font-weight:800; color:#059669; font-size:0.95rem; margin-bottom:0.4rem; padding-bottom:0.4rem; border-bottom:2px solid #a7f3d0;"><span style="background:#059669; color:white; width:24px; height:24px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; font-size:0.8rem; margin-right:6px;">3</span> Etapas del tratamiento</div>
+<p style="font-size:0.75rem; color:#94a3b8; margin:0 0 0.6rem 0;">Marca cada cita cuando se complete. El estado del caso se calcula solo.</p>
+<div id="remEtapas"></div>
+</div>
+
+<div class="input-group" style="margin:0;"><label>Notas clínicas</label><textarea id="remNotas" class="input-field" rows="2" placeholder="Reborde, tolerancia, ajustes realizados, laboratorio..." style="margin:0;"></textarea></div>
+
+<div style="display:flex; gap:0.5rem; margin-top:1rem; flex-wrap:wrap;">
+<button class="btn btn-success" onclick="remGuardar()" style="font-weight:700;"><i class="fa-solid fa-floppy-disk"></i> Guardar caso</button>
+<button class="btn btn-outline" onclick="remCancelar()">Cancelar</button>
+<button class="btn btn-outline" onclick="remImprimir()" style="border-color:#0e7490; color:#0e7490;"><i class="fa-solid fa-print"></i> Reporte PDF</button>
+</div>
+<div style="display:flex; gap:0.5rem; margin-top:0.6rem; flex-wrap:wrap; border-top:1px dashed var(--border); padding-top:0.8rem;">
+<button class="btn btn-outline" onclick="remEnviarLab()" style="border-color:#0e7490; color:#0e7490; font-size:0.82rem;"><i class="fa-solid fa-truck-fast"></i> Crear orden de laboratorio</button>
+<button class="btn btn-outline" onclick="remConsentimiento()" style="border-color:#7c3aed; color:#7c3aed; font-size:0.82rem;"><i class="fa-solid fa-file-signature"></i> Consentimiento</button>
+<button class="btn btn-outline" onclick="printIndicaciones('protesis_removible')" style="border-color:#1f5b9e; color:#1f5b9e; font-size:0.82rem;"><i class="fa-solid fa-print"></i> Indicaciones</button>
+<button class="btn btn-wa" onclick="sendIndicacionWA('protesis_removible')" style="font-size:0.82rem;"><i class="fa-brands fa-whatsapp"></i> Enviar al paciente</button>
+</div>
+</div>
+</div>
+
+<div style="background:#ecfeff; border:1px dashed #a5f3fc; color:#155e75; padding:0.8rem 1rem; border-radius:8px; margin-top:1.2rem; font-size:0.78rem; line-height:1.5;">
+<i class="fa-solid fa-circle-info"></i> Este módulo se enlaza con <b>Laboratorio Dental</b> (categoría Prótesis Removible), con el <b>consentimiento informado</b> y con las <b>indicaciones para el paciente</b>. Cada etapa completada queda registrada en el Historial Dental.
+</div>
+</div>
+
 <div class="app-section" id="s-nota-endo">
 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; background:white; padding:1.2rem; border-radius:var(--radius-md); border:1px solid var(--border); box-shadow:var(--shadow-sm); border-left:5px solid #8b5cf6; flex-wrap:wrap; gap:1rem;">
 <div>
@@ -2657,6 +2730,10 @@ AVISO PRÓX. CITA (Recordatorio local):
 <button class="btn btn-wa" onclick="sendIndicacionWA('extraccion')" style="width:50px; padding:0;" title="Enviar por WhatsApp"><i class="fa-brands fa-whatsapp fa-lg"></i></button>
 </div>
 <div style="display:flex; gap:0.5rem; width:100%;">
+<button class="btn btn-outline" onclick="printIndicaciones('protesis_removible')" style="flex-grow:1; justify-content:flex-start; color:#0e7490; border-color:#0e7490;" title="Imprimir hoja con datos del doctor"><i class="fa-solid fa-print"></i> Prótesis Removible</button>
+<button class="btn btn-wa" onclick="sendIndicacionWA('protesis_removible')" style="width:50px; padding:0;" title="Enviar por WhatsApp"><i class="fa-brands fa-whatsapp fa-lg"></i></button>
+</div>
+<div style="display:flex; gap:0.5rem; width:100%;">
 <button class="btn btn-outline" onclick="printIndicaciones('brackets')" style="flex-grow:1; justify-content:flex-start; color:#1f5b9e; border-color:#1f5b9e;" title="Imprimir hoja con datos del doctor"><i class="fa-solid fa-print"></i> Cuidados Brackets</button>
 <button class="btn btn-wa" onclick="sendIndicacionWA('brackets')" style="width:50px; padding:0;" title="Enviar por WhatsApp"><i class="fa-brands fa-whatsapp fa-lg"></i></button>
 </div>
@@ -2922,6 +2999,21 @@ AVISO PRÓX. CITA (Recordatorio local):
 <div class="fin-row"><b style="color:#0f172a;">Costo Cobrado Tx Total ($)</b><input class="input-field" id="fTxTotal" onchange="saveFin()" style="border-color:#94a3b8; width:130px;" type="number"/></div>
 <div class="fin-row"><b style="color:#0f172a;">Gasto Insumos Totales Est. ($)</b><input class="input-field" id="fInsTotal" onchange="saveFin()" style="border-color:#94a3b8; width:130px;" type="number"/></div>
 </div>
+</div>
+
+<!-- ===== REGISTRO DE INGRESOS ===== -->
+<div class="card" style="border-top-color:#059669;">
+<div style="display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid var(--border); margin-bottom:1.2rem; padding-bottom:0.9rem; flex-wrap:wrap; gap:0.8rem;">
+<h3 style="color:#047857; font-size:1.2rem; margin:0; font-weight:900; display:flex; align-items:center; gap:0.6rem;"><span style="background:linear-gradient(135deg,#059669,#047857); color:white; width:34px; height:34px; border-radius:10px; display:inline-flex; align-items:center; justify-content:center; font-size:0.9rem;"><i class="fa-solid fa-cash-register"></i></span> Registro de ingresos</h3>
+<button class="btn btn-outline" onclick="ingExportar()" style="border-color:#047857; color:#047857; font-weight:800; font-size:0.82rem;"><i class="fa-solid fa-file-arrow-down"></i> Exportar CSV</button>
+</div>
+<p style="font-size:0.82rem; color:var(--text-muted); margin:0 0 1rem 0; background:#f0fdf4; border-left:3px solid #059669; padding:0.6rem 0.9rem; border-radius:4px;"><i class="fa-solid fa-circle-info" style="color:#059669;"></i> Se calcula con los <b>abonos y pagos registrados</b> en cada paciente. Es dinero realmente cobrado, no lo presupuestado.</p>
+<div id="ingResumen"></div>
+<div style="display:flex; gap:0.6rem; align-items:flex-end; flex-wrap:wrap; margin:1.2rem 0 0.8rem;">
+<div class="input-group" style="margin:0;"><label style="font-size:0.8rem;">Ver mes</label><input type="month" id="ingMes" class="input-field" onchange="ingRender()" style="margin:0; padding:0.45rem;"/></div>
+<button class="btn btn-outline" onclick="ingHoyBtn()" style="font-size:0.8rem; padding:0.5rem 0.9rem;">Mes actual</button>
+</div>
+<div id="ingDetalle"></div>
 </div>
 </div>
 <div class="app-section" id="s-admin-inv">
@@ -3260,6 +3352,7 @@ SmileFlow <b>no es un Expediente Clínico Electrónico certificado</b> conforme 
 </div>
 <div style="margin-bottom: 2rem;">
 <h4 id="help-respaldo" style="color:#0f172a; font-size:1.1rem; border-bottom:2px solid #e2e8f0; padding-bottom:0.5rem; margin-bottom:1rem;"><i class="fa-solid fa-shield-halved" style="color:#059669;"></i> Respaldos: protege la información de tus pacientes</h4>
+<button class="btn" onclick="sfOnboarding()" style="background:#1d4ed8; color:white; font-weight:800; padding:0.6rem 1rem; margin-bottom:1rem;"><i class="fa-solid fa-wand-magic-sparkles"></i> Abrir el asistente guiado</button>
 <div style="background:#fffbeb; border:1px solid #fde68a; border-radius:8px; padding:0.8rem 1rem; margin-bottom:1rem; font-size:0.88rem; color:#92400e; line-height:1.6;"><b><i class="fa-solid fa-triangle-exclamation"></i> Lo más importante que debes saber:</b> tus datos viven en <b>este dispositivo</b>. Si se pierde, se daña o borras los datos del navegador, la información se va con él. El respaldo es tu única red de seguridad real.</div>
 <p style="line-height:1.6; color:#475569;">Tienes tres formas de respaldar, y no son excluyentes. Lo ideal es usar al menos dos.</p>
 
@@ -3505,6 +3598,411 @@ Una vez autorizado tu correo: ve a <b>Configuración → Sistema y Nube</b>, toc
         } catch(e){}
     }
 
+    // Revisa si en la nube hay un punto de guardado MÁS NUEVO que lo que tiene
+    // este dispositivo, y si es así avisa de forma clara y guía al doctor.
+    async function sfNubeRevisarNuevo(){
+        try {
+            const t = sfTokenDrive(); if(!t) return;
+            const files = await sfNubeListar();
+            if(!files.length) return;
+            const disp = sfNombreDispositivo();
+            // El punto más nuevo hecho en OTRO dispositivo
+            let otro = null;
+            for(const f of files){
+                let meta = {}; try { meta = JSON.parse(f.description || '{}'); } catch(e){}
+                if(meta.disp && meta.disp !== disp){ otro = { f, meta }; break; } // ya vienen ordenados por fecha desc
+            }
+            if(!otro) return;
+            const tsNube = new Date(otro.f.modifiedTime).getTime();
+            const tsLocal = (db && db.lastMod) || 0;
+            // Solo avisa si la nube es más nueva y no lo avisó ya para ESE punto
+            if(tsNube <= tsLocal) return;
+            if(localStorage.getItem('sf_aviso_nube_id') === otro.f.id) return;
+            localStorage.setItem('sf_aviso_nube_id', otro.f.id);
+            const cuando = new Date(otro.f.modifiedTime).toLocaleString('es-MX');
+            sfAvisoNubeNueva(otro.meta.disp || 'otro dispositivo', cuando, otro.meta.pats);
+        } catch(e){ console.warn('revisar nube', e); }
+    }
+
+    function sfAvisoNubeNueva(dispOtro, cuando, pats){
+        try {
+            const { body, ov } = sfOverlay('<i class="fa-solid fa-cloud-arrow-down"></i> Hay un guardado más reciente', '#1d4ed8');
+            body.innerHTML =
+                '<div style="background:#eff6ff; border:1px solid #bfdbfe; border-radius:10px; padding:1rem 1.1rem; margin-bottom:1rem; font-size:0.95rem; color:#1e40af; line-height:1.6;">'
+              + 'Guardaste en <b>' + dispOtro + '</b> el <b>' + cuando + '</b>' + (pats !== undefined ? ' (' + pats + ' pacientes)' : '') + '.<br>'
+              + 'Ese guardado es <b>más nuevo</b> que lo que tienes en este aparato.</div>'
+              + '<p style="color:#475569; font-size:0.9rem; line-height:1.6; margin:0 0 1rem;">¿Quieres traer ese trabajo a este dispositivo para continuar donde te quedaste?</p>'
+              + '<div style="display:flex; gap:0.5rem; flex-wrap:wrap;">'
+              + '<button onclick="this.closest(\'div[style*=fixed]\').remove(); sfNubePanel();" style="border:none; border-radius:8px; padding:0.75rem 1rem; font-weight:800; background:#1d4ed8; color:white; flex:1; cursor:pointer;"><i class="fa-solid fa-cloud-arrow-down"></i> Ver y traer ese guardado</button>'
+              + '<button onclick="this.closest(\'div[style*=fixed]\').remove();" style="border:1px solid var(--border); border-radius:8px; padding:0.75rem 1rem; font-weight:800; background:white; color:#475569; cursor:pointer;">Ahora no</button>'
+              + '</div>'
+              + '<div style="background:#fffbeb; border:1px dashed #fde68a; color:#92400e; border-radius:8px; padding:0.7rem 0.9rem; margin-top:0.9rem; font-size:0.8rem; line-height:1.5;">'
+              + '<b>Tranquilo:</b> nada se borra sin tu permiso. Si eliges traerlo, primero se guarda una copia de seguridad de lo que tienes ahora.</div>';
+        } catch(e){
+            // Respaldo por si el modal falla: al menos el avatar lo dice
+            if(typeof daniSpeak === 'function') daniSpeak('☁️ Hay un guardado más reciente hecho en ' + dispOtro + '. Ábrelo desde el escudo de arriba → Guardados en la nube.', 12000, 'warn');
+        }
+    }
+
+    // ================= REGISTRO DE INGRESOS =================
+    // Suma los abonos registrados en los pacientes: día por día y por mes.
+    function ingRecolectar(){
+        const out = [];
+        Object.entries(db.pats || {}).forEach(([pid, p]) => {
+            (p.abonos || []).forEach(a => {
+                const m = parseFloat(a.monto) || 0;
+                if(!m) return;
+                out.push({ pid: pid, paciente: p.name || 'Sin nombre', fecha: (a.fecha || '').substring(0,10), monto: m, concepto: a.concepto || '' });
+            });
+        });
+        return out.sort((x,y) => (y.fecha || '').localeCompare(x.fecha || ''));
+    }
+    function ingFmt(n){ return '$' + (n||0).toLocaleString('es-MX', {maximumFractionDigits:2}); }
+
+    function ingHoyBtn(){
+        const el = $('ingMes');
+        if(el){ el.value = new Date().toISOString().substring(0,7); ingRender(); }
+    }
+
+    function ingRender(){
+        const resumen = $('ingResumen'), det = $('ingDetalle');
+        if(!resumen || !det) return;
+        const datos = ingRecolectar();
+        const hoyISO = new Date().toISOString().split('T')[0];
+        const mesSel = ($('ingMes') && $('ingMes').value) ? $('ingMes').value : hoyISO.substring(0,7);
+
+        const totHoy = datos.filter(d => d.fecha === hoyISO).reduce((a,b)=>a+b.monto, 0);
+        const totMes = datos.filter(d => (d.fecha||'').substring(0,7) === mesSel).reduce((a,b)=>a+b.monto, 0);
+        const delMes = datos.filter(d => (d.fecha||'').substring(0,7) === mesSel);
+        const dias = new Set(delMes.map(d=>d.fecha)).size;
+        const prom = dias ? totMes / dias : 0;
+
+        const caja = (lbl, val, col, bg) => '<div style="background:' + bg + '; border:1px solid ' + col + '33; border-radius:12px; padding:0.9rem; text-align:center;">'
+            + '<div style="font-size:1.3rem; font-weight:900; color:' + col + ';">' + val + '</div>'
+            + '<div style="font-size:0.72rem; color:#64748b; font-weight:700; text-transform:uppercase; letter-spacing:0.3px; margin-top:2px;">' + lbl + '</div></div>';
+        resumen.innerHTML = '<div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:0.7rem;">'
+            + caja('Ingresos hoy', ingFmt(totHoy), '#059669', '#f0fdf4')
+            + caja('Total del mes', ingFmt(totMes), '#1d4ed8', '#eff6ff')
+            + caja('Días con ingreso', String(dias), '#7c3aed', '#faf5ff')
+            + caja('Promedio por día', ingFmt(prom), '#b45309', '#fffbeb')
+            + '</div>';
+
+        if(!delMes.length){
+            det.innerHTML = '<p style="color:#94a3b8; font-style:italic; font-size:0.88rem;">Sin ingresos registrados en ese mes.</p>';
+            return;
+        }
+        // Agrupado por día, del más reciente al más antiguo
+        const porDia = {};
+        delMes.forEach(d => { if(!porDia[d.fecha]) porDia[d.fecha] = []; porDia[d.fecha].push(d); });
+        const fechas = Object.keys(porDia).sort().reverse();
+        let h = '<div style="font-weight:800; color:#334155; font-size:0.9rem; margin-bottom:0.6rem;">Detalle por día</div>';
+        fechas.forEach(f => {
+            const arr = porDia[f];
+            const sub = arr.reduce((a,b)=>a+b.monto, 0);
+            const fLbl = new Date(f + 'T12:00:00').toLocaleDateString('es-MX', {weekday:'long', day:'2-digit', month:'long'});
+            h += '<div style="border:1px solid var(--border); border-left:4px solid #059669; border-radius:10px; padding:0.7rem 0.9rem; margin-bottom:0.6rem;">'
+               + '<div style="display:flex; justify-content:space-between; align-items:center; gap:0.6rem; flex-wrap:wrap;">'
+               + '<b style="color:#0f172a; font-size:0.9rem; text-transform:capitalize;">' + fLbl + '</b>'
+               + '<b style="color:#047857; font-size:0.95rem;">' + ingFmt(sub) + '</b></div>';
+            arr.forEach(d => {
+                h += '<div style="display:flex; justify-content:space-between; gap:0.6rem; font-size:0.83rem; color:#475569; margin-top:0.35rem; border-top:1px dashed var(--border); padding-top:0.35rem;">'
+                   + '<span>' + d.paciente + (d.concepto ? ' <span style="color:#94a3b8;">· ' + d.concepto + '</span>' : '') + '</span>'
+                   + '<span style="white-space:nowrap;">' + ingFmt(d.monto) + '</span></div>';
+            });
+            h += '</div>';
+        });
+        det.innerHTML = h;
+    }
+
+    function ingExportar(){
+        try {
+            const datos = ingRecolectar();
+            if(!datos.length) return alert('No hay ingresos registrados todavía.');
+            const esc = t => '"' + String(t == null ? '' : t).replace(/"/g,'""') + '"';
+            const filas = [['Fecha','Paciente','Concepto','Monto']].concat(datos.map(d => [d.fecha, d.paciente, d.concepto, d.monto]));
+            const csv = '\ufeff' + filas.map(f => f.map(esc).join(',')).join('\r\n');
+            const a = document.createElement('a');
+            a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
+            a.download = 'SmileFlow_ingresos_' + new Date().toISOString().split('T')[0] + '.csv';
+            a.click();
+        } catch(e){ alert('No se pudo exportar.'); }
+    }
+
+    // ================= ASISTENTE DE BIENVENIDA =================
+    // Explica en 3 pasos la diferencia entre RESPALDO (carpeta/copia) y
+    // SINCRONIZACIÓN (nube), que es la confusión más común y la que hace
+    // creer a un doctor que perdió pacientes.
+    function sfOnbCerrar(el){
+        localStorage.setItem('sf_onboard_v2','1');
+        localStorage.setItem('sf_guia_resp','1'); // no mostrar además la otra guía
+        try { const ov = el ? el.closest('div[style*="fixed"]') : document.querySelector('div[style*="z-index:99999"]'); if(ov) ov.remove(); } catch(e){}
+    }
+    function sfOnbBtn(txt, onclick, primario){
+        const base = 'border-radius:10px; padding:0.8rem 1rem; font-weight:800; font-size:0.9rem; cursor:pointer; text-align:left; width:100%; margin-bottom:0.5rem;';
+        return primario
+            ? '<button onclick="' + onclick + '" style="' + base + ' border:none; background:#1d4ed8; color:white;">' + txt + '</button>'
+            : '<button onclick="' + onclick + '" style="' + base + ' border:1px solid var(--border); background:white; color:#334155;">' + txt + '</button>';
+    }
+    function sfOnbPaso(n){
+        const cont = document.getElementById('sfOnbBody');
+        if(!cont) return;
+        const fsOk = (typeof sfFSSoportado === 'function') ? sfFSSoportado() : false;
+        if(n === 1){
+            cont.innerHTML =
+              '<p style="color:#475569; font-size:0.95rem; line-height:1.65; margin:0 0 1rem;">Bienvenido. Antes de empezar, dos minutos para dejar tus datos protegidos.<br><br>'
+            + '<b>Lo más importante:</b> SmileFlow guarda la información <b>en el dispositivo donde la usas</b>, no en un servidor nuestro. Eso te da privacidad, pero significa que <b>tú decides cómo respaldarla</b>.</p>'
+            + '<div style="background:#eff6ff; border:1px solid #bfdbfe; border-radius:10px; padding:0.9rem 1rem; margin-bottom:1rem; font-size:0.88rem; color:#1e40af; line-height:1.6;">¿En cuántos dispositivos piensas usar SmileFlow?</div>'
+            + sfOnbBtn('<i class="fa-solid fa-desktop"></i> Solo en este dispositivo', 'sfOnbPaso(2)', true)
+            + sfOnbBtn('<i class="fa-solid fa-laptop-mobile"></i> En varios (computadora y celular)', 'sfOnbPaso(3)', true)
+            + '<div style="text-align:center; margin-top:0.6rem;"><span onclick="sfOnbCerrar(this)" style="font-size:0.82rem; color:#94a3b8; cursor:pointer; text-decoration:underline;">Saltar por ahora</span></div>';
+        } else if(n === 2){
+            cont.innerHTML =
+              '<div style="background:#f0fdf4; border:1px solid #bbf7d0; border-radius:10px; padding:0.9rem 1rem; margin-bottom:1rem; font-size:0.9rem; color:#166534; line-height:1.6;">'
+            + '<b>Tu camino: respaldo local.</b><br>Con un dispositivo no necesitas nube. Lo que sí necesitas es una copia por si el aparato se pierde, se daña o el navegador borra los datos.</div>'
+            + '<div style="font-size:0.9rem; color:#475569; line-height:1.7; margin-bottom:1rem;">'
+            + '<b>1. Copia de seguridad (imprescindible).</b> Descarga un archivo y guárdalo en tu Google Drive o una USB. Hazlo <b>una vez por semana</b>.<br>'
+            + (fsOk ? '<b>2. Carpeta automática (recomendado).</b> Eliges una carpeta y la app deja copias ahí sola. Si eliges una carpeta de Google Drive en tu computadora, suben a la nube sin que hagas nada.' : '<b>2. En este dispositivo</b> la carpeta automática no está disponible (es solo de Chrome/Edge en computadora). Con la copia semanal quedas cubierto.')
+            + '</div>'
+            + sfOnbBtn('<i class="fa-solid fa-download"></i> Descargar mi primera copia ahora', "sfOnbCerrar(this); backupDB();", true)
+            + (fsOk ? sfOnbBtn('<i class="fa-solid fa-folder-open"></i> Elegir carpeta automática', "sfOnbCerrar(this); sfCarpetaElegir();", false) : '')
+            + sfOnbBtn('<i class="fa-solid fa-circle-question"></i> Ver la guía completa en Ayuda', "sfOnbCerrar(this); openSection('s-ayuda', document.querySelector('#sidebar [onclick*=\\'s-ayuda\\']'));", false)
+            + '<div style="text-align:center; margin-top:0.4rem;"><span onclick="sfOnbPaso(1)" style="font-size:0.82rem; color:#94a3b8; cursor:pointer; text-decoration:underline;">← Volver</span></div>';
+        } else {
+            cont.innerHTML =
+              '<div style="background:#fffbeb; border:1px solid #fde68a; border-radius:10px; padding:0.9rem 1rem; margin-bottom:1rem; font-size:0.9rem; color:#92400e; line-height:1.6;">'
+            + '<b>Ojo con esta diferencia</b> (es la confusión más común):<br><br>'
+            + '📁 <b>Carpeta de respaldo</b> = copias de seguridad de <b>ese</b> aparato. <b>No</b> pasa tus datos al otro dispositivo, aunque la carpeta esté en Drive.<br><br>'
+            + '☁️ <b>Guardados en la nube</b> = <b>esto sí</b> conecta tus dispositivos.</div>'
+            + '<div style="font-size:0.9rem; color:#475569; line-height:1.7; margin-bottom:1rem;">Así funciona: terminas de trabajar en la computadora y la app <b>sube un punto con la fecha</b>. Llegas al celular, abres SmileFlow y te avisa <i>"hay un guardado más reciente, ¿lo traigo?"</i>. Aceptas y sigues donde te quedaste.<br><br>'
+            + '<b>Nunca se borra nada sin tu permiso</b>, y antes de traer un punto se guarda una copia de lo que tenías.</div>'
+            + '<div style="background:#f5f3ff; border:1px solid #ddd6fe; border-radius:10px; padding:0.8rem 1rem; margin-bottom:1rem; font-size:0.84rem; color:#4c1d95; line-height:1.55;">La sincronización está en <b>fase de desarrollo</b>: el acceso se habilita cuenta por cuenta. Escribe a <b>soporte@dentilike.com.mx</b> para que autoricemos tu correo.</div>'
+            + sfOnbBtn('<i class="fa-solid fa-envelope"></i> Solicitar acceso a la nube', "sfOnbCerrar(this); window.location.href='mailto:soporte@dentilike.com.mx?subject=Solicito%20acceso%20a%20sincronizaci%C3%B3n%20(SmileFlow)';", true)
+            + sfOnbBtn('<i class="fa-solid fa-download"></i> Mientras tanto, descargar una copia', "sfOnbCerrar(this); backupDB();", false)
+            + sfOnbBtn('<i class="fa-solid fa-circle-question"></i> Ver la guía completa en Ayuda', "sfOnbCerrar(this); openSection('s-ayuda', document.querySelector('#sidebar [onclick*=\\'s-ayuda\\']'));", false)
+            + '<div style="text-align:center; margin-top:0.4rem;"><span onclick="sfOnbPaso(1)" style="font-size:0.82rem; color:#94a3b8; cursor:pointer; text-decoration:underline;">← Volver</span></div>';
+        }
+    }
+    function sfOnboarding(){
+        try {
+            const { body } = sfOverlay('<i class="fa-solid fa-shield-halved"></i> Protege tu información', '#1d4ed8');
+            body.innerHTML = '<div id="sfOnbBody"></div>';
+            sfOnbPaso(1);
+        } catch(e){ console.warn('onboarding', e); }
+    }
+    function sfOnboardingCheck(){
+        try {
+            if(localStorage.getItem('sf_onboard_v2')) return;
+            setTimeout(() => { if(!document.querySelector('div[style*="z-index:99999"]')) sfOnboarding(); }, 3000);
+        } catch(e){}
+    }
+
+    // Subida automática de puntos a la nube: cada cierto número de guardados y
+    // al dejar la app. Así el otro dispositivo siempre encuentra algo reciente.
+    const SF_CLOUD_CADA = 8;      // guardados
+    const SF_CLOUD_MIN_MS = 180000; // no subir más de una vez cada 3 min
+
+    function sfCloudAutoActivo(){ return localStorage.getItem('sf_cloud_auto') !== '0'; }
+    function sfCloudAutoToggle(v){
+        localStorage.setItem('sf_cloud_auto', v ? '1' : '0');
+        if(typeof daniSpeak === 'function') daniSpeak(v ? '☁️ Subida automática activada.' : '☁️ Subida automática desactivada. Recuerda subir tus puntos a mano.', 6000, 'info');
+        sfNubePanel();
+    }
+    function sfCloudDebeSubir(){
+        if(!sfCloudAutoActivo()) return false;
+        if(!sfTokenDrive()) return false;
+        const last = localStorage.getItem('sf_last_cloud_save');
+        if(last && (Date.now() - new Date(last).getTime()) < SF_CLOUD_MIN_MS) return false;
+        return true;
+    }
+    // Se llama tras cada guardado local (ya viene con retardo desde sfBlindaje)
+    function sfCloudTrasGuardar(){
+        try {
+            const n = (parseInt(localStorage.getItem('sf_cloud_pend') || '0', 10) || 0) + 1;
+            localStorage.setItem('sf_cloud_pend', String(n));
+            if(n >= SF_CLOUD_CADA && sfCloudDebeSubir()) sfNubeGuardar(true);
+        } catch(e){}
+    }
+    // Al minimizar, cambiar de app o cerrar: si quedaron cambios sin subir, subirlos
+    function sfCloudAlSalir(){
+        try {
+            const n = parseInt(localStorage.getItem('sf_cloud_pend') || '0', 10) || 0;
+            if(n > 0 && sfCloudDebeSubir()) sfNubeGuardar(true);
+        } catch(e){}
+    }
+    try {
+        document.addEventListener('visibilitychange', () => { if(document.hidden) sfCloudAlSalir(); });
+        window.addEventListener('pagehide', sfCloudAlSalir);
+    } catch(e){}
+
+    // ================= GUARDADOS EN LA NUBE (estilo consola) =================
+    // Varios puntos con FECHA y DISPOSITIVO. Tú eliges cuál usar, en vez de que
+    // el último que guarde pise el trabajo del otro aparato.
+    const SF_NUBE_PREFIJO = 'SmileFlow_Save_';
+    const SF_NUBE_MAX = 12; // por dispositivo
+
+    function sfNombreDispositivo(){
+        let n = localStorage.getItem('sf_device_name');
+        if(n) return n;
+        const ua = navigator.userAgent || '';
+        if(/iPhone|iPad/i.test(ua))      n = 'iPhone';
+        else if(/Android/i.test(ua))     n = 'Celular';
+        else if(/Macintosh/i.test(ua))   n = 'Mac';
+        else if(/Windows/i.test(ua))     n = 'Computadora';
+        else                             n = 'Dispositivo';
+        localStorage.setItem('sf_device_name', n);
+        return n;
+    }
+    function sfRenombrarDispositivo(){
+        const actual = sfNombreDispositivo();
+        const n = prompt('¿Cómo quieres llamar a este dispositivo?\n(Ej. "Laptop consultorio", "Celular Dr. Mike")', actual);
+        if(n && n.trim()){ localStorage.setItem('sf_device_name', n.trim().substring(0,30)); sfNubePanel(); }
+    }
+    function sfTokenDrive(){ try { return gapi.client.getToken(); } catch(e){ return null; } }
+
+    // Sube un punto NUEVO con fecha (no pisa el anterior)
+    async function sfNubeGuardar(silencioso){
+        const t = sfTokenDrive();
+        if(!t){ if(!silencioso) alert('Primero conecta tu cuenta de Google en Configuración → Sistema y Nube.'); return; }
+        try {
+            if(!silencioso && typeof daniSpeak === 'function') daniSpeak('☁️ Subiendo un punto de guardado a tu nube...', 5000, 'info');
+            const disp = sfNombreDispositivo();
+            const d = new Date();
+            const stamp = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0')
+                        + '_' + String(d.getHours()).padStart(2,'0') + String(d.getMinutes()).padStart(2,'0');
+            const nPats = db.pats ? Object.keys(db.pats).length : 0;
+            const meta = JSON.stringify({ disp: disp, ts: d.toISOString(), pats: nPats });
+            let payload = JSON.stringify(db);
+            const cp = localStorage.getItem('sf_cloud_pass');
+            if(cp){ try { payload = JSON.stringify(await sfEncrypt(payload, cp)); } catch(e){} }
+            const nombre = SF_NUBE_PREFIJO + disp.replace(/[^A-Za-z0-9áéíóúÁÉÍÓÚñÑ ]/g,'') + '_' + stamp + '.json';
+            const bnd = '31415926535897';
+            const info = JSON.stringify({ name: nombre, mimeType: 'application/json', description: meta });
+            const body = '\r\n--' + bnd + '\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n' + info
+                       + '\r\n--' + bnd + '\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n' + payload
+                       + '\r\n--' + bnd + '--';
+            const res = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart', {
+                method:'POST',
+                headers: new Headers({ 'Authorization':'Bearer ' + t.access_token, 'Content-Type':'multipart/related; boundary=' + bnd }),
+                body: body
+            });
+            if(!res.ok) throw new Error('subida');
+            localStorage.setItem('sf_last_cloud_save', new Date().toISOString());
+            localStorage.setItem('sf_cloud_pend', '0');
+            await sfNubeLimpiar(disp);
+            if(silencioso){ if(typeof daniSpeak === 'function') daniSpeak('☁️ Guardé un punto en tu nube automáticamente.', 5000, 'info'); return; }
+            if(typeof daniSpeak === 'function') daniSpeak('✅ Punto guardado en tu nube (' + disp + ').', 6000, 'info');
+            sfNubePanel();
+        } catch(e){ console.error(e); if(!silencioso) alert('No se pudo subir el punto de guardado. Revisa tu conexión y que la nube esté conectada.'); }
+    }
+
+    async function sfNubeListar(){
+        const t = sfTokenDrive(); if(!t) return [];
+        if(typeof gapi !== 'undefined' && gapi.client && !gapi.client.drive) await gapi.client.load('drive','v3');
+        const r = await gapi.client.drive.files.list({
+            q: "name contains '" + SF_NUBE_PREFIJO + "' and trashed=false",
+            fields: 'files(id,name,modifiedTime,size,description)',
+            orderBy: 'modifiedTime desc', pageSize: 60, spaces: 'drive'
+        });
+        return (r.result && r.result.files) ? r.result.files : [];
+    }
+
+    // Conserva los últimos N de este dispositivo
+    async function sfNubeLimpiar(disp){
+        try {
+            const files = await sfNubeListar();
+            const mios = files.filter(f => (f.name||'').indexOf(SF_NUBE_PREFIJO + disp.replace(/[^A-Za-z0-9áéíóúÁÉÍÓÚñÑ ]/g,'')) === 0);
+            for(let i = SF_NUBE_MAX; i < mios.length; i++){
+                try { await gapi.client.drive.files.delete({ fileId: mios[i].id }); } catch(e){}
+            }
+        } catch(e){}
+    }
+
+    async function sfNubePanel(){
+        const { body } = sfOverlay('<i class="fa-solid fa-cloud-arrow-up"></i> Guardados en la nube', '#1d4ed8');
+        body.innerHTML = '<p style="color:#64748b; font-size:0.9rem;">Consultando tu nube…</p>';
+        const t = sfTokenDrive();
+        if(!t){
+            body.innerHTML = '<div style="background:#fffbeb; border:1px solid #fde68a; color:#92400e; border-radius:10px; padding:1rem;">'
+                + 'Tu cuenta de Google no está conectada en este dispositivo. Ve a <b>Configuración → Sistema y Nube</b> y conéctala.<br><br>'
+                + '<i style="font-size:0.85rem;">Recuerda que la sincronización está en fase de desarrollo: escribe a soporte@dentilike.com.mx para habilitar tu correo.</i></div>';
+            return;
+        }
+        try {
+            const files = await sfNubeListar();
+            const disp = sfNombreDispositivo();
+            const bs = 'border:none; border-radius:8px; padding:0.45rem 0.8rem; font-weight:800; font-size:0.8rem; cursor:pointer;';
+            let h = '<div style="background:#eff6ff; border:1px solid #bfdbfe; border-radius:10px; padding:0.8rem 1rem; margin-bottom:1rem; font-size:0.86rem; color:#1e40af; line-height:1.55;">'
+                  + 'Este dispositivo se llama <b>' + disp + '</b> <span onclick="sfRenombrarDispositivo()" style="text-decoration:underline; cursor:pointer;">(cambiar)</span>.<br>'
+                  + 'Sube un punto al terminar de trabajar aquí, y en el otro aparato elige ese punto para continuar donde te quedaste.</div>'
+                  + '<label style="display:flex; gap:0.5rem; align-items:center; background:#f0fdf4; border:1px solid #bbf7d0; border-radius:10px; padding:0.7rem 0.9rem; margin-bottom:0.8rem; font-size:0.86rem; color:#166534; cursor:pointer;">'
+                  + '<input type="checkbox" ' + (sfCloudAutoActivo() ? 'checked' : '') + ' onchange="sfCloudAutoToggle(this.checked)" style="width:18px; height:18px;"/>'
+                  + '<span><b>Subir puntos automáticamente</b><br><span style="font-size:0.78rem; opacity:0.85;">La app sube un punto sola mientras trabajas y al cerrarla. Recomendado si usas varios dispositivos.</span></span></label>'
+                  + '<button onclick="sfNubeGuardar()" style="' + bs + ' background:#1d4ed8; color:white; width:100%; padding:0.75rem;"><i class="fa-solid fa-cloud-arrow-up"></i> Subir un punto desde este dispositivo</button>'
+                  + '<div style="font-weight:800; color:#334155; font-size:0.9rem; margin:1.1rem 0 0.5rem;">Puntos disponibles</div>';
+            if(!files.length){
+                h += '<p style="color:#94a3b8; font-style:italic; font-size:0.87rem;">Todavía no hay puntos guardados. Sube el primero con el botón de arriba.</p>';
+            } else {
+                files.forEach(f => {
+                    let meta = {};
+                    try { meta = JSON.parse(f.description || '{}'); } catch(e){}
+                    const fecha = f.modifiedTime ? new Date(f.modifiedTime).toLocaleString('es-MX') : '';
+                    const esteDisp = meta.disp === disp;
+                    const kb = f.size ? Math.round(parseInt(f.size)/1024) : null;
+                    h += '<div style="border:1px solid var(--border); border-left:4px solid ' + (esteDisp ? '#1d4ed8' : '#0e7490') + '; border-radius:10px; padding:0.75rem 0.9rem; margin-bottom:0.6rem;">'
+                       + '<div style="display:flex; justify-content:space-between; align-items:flex-start; gap:0.6rem; flex-wrap:wrap;">'
+                       + '<div><div style="font-weight:800; color:var(--text,#0f172a); font-size:0.92rem;"><i class="fa-solid ' + (esteDisp ? 'fa-laptop' : 'fa-mobile-screen') + '" style="color:' + (esteDisp ? '#1d4ed8' : '#0e7490') + ';"></i> ' + (meta.disp || 'Dispositivo') + (esteDisp ? ' <span style="font-size:0.7rem; background:#dbeafe; color:#1e40af; padding:1px 6px; border-radius:5px;">este aparato</span>' : '') + '</div>'
+                       + '<div style="font-size:0.82rem; color:#64748b; margin-top:2px;">' + fecha + (meta.pats !== undefined ? ' · ' + meta.pats + ' paciente(s)' : '') + (kb ? ' · ' + kb + ' KB' : '') + '</div></div>'
+                       + '<div style="display:flex; gap:0.35rem;">'
+                       + '<button onclick="sfNubeUsar(\'' + f.id + '\')" style="' + bs + ' background:#059669; color:white;"><i class="fa-solid fa-download"></i> Usar</button>'
+                       + '<button onclick="sfNubeBorrar(\'' + f.id + '\')" style="' + bs + ' background:#fee2e2; color:#dc2626;"><i class="fa-solid fa-trash"></i></button>'
+                       + '</div></div></div>';
+                });
+            }
+            h += '<div style="background:#fffbeb; border:1px dashed #fde68a; color:#92400e; border-radius:8px; padding:0.7rem 0.9rem; margin-top:0.8rem; font-size:0.78rem; line-height:1.5;">'
+               + '<b>Importante:</b> al usar un punto, los datos de ESTE dispositivo se reemplazan por los de ese punto. Antes de reemplazar se crea un punto de seguridad local, por si te arrepientes.</div>';
+            body.innerHTML = h;
+        } catch(e){
+            console.error(e);
+            body.innerHTML = '<p style="color:var(--danger-text,#dc2626);">No se pudo consultar la nube. Revisa tu conexión o reconecta tu cuenta de Google.</p>';
+        }
+    }
+
+    async function sfNubeUsar(fileId){
+        const t = sfTokenDrive(); if(!t) return;
+        try {
+            if(typeof gapi !== 'undefined' && gapi.client && !gapi.client.drive) await gapi.client.load('drive','v3');
+            const r = await gapi.client.drive.files.get({ fileId: fileId, alt: 'media' });
+            let rDb = r.result;
+            if(typeof rDb === 'string'){ try { rDb = JSON.parse(rDb); } catch(e){} }
+            if(rDb && rDb.sf_enc){
+                const cp = localStorage.getItem('sf_cloud_pass') || prompt('🔐 Este punto está protegido. Contraseña de nube:');
+                if(!cp) return;
+                try { rDb = JSON.parse(await sfDecrypt(rDb, cp.trim())); localStorage.setItem('sf_cloud_pass', cp.trim()); }
+                catch(e){ return alert('❌ Contraseña de nube incorrecta.'); }
+            }
+            const v = (typeof validarRespaldo === 'function') ? validarRespaldo(rDb) : { ok:!!(rDb && rDb.cfg), resumen:{} };
+            if(!v.ok) return alert('Ese punto está dañado y no se cargó. Tus datos actuales siguen intactos.');
+            const nPats = v.resumen ? v.resumen.pacientes : '?';
+            const misPats = db.pats ? Object.keys(db.pats).length : 0;
+            if(!confirm('Vas a reemplazar los datos de ESTE dispositivo.\n\nEste aparato: ' + misPats + ' paciente(s)\nEl punto elegido: ' + nPats + ' paciente(s)\n\n¿Continuar?')) return;
+            if(typeof sfDoQuickSave === 'function') await sfDoQuickSave();
+            if(typeof sfBitacora === 'function') await sfBitacora('Restauración desde nube', 'Se cargó un punto de guardado de la nube');
+            db = rDb;
+            saveDB();
+            alert('✅ Listo. Se cargaron los datos del punto elegido. La app se reiniciará.');
+            location.reload();
+        } catch(e){ console.error(e); alert('No se pudo descargar ese punto.'); }
+    }
+
+    async function sfNubeBorrar(fileId){
+        if(!confirm('¿Eliminar este punto de la nube? No se puede deshacer.')) return;
+        try {
+            if(typeof gapi !== 'undefined' && gapi.client && !gapi.client.drive) await gapi.client.load('drive','v3');
+            await gapi.client.drive.files.delete({ fileId: fileId });
+            sfNubePanel();
+        } catch(e){ alert('No se pudo eliminar.'); }
+    }
+
     // ================= RESPALDOS: SEMÁFORO Y PANEL =================
     // Habla en consecuencias ("Protegido" / "En riesgo"), no en términos técnicos.
     let _sfCarpetaCache = { configurada:false, permiso:false, nombre:'' };
@@ -3600,7 +4098,8 @@ Una vez autorizado tu correo: ve a <b>Configuración → Sistema y Nube</b>, toc
 
         h += sfFila(false, 'Google Drive <span style="background:#fef3c7; color:#92400e; font-size:0.65rem; padding:1px 6px; border-radius:5px;">EN DESARROLLO</span>',
               'El acceso se habilita cuenta por cuenta. Escribe a soporte@dentilike.com.mx antes de intentar conectarte.',
-              '<a href="mailto:soporte@dentilike.com.mx?subject=Solicito%20acceso%20a%20Google%20Drive%20(SmileFlow)" style="' + bs + ' background:#b45309; color:white; text-decoration:none; display:inline-block;"><i class="fa-solid fa-envelope"></i> Solicitar acceso</a>');
+              '<a href="mailto:soporte@dentilike.com.mx?subject=Solicito%20acceso%20a%20Google%20Drive%20(SmileFlow)" style="' + bs + ' background:#b45309; color:white; text-decoration:none; display:inline-block;"><i class="fa-solid fa-envelope"></i> Solicitar acceso</a>'
+            + '<button onclick="sfNubePanel()" style="' + bs + ' background:#1d4ed8; color:white;"><i class="fa-solid fa-clock-rotate-left"></i> Guardados en la nube</button>');
 
         h += '<div style="border-top:1px solid var(--border); margin-top:1rem; padding-top:1rem;">'
            + '<div style="font-weight:800; color:#334155; font-size:0.9rem; margin-bottom:0.4rem;"><i class="fa-solid fa-clipboard-check"></i> ¿Tu respaldo sirve?</div>'
@@ -3668,6 +4167,8 @@ Una vez autorizado tu correo: ve a <b>Configuración → Sistema y Nube</b>, toc
         if(targetId === 's-black') { try{ renderBlack(); }catch(e){console.error('black',e);} }
         if(targetId === 's-nolla') { try{ renderNolla(); }catch(e){console.error('nolla',e);} }
         if(targetId === 's-patologias') { try{ renderPatologias(''); }catch(e){console.error('pato',e);} }
+        if(targetId === 's-admin-fin') { try{ if($('ingMes') && !$('ingMes').value) $('ingMes').value = new Date().toISOString().substring(0,7); ingRender(); }catch(e){console.error('ingresos',e);} }
+        if(targetId === 's-nota-removible') { try{ remInit(); }catch(e){console.error('removible',e);} }
         if(targetId === 's-manuales') { try{ renderResina(); renderBlanqueamiento(); renderStepByDent(); }catch(e){console.error('manuales',e);} }
         if(targetId === 's-asistencia') { try{ renderAsistencia(); }catch(e){console.error('asist',e);} }
         if(targetId === 's-paralelismo') { try{ parInit(); }catch(e){console.error('par',e);} }
@@ -4027,31 +4528,39 @@ db = {
                 endo:       { t:'Endodoncias activas',     ic:'fa-diagram-project',  c:'#7c3aed' },
                 protesis:   { t:'Prótesis activas',        ic:'fa-crown',            c:'#b45309' },
                 lab:        { t:'Trabajos en laboratorio', ic:'fa-truck-fast',       c:'#0e7490' },
-                adeudo:     { t:'Pacientes con adeudo',    ic:'fa-user-clock',       c:'#dc2626' }
+                adeudo:     { t:'Pacientes con adeudo',    ic:'fa-user-clock',       c:'#dc2626' },
+                ingresos:   { t:'Ingresos de hoy',         ic:'fa-cash-register',    c:'#059669' }
             }[tipo] || { t:'Detalle', ic:'fa-list', c:'#475569' };
 
             const filas = [];
-            Object.values(db.pats || {}).forEach(p => {
+            Object.entries(db.pats || {}).forEach(([pid, p]) => {
                 if(tipo === 'citas'){
-                    if(p.nextAppt === hoy) filas.push({ id:p.id, n:p.name, d: fmtH(p.nextApptTime) || 'Sin hora', orden: p.nextApptTime || '99:99' });
+                    if(p.nextAppt === hoy) filas.push({ id:pid, n:p.name, d: fmtH(p.nextApptTime) || 'Sin hora', orden: p.nextApptTime || '99:99' });
                 } else if(tipo === 'pendientes'){
-                    if(p.alert && p.alert.trim()) filas.push({ id:p.id, n:p.name, d:p.alert });
+                    if(p.alert && p.alert.trim()) filas.push({ id:pid, n:p.name, d:p.alert });
                 } else if(tipo === 'endo'){
-                    (p.endos || []).forEach(e => { if(e.estado !== 'Terminado') filas.push({ id:p.id, n:p.name, d:(e.diente? 'Diente '+e.diente+' · ':'') + (e.estado || 'En proceso') }); });
+                    (p.endos || []).forEach(e => { if(e.estado !== 'Terminado') filas.push({ id:pid, n:p.name, d:(e.diente? 'Diente '+e.diente+' · ':'') + (e.estado || 'En proceso') }); });
                 } else if(tipo === 'protesis'){
-                    (p.protesis || []).forEach(pr => { if(!(pr.etapas && pr.etapas.cementacion && pr.etapas.cementacion.done)) filas.push({ id:p.id, n:p.name, d:(pr.tipo || 'Prótesis') + (pr.diente? ' · Diente '+pr.diente : '') }); });
+                    (p.protesis || []).forEach(pr => { if(!(pr.etapas && pr.etapas.cementacion && pr.etapas.cementacion.done)) filas.push({ id:pid, n:p.name, d:'Fija · ' + (pr.tipo || 'Prótesis') + (pr.piezas && pr.piezas.length ? ' · ' + pr.piezas.map(x=>x.fdi).filter(Boolean).join(', ') : '') }); });
+                    (p.removibles || []).forEach(r => { if(!(r.etapas && r.etapas.instalacion && r.etapas.instalacion.done)) filas.push({ id:pid, n:p.name, d:'Removible · ' + (r.tipo || '') + (r.arcada ? ' · ' + r.arcada : '') }); });
                 } else if(tipo === 'lab'){
                     (p.ordenesLab || []).forEach(o => {
                         if(/Recibido/i.test(o.fase||'')) return;
                         let vencido = false;
                         if(o.fechaEntrega){ const d=new Date(o.fechaEntrega+'T12:00:00'); d.setHours(0,0,0,0); vencido = d < hoy0; }
-                        filas.push({ id:p.id, n:p.name, d:(o.trabajo || o.tipo || 'Trabajo') + ' · ' + (o.fase || 'En proceso') + (o.fechaEntrega ? ' · entrega ' + new Date(o.fechaEntrega+'T12:00:00').toLocaleDateString('es-MX') : ''), alerta: vencido, orden: o.fechaEntrega || '9999' });
+                        filas.push({ id:pid, n:p.name, d:(o.trabajo || o.tipo || 'Trabajo') + ' · ' + (o.fase || 'En proceso') + (o.fechaEntrega ? ' · entrega ' + new Date(o.fechaEntrega+'T12:00:00').toLocaleDateString('es-MX') : ''), alerta: vencido, orden: o.fechaEntrega || '9999' });
+                    });
+                } else if(tipo === 'ingresos'){
+                    const hoyI = new Date().toISOString().split('T')[0];
+                    (p.abonos || []).forEach(a => {
+                        if((a.fecha||'').substring(0,10) !== hoyI) return;
+                        filas.push({ id:pid, n:p.name, d: dinero(parseFloat(a.monto)||0) + (a.concepto ? ' · ' + a.concepto : ''), orden: -(parseFloat(a.monto)||0) });
                     });
                 } else if(tipo === 'adeudo'){
                     const costo = parseFloat(p.costoTotal) || 0;
                     const abonado = (p.abonos || []).reduce((s,a)=>s+(parseFloat(a.monto)||0),0);
                     const deuda = costo - abonado;
-                    if(deuda > 0) filas.push({ id:p.id, n:p.name, d:'Debe ' + dinero(deuda) + ' de ' + dinero(costo), orden: -deuda });
+                    if(deuda > 0) filas.push({ id:pid, n:p.name, d:'Debe ' + dinero(deuda) + ' de ' + dinero(costo), orden: -deuda });
                 }
             });
             filas.sort((a,b)=>{
@@ -4101,8 +4610,9 @@ db = {
         // Citas de hoy
         const hoy = new Date().toISOString().split('T')[0];
         const citasHoy = [];
-        Object.values(db.pats || {}).forEach(p => {
-            if(p.nextAppt === hoy) citasHoy.push({ name:p.name, hora:p.nextApptTime || '', id:p.id });
+        Object.entries(db.pats || {}).forEach(([pid, p]) => {
+            // Usar la clave real: los pacientes de respaldos viejos pueden no traer .id
+            if(p.nextAppt === hoy) citasHoy.push({ name:p.name, hora:p.nextApptTime || '', id: p.id || pid });
         });
         // Ordenar por hora (las sin hora al final)
         citasHoy.sort((a,b)=>{ if(!a.hora) return 1; if(!b.hora) return -1; return a.hora.localeCompare(b.hora); });
@@ -4128,7 +4638,21 @@ db = {
         Object.values(db.pats || {}).forEach(p => { (p.endos || []).forEach(e => { if(e.estado !== 'Terminado') endoActivas++; }); });
         // Prótesis fijas activas (sin cementación registrada) en todo el consultorio
         let protActivas = 0;
-        Object.values(db.pats || {}).forEach(p => { (p.protesis || []).forEach(pr => { if(!(pr.etapas && pr.etapas.cementacion && pr.etapas.cementacion.done)) protActivas++; }); });
+        Object.values(db.pats || {}).forEach(p => {
+            (p.protesis || []).forEach(pr => { if(!(pr.etapas && pr.etapas.cementacion && pr.etapas.cementacion.done)) protActivas++; });
+            // Removibles activas: cuentan igual hasta que se instalan
+            (p.removibles || []).forEach(r => { if(!(r.etapas && r.etapas.instalacion && r.etapas.instalacion.done)) protActivas++; });
+        });
+        // Ingresos: suma de abonos por fecha (lo realmente cobrado)
+        const _hoyISO = new Date().toISOString().split('T')[0];
+        const _mesISO = _hoyISO.substring(0,7);
+        let ingHoy = 0, ingMes = 0;
+        Object.values(db.pats || {}).forEach(p => { (p.abonos || []).forEach(a => {
+            const f = (a.fecha || '').substring(0,10);
+            const m = parseFloat(a.monto) || 0;
+            if(f === _hoyISO) ingHoy += m;
+            if(f.substring(0,7) === _mesISO) ingMes += m;
+        }); });
         // Trabajos en laboratorio dental (no recibidos) + vencidos
         let labActivos = 0, labVencidos = 0;
         const _hoy0 = new Date(); _hoy0.setHours(0,0,0,0);
@@ -4151,7 +4675,8 @@ db = {
                 tarjeta('fa-crown', protActivas, 'Prótesis activas', '#b45309', '#fffbeb', 'protesis') +
                 tarjeta('fa-truck-fast', labActivos + (labVencidos?' ⚠️':''), 'En laboratorio', labVencidos?'#dc2626':'#0e7490', labVencidos?'#fef2f2':'#ecfeff', 'lab') +
                 tarjeta('fa-user-clock', conAdeudo, 'Con adeudo', '#dc2626', '#fef2f2', 'adeudo') +
-                tarjeta('fa-sack-dollar', fmt(porCobrar), 'Por cobrar', '#059669', '#f0fdf4', 'adeudo');
+                tarjeta('fa-cash-register', fmt(ingHoy), 'Ingresos hoy', '#059669', '#f0fdf4', 'ingresos') +
+                tarjeta('fa-sack-dollar', fmt(porCobrar), 'Por cobrar', '#0e7490', '#ecfeff', 'adeudo');
         }
 
         renderPromosBanner();
@@ -8636,6 +9161,241 @@ El doctor adjunta una fotografía clínica para una lectura de APOYO (nunca diag
     let protEditId = null;
     let protPiezas = [];
     let protEtapasData = {};
+    // ================= PRÓTESIS REMOVIBLE (TOTAL Y PARCIAL) =================
+    const REM_ETAPAS = [
+        {key:'impPrelim',  lbl:'Impresión preliminar'},
+        {key:'impDefin',   lbl:'Impresión definitiva / funcional'},
+        {key:'rodillos',   lbl:'Relación intermaxilar (rodillos)'},
+        {key:'pruebaCera', lbl:'Prueba de dientes en cera'},
+        {key:'instalacion',lbl:'Instalación / entrega'},
+        {key:'control',    lbl:'Control de ajuste'}
+    ];
+    let remPiezasEditId = null, remEtapasData = {}, remEditId = null;
+
+    function remEstadoDe(r){
+        const e = r.etapas || {};
+        if(e.instalacion && e.instalacion.done) return 'Instalada';
+        if(REM_ETAPAS.some(et => e[et.key] && e[et.key].done)) return 'En proceso';
+        return 'Planeado';
+    }
+
+    function remInit(){
+        const p = db.curr ? db.pats[db.curr] : null;
+        if($('remPacienteLbl')) $('remPacienteLbl').textContent = p ? ('Paciente: ' + (p.name || '—')) : 'Selecciona un paciente primero.';
+        remRenderLista();
+        if($('remForm')) $('remForm').style.display = 'none';
+    }
+
+    function remRenderLista(){
+        const cont = $('remLista'); if(!cont) return;
+        const p = db.curr ? db.pats[db.curr] : null;
+        const arr = (p && p.removibles) ? p.removibles : [];
+        if(!arr.length){ cont.innerHTML = '<p style="color:#94a3b8; font-style:italic; font-size:0.85rem; margin:0;">Sin casos registrados. Toca "Nuevo caso" para empezar.</p>'; return; }
+        cont.innerHTML = arr.map(r => {
+            const est = remEstadoDe(r);
+            const col = est === 'Instalada' ? '#059669' : (est === 'En proceso' ? '#d97706' : '#64748b');
+            const hechas = REM_ETAPAS.filter(et => r.etapas && r.etapas[et.key] && r.etapas[et.key].done).length;
+            return '<div style="border:1px solid var(--border); border-left:4px solid ' + col + '; border-radius:10px; padding:0.7rem 0.9rem; margin-bottom:0.6rem; display:flex; justify-content:space-between; align-items:center; gap:0.7rem; flex-wrap:wrap;">'
+                 + '<div><div style="font-weight:800; color:var(--text,#0f172a);">' + (r.tipo||'Prótesis') + ' · ' + (r.arcada||'') + '</div>'
+                 + '<div style="font-size:0.8rem; color:#64748b; margin-top:2px;">' + est + ' · ' + hechas + '/' + REM_ETAPAS.length + ' etapas'
+                 + (r.dientes ? ' · Repone: ' + r.dientes : '') + '</div></div>'
+                 + '<div style="display:flex; gap:0.35rem;">'
+                 + '<button class="btn btn-outline" onclick="remEditar(\'' + r.id + '\')" style="font-size:0.75rem; padding:0.35rem 0.7rem;"><i class="fa-solid fa-pen"></i></button>'
+                 + '<button class="btn btn-outline" onclick="remEliminar(\'' + r.id + '\')" style="font-size:0.75rem; padding:0.35rem 0.7rem; border-color:#dc2626; color:#dc2626;"><i class="fa-solid fa-trash"></i></button>'
+                 + '</div></div>';
+        }).join('');
+    }
+
+    function remRenderEtapas(){
+        const cont = $('remEtapas'); if(!cont) return;
+        cont.innerHTML = REM_ETAPAS.map(et => {
+            const d = remEtapasData[et.key] || {done:false, fecha:''};
+            return '<div style="display:flex; align-items:center; gap:0.6rem; padding:0.5rem 0.7rem; border:1px solid var(--border); border-radius:8px; margin-bottom:0.4rem; background:' + (d.done ? '#f0fdf4' : 'white') + ';">'
+                 + '<input type="checkbox" ' + (d.done ? 'checked' : '') + ' onchange="remEtapaToggle(\'' + et.key + '\', this.checked)" style="width:18px; height:18px;"/>'
+                 + '<span style="flex:1; font-size:0.88rem; font-weight:' + (d.done ? '700' : '500') + '; color:' + (d.done ? '#047857' : '#334155') + ';">' + et.lbl + '</span>'
+                 + '<input type="date" value="' + (d.fecha||'') + '" onchange="remEtapaFecha(\'' + et.key + '\', this.value)" style="font-size:0.8rem; padding:0.25rem 0.4rem; border:1px solid var(--border); border-radius:6px;"/>'
+                 + '</div>';
+        }).join('');
+    }
+    function remEtapaToggle(key, done){
+        if(!remEtapasData[key]) remEtapasData[key] = {done:false, fecha:''};
+        remEtapasData[key].done = done;
+        if(done && !remEtapasData[key].fecha) remEtapasData[key].fecha = new Date().toISOString().split('T')[0];
+        remRenderEtapas();
+    }
+    function remEtapaFecha(key, val){
+        if(!remEtapasData[key]) remEtapasData[key] = {done:false, fecha:''};
+        remEtapasData[key].fecha = val;
+    }
+
+    // En una prótesis total no hay dientes pilares: el bloque de diseño parcial se oculta.
+    function remTipoCheck(){
+        const t = $('remTipo') ? $('remTipo').value : '';
+        const esTotal = (t === 'Placa total' || t === 'Sobredentadura');
+        const blq = $('remBloqueParcial'); if(blq) blq.style.display = esTotal ? 'none' : 'block';
+        const blt = $('remBloqueTotal');   if(blt) blt.style.display = esTotal ? 'block' : 'none';
+    }
+
+    function remNuevo(){
+        if(!db.curr) return alert('Selecciona un paciente primero.');
+        remEditId = null; remEtapasData = {};
+        ['remColor','remDientes','remRetenedores','remPilares','remNotas','remAditamentos','remObsReborde'].forEach(id => { if($(id)) $(id).value = ''; });
+        ['remTipo','remArcada','remMaterial','remKennedySup','remKennedyInf','remMomento','remRetencion','remReborde','remDV','remRelacion'].forEach(id => { if($(id)) $(id).selectedIndex = 0; });
+        remRenderEtapas(); remTipoCheck();
+        if($('remForm')) $('remForm').style.display = 'block';
+    }
+
+    function remRecoger(){
+        const v = id => { const e = $(id); return e ? e.value : ''; };
+        const etapas = {};
+        REM_ETAPAS.forEach(et => { const d = remEtapasData[et.key]; if(d && (d.done || d.fecha)) etapas[et.key] = {done:!!d.done, fecha:d.fecha||''}; });
+        return {
+            id: remEditId || ('rem_' + Date.now()),
+            tipo: v('remTipo'), arcada: v('remArcada'), material: v('remMaterial'), color: v('remColor'),
+            kennedySup: v('remKennedySup'), kennedyInf: v('remKennedyInf'),
+            dientes: v('remDientes'), retenedores: v('remRetenedores'), pilares: v('remPilares'),
+            momento: v('remMomento'), retencion: v('remRetencion'), reborde: v('remReborde'),
+            aditamentos: v('remAditamentos'), dv: v('remDV'), relacion: v('remRelacion'), obsReborde: v('remObsReborde'),
+            etapas: etapas, notas: v('remNotas')
+        };
+    }
+
+    function remGuardar(){
+        if(!db.curr) return alert('Selecciona un paciente.');
+        const r = remRecoger();
+        if(r.tipo !== 'Placa total' && !r.dientes.trim()){
+            if(!confirm('No anotaste los dientes a reponer. ¿Guardar de todos modos?')) return;
+        }
+        const p = db.pats[db.curr];
+        if(!p.removibles) p.removibles = [];
+        const idx = p.removibles.findIndex(x => x.id === r.id);
+        const prev = idx >= 0 ? p.removibles[idx] : null;
+        if(idx >= 0) p.removibles[idx] = r; else p.removibles.push(r);
+        const desc = r.tipo + ' ' + (r.arcada || '');
+        if(typeof pushHist === 'function'){
+            if(!prev) pushHist('protrem', new Date().toISOString().split('T')[0], '[Prótesis Removible] ' + desc + ' — Caso registrado');
+            REM_ETAPAS.forEach(et => {
+                const ahora = r.etapas && r.etapas[et.key] && r.etapas[et.key].done;
+                const antes = prev && prev.etapas && prev.etapas[et.key] && prev.etapas[et.key].done;
+                if(ahora && !antes){
+                    const f = r.etapas[et.key].fecha || new Date().toISOString().split('T')[0];
+                    pushHist('protrem', f, '[Prótesis Removible] ' + desc + ' — Etapa completada: ' + et.lbl);
+                }
+            });
+        }
+        saveDB();
+        remEditId = null;
+        remRenderLista();
+        if($('remForm')) $('remForm').style.display = 'none';
+        if(typeof daniSpeak === 'function') daniSpeak('✅ Caso de prótesis removible guardado.', 4000, 'info');
+    }
+
+    function remEditar(id){
+        const p = db.pats[db.curr]; if(!p || !p.removibles) return;
+        const r = p.removibles.find(x => x.id === id); if(!r) return;
+        remEditId = id;
+        const set = (i,val) => { if($(i)) $(i).value = val || ''; };
+        set('remTipo', r.tipo); set('remArcada', r.arcada); set('remMaterial', r.material); set('remColor', r.color);
+        set('remKennedySup', r.kennedySup); set('remKennedyInf', r.kennedyInf);
+        set('remDientes', r.dientes); set('remRetenedores', r.retenedores); set('remPilares', r.pilares); set('remNotas', r.notas);
+        set('remMomento', r.momento); set('remRetencion', r.retencion); set('remReborde', r.reborde);
+        set('remAditamentos', r.aditamentos); set('remDV', r.dv); set('remRelacion', r.relacion); set('remObsReborde', r.obsReborde);
+        remEtapasData = {};
+        REM_ETAPAS.forEach(et => { if(r.etapas && r.etapas[et.key]) remEtapasData[et.key] = { done:!!r.etapas[et.key].done, fecha:r.etapas[et.key].fecha||'' }; });
+        remRenderEtapas(); remTipoCheck();
+        if($('remForm')) { $('remForm').style.display = 'block'; $('remForm').scrollIntoView({behavior:'smooth', block:'start'}); }
+    }
+
+    function remEliminar(id){
+        const p = db.pats[db.curr]; if(!p || !p.removibles) return;
+        if(!confirm('¿Eliminar este caso de prótesis removible? No se puede deshacer.')) return;
+        p.removibles = p.removibles.filter(x => x.id !== id);
+        saveDB(); remRenderLista();
+    }
+
+    function remCancelar(){ remEditId = null; if($('remForm')) $('remForm').style.display = 'none'; }
+
+    // Enlace con Laboratorio Dental: abre la sección con la categoría lista.
+    function remEnviarLab(){
+        if(!db.curr) return alert('Selecciona un paciente primero.');
+        const r = remRecoger();
+        const nav = document.querySelector('#sidebar [onclick*="s-labdental"]');
+        openSection('s-labdental', nav);
+        setTimeout(() => {
+            try {
+                if(typeof ldSetCat === 'function') ldSetCat('removible');
+                setTimeout(() => {
+                    const pon = (cid, val) => { const e = $('ldC_' + cid); if(e && val) e.value = val; };
+                    pon('arcada', r.arcada);
+                    pon('kennedy', r.kennedySup || r.kennedyInf);
+                    pon('dientes', r.dientes);
+                    pon('colorDientes', r.color);
+                    pon('retenedores', r.retenedores);
+                    pon('momento', r.momento); pon('retencion', r.retencion); pon('reborde', r.reborde);
+                    pon('aditamentos', r.aditamentos); pon('dv', r.dv);
+                    const sub = $('ldSubtipo');
+                    if(sub){ for(const o of sub.options){ if(o.value === r.tipo){ sub.value = r.tipo; break; } } }
+                    if(typeof daniSpeak === 'function') daniSpeak('📋 Cargué los datos del caso en la orden. Revisa el laboratorio destino y las fechas antes de guardar.', 9000, 'info');
+                }, 250);
+            } catch(e){ console.warn('prefill lab', e); }
+        }, 300);
+    }
+
+    // Consentimiento informado de prótesis removible (ya existe en Documentos).
+    function remConsentimiento(){
+        const nav = document.querySelector('#sidebar [onclick*="s-docs"]');
+        openSection('s-docs', nav);
+        setTimeout(() => {
+            try {
+                if(typeof abrirFirma === 'function') abrirFirma('cons_protremov');
+                else if(typeof printLegal === 'function') printLegal('cons_protremov');
+                else if(typeof daniSpeak === 'function') daniSpeak('Busca "Prótesis Removible" en la lista de consentimientos.', 7000, 'info');
+            } catch(e){ console.warn('consent', e); }
+        }, 300);
+    }
+
+    function remImprimir(){
+        if(!db.curr) return alert('Selecciona un paciente primero.');
+        if(typeof ensurePdfMake === 'function' && !ensurePdfMake()) return;
+        const r = remRecoger();
+        const p = db.pats[db.curr];
+        const cfg = db.cfg || {};
+        const activeD = (db.docs && db.activeDoc && db.docs[db.activeDoc]) ? db.docs[db.activeDoc] : {};
+        const accent = '#0e7490';
+        const d = new Date();
+        const ds = String(d.getDate()).padStart(2,'0') + '/' + String(d.getMonth()+1).padStart(2,'0') + '/' + d.getFullYear();
+        const fila = (lbl, val) => (val ? [{ text:lbl, bold:true, fontSize:9, color:'#475569' }, { text:String(val), fontSize:10, margin:[0,0,0,6] }] : []);
+        const etapasBody = REM_ETAPAS.map(et => {
+            const e = (r.etapas && r.etapas[et.key]) ? r.etapas[et.key] : {};
+            return [ { text: et.lbl, fontSize:9 }, { text: e.done ? 'Completada' : 'Pendiente', fontSize:9, color: e.done ? '#047857' : '#94a3b8' }, { text: e.fecha || '—', fontSize:9 } ];
+        });
+        const doc = {
+            pageSize:'LETTER', pageMargins:[40,40,40,50],
+            content: [
+                { columns:[
+                    { stack:[
+                        { text: cfg.cli || 'Consultorio Dental', bold:true, fontSize:15, color:accent },
+                        cfg.address ? { text: cfg.address, fontSize:8, color:'#64748b' } : {}
+                    ], width:'*' },
+                    cfg.logo ? { image: cfg.logo, width:55, alignment:'right' } : { text:'', width:'auto' }
+                ], margin:[0,0,0,12] },
+                { text:'REPORTE DE PRÓTESIS REMOVIBLE', bold:true, fontSize:13, color:accent, margin:[0,0,0,8] },
+                { columns:[ { text:'Paciente: ' + (p.name || '—'), fontSize:10 }, { text:'Fecha: ' + ds, fontSize:10, alignment:'right' } ], margin:[0,0,0,10] },
+                { text:'Datos del caso', bold:true, fontSize:11, color:accent, margin:[0,0,0,5] },
+                ...fila('Tipo', r.tipo), ...fila('Arcada', r.arcada), ...fila('Material de base', r.material), ...fila('Color de dientes', r.color),
+                ...fila('Kennedy superior', r.kennedySup), ...fila('Kennedy inferior', r.kennedyInf),
+                ...fila('Dientes a reponer', r.dientes), ...fila('Retenedores / conector', r.retenedores), ...fila('Dientes pilares', r.pilares),
+                ...fila('Momento de colocación', r.momento), ...fila('Retención', r.retencion), ...fila('Tipo de reborde', r.reborde),
+                ...fila('Aditamentos', r.aditamentos), ...fila('Dimensión vertical', r.dv), ...fila('Relación intermaxilar', r.relacion), ...fila('Observaciones del reborde', r.obsReborde),
+                { text:'Etapas', bold:true, fontSize:11, color:accent, margin:[0,8,0,5] },
+                { table:{ widths:['*','auto','auto'], body:[[ {text:'Etapa', bold:true, fontSize:9}, {text:'Estado', bold:true, fontSize:9}, {text:'Fecha', bold:true, fontSize:9} ], ...etapasBody] }, layout:'lightHorizontalLines' },
+                r.notas ? { text:'Notas: ' + r.notas, fontSize:9, margin:[0,10,0,0] } : {},
+                { text: (activeD.name ? activeD.name : '') + (activeD.ced ? '  ·  Céd. Prof. ' + activeD.ced : ''), fontSize:9, color:'#475569', alignment:'center', margin:[0,30,0,0] }
+            ]
+        };
+        try { pdfMake.createPdf(doc).open(); } catch(e){ alert('No se pudo generar el PDF.'); }
+    }
+
     const PROT_ETAPAS = [
         {key:'preparacion', lbl:'Preparación'},
         {key:'impresion',   lbl:'Impresión / escaneo'},
@@ -10530,7 +11290,12 @@ ${patientText}`;
                 {id:'kennedy', lbl:'Clasificación de Kennedy', tipo:'select', opts:['No aplica','Clase I','Clase II','Clase III','Clase IV']},
                 {id:'dientes', lbl:'Dientes a reponer (FDI)', tipo:'text', ph:'Ej. 15, 16, 24'},
                 {id:'colorDientes', lbl:'Color de dientes', tipo:'text', ph:'Ej. A2'},
-                {id:'retenedores', lbl:'Retenedores / diseño', tipo:'text', ph:'Ganchos, apoyos, conector mayor...'}
+                {id:'retenedores', lbl:'Retenedores / diseño', tipo:'text', ph:'Ganchos, apoyos, conector mayor...'},
+                {id:'momento', lbl:'Momento de colocación', tipo:'select', opts:['Convencional (reborde cicatrizado)','Inmediata (al extraer)','Provisional / de transición']},
+                {id:'retencion', lbl:'Retención', tipo:'select', opts:['Mucosoportada (sin implantes)','Sobredentadura sobre 2 implantes','Sobredentadura sobre 4 implantes','Sobre implantes (otro número)']},
+                {id:'reborde', lbl:'Tipo de reborde', tipo:'select', opts:['Favorable (amplio y firme)','Reabsorbido moderado','Reabsorbido severo (plano)','Flácido / con reborde móvil','Con torus o exostosis']},
+                {id:'aditamentos', lbl:'Aditamentos de retención', tipo:'text', ph:'Locators, bola, barra, O-rings...'},
+                {id:'dv', lbl:'Dimensión vertical', tipo:'select', opts:['Registrada y conforme','Aumentada respecto a la previa','Disminuida respecto a la previa','Pendiente de registrar']}
             ],
             fases: ['Solicitado','Enviado','Prueba de rodillos','Prueba de dientes en cera','Terminado','Recibido en clínica']
         }
@@ -11915,7 +12680,7 @@ Reglas: español de México; terminología dental correcta; máximo 6 líneas; u
         p.notas.unshift({ id: Date.now() + Math.floor(Math.random()*10000), type: type, f: f || new Date().toISOString().split('T')[0], obs: obs });
     }
 
-    function renderTimeline() { if(!db.curr||!db.pats[db.curr].notas || db.pats[db.curr].notas.length===0) { if($('tlRender')) $('tlRender').innerHTML='<p style="text-align:center; color:#94a3b8; padding:2rem;">Sin notas.</p>'; return; } let h=''; db.pats[db.curr].notas.forEach(n=>{ let l=({gen:'Odontología',orto:'Ortodoncia',ali:'Alineadores',endo:'Endodoncia',prot:'Prótesis Fija'})[n.type]||'Nota'; let tlBg=({endo:'#ede9fe',prot:'#fef3c7'})[n.type]||'#e2e8f0'; h+=`<div class="tl-item"><div class="tl-date">${n.f} <span class="tl-tag" style="background:${tlBg};">${l}</span> <button onclick="deleteNota(${n.id})" style="background:none;border:none;color:red;cursor:pointer;"><i class="fa-solid fa-trash-can"></i></button></div><div class="tl-card" style="white-space:pre-wrap;">${n.obs}</div></div>`; }); if($('tlRender')) $('tlRender').innerHTML=h; }
+    function renderTimeline() { if(!db.curr||!db.pats[db.curr].notas || db.pats[db.curr].notas.length===0) { if($('tlRender')) $('tlRender').innerHTML='<p style="text-align:center; color:#94a3b8; padding:2rem;">Sin notas.</p>'; return; } let h=''; db.pats[db.curr].notas.forEach(n=>{ let l=({gen:'Odontología',orto:'Ortodoncia',ali:'Alineadores',endo:'Endodoncia',prot:'Prótesis Fija',protrem:'Prótesis Removible'})[n.type]||'Nota'; let tlBg=({endo:'#ede9fe',prot:'#fef3c7',protrem:'#cffafe'})[n.type]||'#e2e8f0'; h+=`<div class="tl-item"><div class="tl-date">${n.f} <span class="tl-tag" style="background:${tlBg};">${l}</span> <button onclick="deleteNota(${n.id})" style="background:none;border:none;color:red;cursor:pointer;"><i class="fa-solid fa-trash-can"></i></button></div><div class="tl-card" style="white-space:pre-wrap;">${n.obs}</div></div>`; }); if($('tlRender')) $('tlRender').innerHTML=h; }
     function deleteNota(id) { if(confirm("¿Eliminar permanentemente?")) { db.pats[db.curr].notas=db.pats[db.curr].notas.filter(n=>n.id!==id); saveDB(); renderTimeline(); } }
     function triggerAlertUpdate(fut) { if(fut) { $('pAlert').value=fut; db.pats[db.curr].alert=fut; db.pats[db.curr].alertDate=new Date().toISOString().split('T')[0]; setAlertLabel(db.pats[db.curr].alertDate); } }
 
@@ -13112,6 +13877,24 @@ Reglas: español de México; terminología dental correcta; máximo 6 líneas; u
     // Catálogo de recomendaciones por tipo de procedimiento
     // ============================================================
     const INDICACIONES_TEXTO = {
+        protesis_removible: {
+            titulo: 'Cuidados de tu Prótesis Removible',
+            color: '#0e7490',
+            icon: '🦷',
+            items: [
+                'Los primeros días es <b>normal</b> sentir la prótesis voluminosa, salivar más y notar cambios al hablar. Tu boca se adapta en <b>1 a 3 semanas</b>.',
+                'Empieza con <b>alimentos blandos y cortados en trozos pequeños</b>. Mastica con los dos lados a la vez para que la prótesis no se ladee.',
+                'Practica leer en voz alta unos minutos al día: la pronunciación se normaliza mucho más rápido.',
+                '<b>Retírala para dormir</b>, salvo que te indiquemos lo contrario. Los tejidos necesitan descansar y así evitas lesiones e infecciones.',
+                'Guárdala en un recipiente <b>con agua</b> (nunca caliente) cuando no la uses, para que no se deforme ni se reseque.',
+                'Límpiala <b>después de cada comida</b>: cepillo especial para prótesis y jabón neutro. <b>No uses pasta dental común</b>, la raya y acumula manchas.',
+                'Cepilla también tus encías, paladar y lengua, y los dientes que te queden: la higiene de la boca es igual de importante.',
+                'Si tienes ganchos, colócala y retírala <b>con los dedos, nunca mordiéndola</b>: se doblan o se fracturan.',
+                'Si aparece una llaga o un punto que roza, <b>no la ajustes tú</b>. Suspende su uso unas horas y acude a consulta para el ajuste.',
+                'Con el tiempo el hueso cambia y la prótesis puede aflojarse: acude a <b>revisión al menos una vez al año</b> para valorar rebase o cambio.',
+                'Nunca la repares por tu cuenta ni uses pegamentos: puedes dañarla de forma irreversible y lastimar tus tejidos.'
+            ]
+        },
         extraccion: {
             titulo: 'Cuidados Post-Extracción Dental',
             color: '#1e6091',
@@ -14018,6 +14801,7 @@ Reglas: español de México; terminología dental correcta; máximo 6 líneas; u
         _sfBlindajeTimer = setTimeout(async () => {
             await sfDoQuickSave();
             await sfBitacora('Guardado', 'Se registró un guardado de datos');
+            try { sfCloudTrasGuardar(); } catch(e){}
         }, 12000);
     }
 
@@ -14425,7 +15209,7 @@ Reglas: español de México; terminología dental correcta; máximo 6 líneas; u
     async function checkDriveFile() { updateGlobalSyncStatus('syncing');
         const okT = await ensureDriveToken();
         if(!okT) { updateGlobalSyncStatus('offline'); daniSpeak('🔌 La sesión de Google expiró. Pulsa "Conectar" para volver a entrar.', 8000, 'warn'); return; }
-        try { if(typeof gapi!=='undefined'&&gapi.client&&!gapi.client.drive) await gapi.client.load('drive','v3'); let r=await gapi.client.drive.files.list({q:"name='SmileFlow_Database.json' and trashed=false",fields:'files(id)',spaces:'drive'}); let f=r.result.files; if(f&&f.length>0){driveFileId=f[0].id; localStorage.setItem('sf_drive_file_id',driveFileId); await downloadFromDrive(driveFileId); updateGlobalSyncStatus('online'); daniSpeak("✅ Base descargada.",5000,'info');}else{if(Object.keys(db.pats).length>0) await uploadToDrive(true); else updateGlobalSyncStatus('online');} }catch(e){updateGlobalSyncStatus('offline'); daniSpeak("❌ No pude sincronizar con Drive. Reintenta; si persiste, desconecta y vuelve a conectar la nube.",9000,'error'); console.error('Drive:', e);} }
+        try { if(typeof gapi!=='undefined'&&gapi.client&&!gapi.client.drive) await gapi.client.load('drive','v3'); let r=await gapi.client.drive.files.list({q:"name='SmileFlow_Database.json' and trashed=false",fields:'files(id)',spaces:'drive'}); let f=r.result.files; if(f&&f.length>0){driveFileId=f[0].id; localStorage.setItem('sf_drive_file_id',driveFileId); await downloadFromDrive(driveFileId); updateGlobalSyncStatus('online'); daniSpeak("✅ Base descargada.",5000,'info');}else{if(Object.keys(db.pats).length>0) await uploadToDrive(true); else updateGlobalSyncStatus('online');} try{ setTimeout(sfNubeRevisarNuevo, 2500); }catch(e){} }catch(e){updateGlobalSyncStatus('offline'); daniSpeak("❌ No pude sincronizar con Drive. Reintenta; si persiste, desconecta y vuelve a conectar la nube.",9000,'error'); console.error('Drive:', e);} }
     async function downloadFromDrive(fid) { try { let r=await gapi.client.drive.files.get({fileId:fid, alt:'media'}); let rDb=r.result; if(typeof rDb==='string'){ try{rDb=JSON.parse(rDb);}catch(e){} } if(rDb&&rDb.sf_enc){ let cp=localStorage.getItem('sf_cloud_pass') || prompt('🔐 Tu nube está protegida. Contraseña de nube:'); if(!cp) return; try{ rDb=JSON.parse(await sfDecrypt(rDb, cp.trim())); localStorage.setItem('sf_cloud_pass', cp.trim()); }catch(e){ alert('❌ Contraseña de nube incorrecta.'); return; } }
         if(!(rDb&&rDb.cfg)) return;
         // PROTECCIÓN ANTI-PÉRDIDA: si lo local es MÁS RECIENTE que la copia de Drive
@@ -14593,6 +15377,8 @@ function saveDB() {
     
     await initDB(); 
         try { sfChequeoNavegador(); } catch(e) {}
+        try { sfOnboardingCheck(); } catch(e) {}
+        // Reacomodo de controles desactivado: la barra se queda como estaba.
         try { loadConfigUI(); } catch(e) { console.error("Error UI Inicial", e); }
         try { buildTreats(); } catch(e) { console.error("Error Tratamientos", e); }
         try { ensureOdontoRED(); } catch(e) { console.error("Error OdontoRED", e); }
