@@ -16043,6 +16043,36 @@ Reglas: español de México; terminología dental correcta; máximo 6 líneas; u
         const remoteMod = rDb.lastMod || 0;
         const vistoAntes = parseInt(localStorage.getItem('sf_drive_seen') || '0', 10);
         const tsServidor = mtimeServidor ? new Date(mtimeServidor).getTime() : 0;
+
+        // Huella del contenido (ignora imágenes y la marca de tiempo): permite
+        // saber si dos versiones son realmente iguales aunque su hora difiera por
+        // segundos. Evita preguntar cuando en el fondo son los mismos datos.
+        const sfHuellaDatos = (d) => {
+            try {
+                if(!d || !d.pats) return 'vacio';
+                const parts = [];
+                Object.keys(d.pats).sort().forEach(id => {
+                    const p = d.pats[id] || {};
+                    parts.push(id + ':' + (p.name||'') + ':' + ((p.notas&&p.notas.length)||0)
+                        + ':' + ((p.abonos&&p.abonos.length)||0) + ':' + ((p.estudios&&p.estudios.length)||0)
+                        + ':' + ((p.removibles&&p.removibles.length)||0) + ':' + (p.costoTotal||0)
+                        + ':' + (p.alert||'') + ':' + (p.nextAppt||''));
+                });
+                parts.push('docs:' + (d.docs ? Object.keys(d.docs).length : 0));
+                parts.push('cli:' + ((d.cfg&&d.cfg.cli)||''));
+                return parts.join('|');
+            } catch(e){ return 'err'+Math.random(); }
+        };
+
+        // Si el contenido es idéntico, no hay conflicto real: sincroniza en
+        // silencio (actualiza el sello, no recarga, no molesta).
+        if(sfHuellaDatos(db) === sfHuellaDatos(rDb)){
+            if(tsServidor) localStorage.setItem('sf_drive_seen', String(tsServidor));
+            sfSyncInicialPendiente = false;
+            try { updateGlobalSyncStatus('online'); } catch(e){}
+            try { if(typeof sfActualizarBadgeSync==='function') sfActualizarBadgeSync(); } catch(e){}
+            return;
+        }
         const nubeConNovedades = tsServidor > 0 ? (tsServidor > vistoAntes) : (remoteMod > localMod);
 
         const aplicarNube = () => {
