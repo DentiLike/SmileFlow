@@ -499,7 +499,7 @@
 .cef-point-marker:active { cursor:grabbing; }
 .cef-point-marker::after { content:''; position:absolute; inset:-8px; border-radius:50%; }
 .cef-point-marker .cef-point-label { position:absolute; top:-16px; left:50%; transform:translateX(-50%); font-size:0.6rem; font-weight:800; color:white; background:rgba(0,0,0,0.6); padding:1px 4px; border-radius:4px; white-space:nowrap; pointer-events:none; }
-.cef-next-hint { position:absolute; top:10px; left:10px; z-index:8; background:rgba(31,91,158,0.92); color:white; padding:6px 12px; border-radius:8px; font-size:0.8rem; font-weight:700; pointer-events:none; }
+.cef-next-hint { position:absolute; top:10px; left:10px; right:10px; z-index:8; background:rgba(31,91,158,0.94); color:white; padding:7px 12px; border-radius:8px; font-size:0.82rem; font-weight:700; pointer-events:none; box-shadow:0 2px 8px rgba(0,0,0,0.25); }
 .cef-measurement-item { background:#f8fafc; border-radius:8px; padding:0.6rem; margin-bottom:0.5rem; border-left:3px solid #cbd5e1; }
 .cef-measurement-item.normal { border-left-color:#10b981; }
 .cef-measurement-item.alterado { border-left-color:#ef4444; }
@@ -858,6 +858,7 @@ window._pdfReady=true;
       <button class="btn btn-success" type="button" onclick="cefGenerarDiagnostico()" style="flex:1; font-size:0.8rem; padding:0.55rem;"><i class="fa-solid fa-file-medical"></i> Generar dx</button>
       <button class="btn" type="button" onclick="cefImprimirHoja()" style="flex:1; font-size:0.8rem; padding:0.55rem; background:#1f5b9e; color:white; font-weight:700;"><i class="fa-solid fa-print"></i> Imprimir</button>
     </div>
+    <button class="btn btn-outline" type="button" onclick="cefPanelTrazado()" style="width:100%; font-size:0.8rem; padding:0.55rem; margin-top:0.5rem; border-color:#0e7490; color:#0e7490; font-weight:700;"><i class="fa-solid fa-image"></i> Guardar / compartir trazado</button>
     <div class="cef-sec-title" style="margin-top:1.2rem;"><i class="fa-solid fa-chart-simple"></i> Mediciones</div>
     <div id="cefMeasurementsList"></div>
     <div id="cefAlertaQuir" style="margin-top:0.8rem;"></div>
@@ -2342,6 +2343,23 @@ AVISO PRÓX. CITA (Recordatorio local):
     <span style="display:inline-flex; align-items:center; gap:5px;"><span style="width:14px;height:14px;border-radius:3px;background:#e2e8f0;position:relative;overflow:hidden;"><span style="position:absolute;inset:0;background:repeating-linear-gradient(45deg,#94a3b8,#94a3b8 2px,transparent 2px,transparent 4px);"></span></span> Ausente (ya no está)</span>
 </div>
 
+<!-- SELECCIÓN MÚLTIPLE DE DIENTES -->
+<div style="margin-bottom:0.8rem;">
+<button class="btn btn-outline" id="odoMultiBtn" type="button" onclick="odoToggleMulti()" style="width:100%; font-weight:800; font-size:0.85rem; padding:0.6rem; border-color:#7c3aed; color:#6d28d9;"><i class="fa-solid fa-check-double"></i> Selección múltiple</button>
+<div id="odoMultiPanel" style="display:none; background:#faf5ff; border:1px solid #ddd6fe; border-radius:10px; padding:0.8rem 0.9rem; margin-top:0.5rem;">
+<div style="font-size:0.78rem; color:#6d28d9; line-height:1.5; margin-bottom:0.6rem;"><i class="fa-solid fa-circle-info"></i> Toca varios dientes (o usa <b>Ctrl+clic</b> en computadora) y aplica el estado una sola vez. El modo se apaga al aplicar.</div>
+<div style="font-weight:800; font-size:0.75rem; color:#4c1d95; margin-bottom:0.4rem;">ATAJOS</div>
+<div style="display:flex; flex-wrap:wrap; gap:0.35rem; margin-bottom:0.6rem;">
+<button class="btn" type="button" onclick="odoPreset('terceros')" style="background:#ede9fe; color:#6d28d9; font-weight:700; font-size:0.74rem; padding:0.35rem 0.6rem;">4 terceros molares</button>
+<button class="btn" type="button" onclick="odoPreset('primeros_pm')" style="background:#ede9fe; color:#6d28d9; font-weight:700; font-size:0.74rem; padding:0.35rem 0.6rem;">4 primeros premolares</button>
+<button class="btn" type="button" onclick="odoPreset('pm_sup')" style="background:#ede9fe; color:#6d28d9; font-weight:700; font-size:0.74rem; padding:0.35rem 0.6rem;">Premolares sup.</button>
+<button class="btn" type="button" onclick="odoPreset('pm_inf')" style="background:#ede9fe; color:#6d28d9; font-weight:700; font-size:0.74rem; padding:0.35rem 0.6rem;">Premolares inf.</button>
+<button class="btn" type="button" onclick="odoPreset('arcada_sup')" style="background:#ede9fe; color:#6d28d9; font-weight:700; font-size:0.74rem; padding:0.35rem 0.6rem;">Arcada superior</button>
+<button class="btn" type="button" onclick="odoPreset('arcada_inf')" style="background:#ede9fe; color:#6d28d9; font-weight:700; font-size:0.74rem; padding:0.35rem 0.6rem;">Arcada inferior</button>
+</div>
+<div id="odoMultiInfo" style="font-size:0.8rem; color:#4c1d95; background:white; border-radius:8px; padding:0.5rem 0.7rem;">Toca los dientes que quieras marcar igual.</div>
+</div>
+</div>
 <div class="hidden" id="odo-controls" style="margin-top: 1.5rem; background: #f8fafc; padding: 1.5rem; border-radius: var(--radius-md); border: 1px solid var(--border);">
 <h4 style="margin:0 0 1rem 0; color:#0f172a; font-size:1.1rem; border-bottom:1px solid #cbd5e1; padding-bottom:0.5rem;">Asignar estado a OD: <span id="odo-selected-tooth" style="color:var(--primary); font-size:1.4rem; font-weight:900;">--</span> <span id="odo-tooth-type" style="font-size:0.85rem; color:#94a3b8; font-weight:600;"></span></h4>
 <div class="grid-3" style="gap: 0.8rem;">
@@ -4271,6 +4289,11 @@ No hay forma de recuperarlo: el cifrado es real y ni nosotros podemos abrirlo. G
     
 // --- MOTOR IDB INYECTADO ---
 let db = null;
+    // Marca de tiempo de los datos TAL COMO SE CARGARON del disco. Se compara
+    // contra Drive; usar db.lastMod (que cambia en cada guardado) haría creer
+    // que lo local es más nuevo y bloquearía la descarga.
+    let sfLastModAlCargar = 0;
+    let sfSyncInicialPendiente = false;
 // Abre la base principal garantizando el store 'clinica'. Versión 2: repara
 // bases que quedaron creadas vacías (sin store) por aperturas previas sin upgrade.
 function sfOpenMainDB(){
@@ -4441,6 +4464,7 @@ async function initDB() {
                     listo();
                     if (getReq.result) {
                         db = getReq.result.data;
+                        try { sfLastModAlCargar = (db && db.lastMod) || 0; } catch(e){}
                         resolve();
                     } else {
                         const legacy = localStorage.getItem('sf_db_v10');
@@ -5705,7 +5729,7 @@ db = {
             if($('cefCanvasHint')) $('cefCanvasHint').style.display='none';
             $('cefUploadArea').classList.add('has-image');
             // Activar primer punto sin colocar
-            if(!cefState.active) { const sig = CEF_POINTS.find(p=>!cefState.points[p.id]); if(sig) cefSelectPoint(sig.id); }
+            if(!cefState.active) { const sig = cefPuntosActivos().find(p=>!cefState.points[p.id]); if(sig) cefSelectPoint(sig.id); }
             cefUpdateNextHint();
         };
         area.appendChild(img);
@@ -5754,9 +5778,12 @@ db = {
         cefCalculate();
         cefUpdateLines();
         cefSave();
-        const idx = CEF_POINTS.findIndex(p=>p.id===cefState.active);
+        // Avanzar solo entre los puntos del análisis activo (Steiner no debe pedir Ba, Pt, Xi...)
+        const LP = cefPuntosActivos();
+        const idx = LP.findIndex(p=>p.id===cefState.active);
         let avanzo = false;
-        for(let i=idx+1;i<CEF_POINTS.length;i++){ if(!cefState.points[CEF_POINTS[i].id]){ cefSelectPoint(CEF_POINTS[i].id); avanzo=true; break; } }
+        for(let i=idx+1;i<LP.length;i++){ if(!cefState.points[LP[i].id]){ cefSelectPoint(LP[i].id); avanzo=true; break; } }
+        if(!avanzo){ const pend = LP.find(p=>!cefState.points[p.id]); if(pend){ cefSelectPoint(pend.id); avanzo=true; } }
         if(!avanzo) { cefState.active = null; cefRenderPointList(); }
         cefUpdateNextHint();
     }
@@ -5775,6 +5802,35 @@ db = {
         cefUpdateNextHint();
     }
 
+    // El asistente explica el punto activo únicamente cuando el clínico lo pide
+    // (no narra los 27 puntos: eso sería invasivo).
+    function cefExplicarPunto() {
+        try {
+            if(!cefState.active) { if(typeof daniSpeak==='function') daniSpeak('Ya colocaste todos los puntos de este análisis. Puedes pasar a Calcular.', 6000, 'info'); return; }
+            const pd = CEF_POINTS.find(p=>p.id===cefState.active);
+            if(!pd) return;
+            const tips = {
+                S:'Se marca al centro de la silla turca, no en su borde. Si dudas, imagina el círculo que forma la silla y ve al medio.',
+                N:'Es el punto más anterior de la sutura fronto-nasal, donde la frente y la nariz se juntan. No lo confundas con el puente de la nariz de tejido blando.',
+                A:'Lo más profundo de la concavidad del maxilar, entre la espina nasal anterior y el borde alveolar. Es el punto que más se equivoca: sigue la curva y busca el fondo.',
+                B:'Lo más profundo de la concavidad de la mandíbula, entre el borde alveolar y el pogonion.',
+                Go:'Se construye en la bisectriz del ángulo entre la rama y el cuerpo mandibular; no es simplemente la esquina visible.',
+                Me:'El punto más inferior de la sínfisis mentoniana.',
+                Pog:'Lo más anterior del mentón óseo, no del tejido blando.',
+                OcP:'El plano oclusal se traza entre las cúspides; procura tomar una referencia consistente en todos tus casos.',
+                U1:'Borde incisal del incisivo central superior. U1R es su ápice radicular.',
+                L1:'Borde incisal del incisivo central inferior. L1R es su ápice radicular.',
+                Pn:'Punta de la nariz (tejido blando). Con este punto y el pogonion blando se traza la línea S de Steiner.',
+                LS:'Punto más prominente del labio superior.',
+                LI:'Punto más prominente del labio inferior.',
+                PogB:'Pogonion de tejido blando: lo más anterior del mentón en la piel.'
+            };
+            const extra = tips[pd.id] || 'Colócalo con la referencia anatómica de la pista. Si la radiografía tiene poco contraste, acércate con el zoom antes de marcar.';
+            if(typeof daniSpeak==='function') daniSpeak('📍 <b>' + pd.name + '</b><br>' + (pd.desc||'') + '<br><br>' + extra, 15000, 'info');
+            else alert(pd.name + '\n\n' + (pd.desc||'') + '\n\n' + extra);
+        } catch(e){ console.warn('explicar punto', e); }
+    }
+
     function cefUpdateNextHint() {
         const hint = $('cefNextHint');
         if(!hint) return;
@@ -5788,7 +5844,17 @@ db = {
         hint.style.background = 'rgba(31,91,158,0.92)';
         if(cefState.active) {
             const pd = CEF_POINTS.find(p=>p.id===cefState.active);
-            hint.innerHTML = `<i class="fa-solid fa-crosshairs"></i> Coloca: <b>${pd.id}</b> · ${pd.name}`;
+            const LP = cefPuntosActivos();
+            const hechos = LP.filter(x=>cefState.points[x.id]).length;
+            const pos = LP.findIndex(x=>x.id===cefState.active);
+            hint.innerHTML = `<div style="display:flex; align-items:center; gap:8px;">`
+                + `<i class="fa-solid fa-crosshairs"></i>`
+                + `<div style="line-height:1.35;">`
+                +   `<div>Coloca: <b>${pd.id}</b> · ${pd.name} <span style="opacity:0.75; font-weight:600;">(${pos>=0?pos+1:hechos+1} de ${LP.length})</span></div>`
+                +   (pd.desc ? `<div style="font-weight:500; font-size:0.74rem; opacity:0.92; max-width:280px;">${pd.desc}</div>` : '')
+                + `</div>`
+                + `<span onclick="cefExplicarPunto()" style="pointer-events:auto; cursor:pointer; background:rgba(255,255,255,0.22); border-radius:6px; padding:3px 7px; font-size:0.72rem; white-space:nowrap;" title="Que el asistente me explique este punto"><i class="fa-solid fa-circle-question"></i> Ayuda</span>`
+                + `</div>`;
             hint.style.display = 'block';
         } else {
             hint.innerHTML = `<i class="fa-solid fa-check"></i> Todos los puntos colocados`;
@@ -6479,7 +6545,7 @@ db = {
 
 
     // ===== GENERAR TRAZADO EN CANVAS (solo líneas y puntos, fondo blanco, ahorra tinta) =====
-    function cefTrazadoCanvas() {
+    function cefTrazadoCanvas(mono) {
         const pts = cefState.points;
         // Solo puntos del análisis activo
         const idsActivos = cefPuntosActivos().map(p=>p.id);
@@ -6502,7 +6568,7 @@ db = {
         // Definir líneas según análisis
         const linea = (a,b,col) => {
             if(!pts[a]||!pts[b]) return;
-            ctx.beginPath(); ctx.strokeStyle=col; ctx.lineWidth=1.2;
+            ctx.beginPath(); ctx.strokeStyle = mono ? '#111827' : col; ctx.lineWidth=1.2;
             ctx.moveTo(X(pts[a].x),Y(pts[a].y)); ctx.lineTo(X(pts[b].x),Y(pts[b].y)); ctx.stroke();
         };
         if(cefState.analisis==='ricketts_resumido' || cefState.analisis==='ricketts_completo') {
@@ -6518,7 +6584,7 @@ db = {
         // Puntos
         cefPuntosActivos().forEach(pd => {
             const p = pts[pd.id]; if(!p) return;
-            ctx.beginPath(); ctx.fillStyle=pd.color; ctx.arc(X(p.x),Y(p.y),3,0,2*Math.PI); ctx.fill();
+            ctx.beginPath(); ctx.fillStyle = mono ? '#111827' : pd.color; ctx.arc(X(p.x),Y(p.y),3,0,2*Math.PI); ctx.fill();
             ctx.fillStyle='#334155'; ctx.font='bold 8px sans-serif'; ctx.fillText(pd.id, X(p.x)+5, Y(p.y)-3);
         });
         return { dataUrl: canvas.toDataURL('image/png'), w, h };
@@ -8608,7 +8674,193 @@ El doctor adjunta una fotografía clínica para una lectura de APOYO (nunca diag
         if(chev) chev.style.transform = open ? 'rotate(0deg)' : 'rotate(180deg)';
     }
 
-    function cefImprimirHoja() {
+    // ===== EXPORTAR EL TRAZADO COMO IMAGEN =====
+    // El trazado en pantalla son elementos HTML sobre la radiografía; no existe
+    // como archivo. Aquí se compone todo en un lienzo: radiografía + líneas +
+    // puntos + etiquetas. Lee las líneas que YA están dibujadas, así queda
+    // sincronizado con cualquier análisis sin duplicar su definición.
+    function cefComponerTrazado(op){
+        op = op || {};
+        const area = $('cefCanvasArea');
+        const img = cefState.imgEl;
+        if(!area || !img) return null;
+        const rect = area.getBoundingClientRect();
+        const K = 2;                                  // calidad (2x)
+        const cv = document.createElement('canvas');
+        cv.width = Math.round(rect.width * K);
+        cv.height = Math.round(rect.height * K);
+        const ctx = cv.getContext('2d');
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, cv.width, cv.height);
+
+        // 1) Radiografía (completa, tenue o ninguna)
+        const modo = op.rx || 'completa';
+        if(modo !== 'ninguna'){
+            const h = rect.height * 0.9 * K;
+            const w = h * (img.naturalWidth / img.naturalHeight);
+            ctx.save();
+            ctx.globalAlpha = (modo === 'tenue') ? 0.18 : 1;
+            try { ctx.drawImage(img, (cv.width - w)/2, (cv.height - h)/2, w, h); } catch(e){}
+            ctx.restore();
+        }
+
+        const esc = K / (cefState.scale || 1);
+        const conv = (x, y) => ({ x: cv.width/2 + (x - rect.width/2) * esc, y: cv.height/2 + (y - rect.height/2) * esc });
+        const mono = !!op.mono;
+        const colorTrazo = c => mono ? '#111827' : c;
+
+        // 2) Líneas del análisis (leídas del overlay SVG actual)
+        const svg = $('cefLineOverlay');
+        if(svg){
+            ctx.lineWidth = Math.max(1.6, 1.9 * K * 0.7);
+            svg.querySelectorAll('line').forEach(l => {
+                const a = conv(parseFloat(l.getAttribute('x1')), parseFloat(l.getAttribute('y1')));
+                const b = conv(parseFloat(l.getAttribute('x2')), parseFloat(l.getAttribute('y2')));
+                ctx.strokeStyle = colorTrazo(l.getAttribute('stroke') || '#1f5b9e');
+                ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
+            });
+        }
+
+        // 3) Puntos y etiquetas
+        const R = 4.5 * K;
+        ctx.font = '700 ' + Math.round(9 * K) + 'px -apple-system, Roboto, sans-serif';
+        Object.keys(cefState.points || {}).forEach(id => {
+            const pt = cefState.points[id];
+            const sc = cefToScreen(pt);
+            const c = conv(sc.x, sc.y);
+            const pd = CEF_POINTS.find(x => x.id === id);
+            ctx.beginPath(); ctx.arc(c.x, c.y, R, 0, Math.PI*2);
+            ctx.fillStyle = colorTrazo(pd ? pd.color : '#ef4444');
+            ctx.fill();
+            ctx.lineWidth = 1.4 * K; ctx.strokeStyle = (modo === 'completa') ? '#ffffff' : '#64748b'; ctx.stroke();
+            if(op.etiquetas !== false){
+                const tx = c.x + R + 3*K, ty = c.y - R;
+                ctx.lineWidth = 3 * K; ctx.strokeStyle = (modo === 'completa') ? 'rgba(0,0,0,0.65)' : '#ffffff';
+                ctx.strokeText(id, tx, ty);
+                ctx.fillStyle = (modo === 'completa') ? '#ffffff' : '#0f172a';
+                ctx.fillText(id, tx, ty);
+            }
+        });
+
+        // 4) Pie con paciente, análisis y fecha
+        const p = db.curr ? db.pats[db.curr] : null;
+        const nomAn = (CEF_ANALISIS[cefState.analisis] || CEF_ANALISIS.steiner).nombre;
+        const pie = (p && p.name ? p.name + '  ·  ' : '') + nomAn + '  ·  ' + new Date().toLocaleDateString('es-MX');
+        ctx.font = '700 ' + Math.round(11 * K) + 'px -apple-system, Roboto, sans-serif';
+        ctx.fillStyle = 'rgba(255,255,255,0.9)';
+        ctx.fillRect(0, cv.height - 22*K, cv.width, 22*K);
+        ctx.fillStyle = '#334155';
+        ctx.fillText(pie, 8*K, cv.height - 7*K);
+        return cv;
+    }
+
+    function cefPanelTrazado(){
+        if(!cefState.loaded || !cefState.imgEl) return alert('Primero carga la radiografía y marca los puntos.');
+        const { body } = sfOverlay('<i class="fa-solid fa-image"></i> Guardar o compartir el trazado', '#0e7490');
+        body.innerHTML =
+            '<label style="font-weight:800; font-size:0.85rem; color:#334155;">Radiografía de fondo</label>'
+          + '<select id="czRx" class="input-field" onchange="cefPreviaTrazado()" style="margin:0.3rem 0 0.8rem;">'
+          +   '<option value="completa">Completa (expediente / colega)</option>'
+          +   '<option value="tenue">Silueta tenue (ahorra tinta y conserva referencia)</option>'
+          +   '<option value="ninguna">Solo el trazado (máximo ahorro de tinta)</option>'
+          + '</select>'
+          + '<label style="display:flex; gap:0.5rem; align-items:center; font-size:0.86rem; color:#334155; margin-bottom:0.4rem; cursor:pointer;"><input type="checkbox" id="czMono" onchange="cefPreviaTrazado()" style="width:17px;height:17px;"/> Trazado en un solo color oscuro (menos tinta de color)</label>'
+          + '<label style="display:flex; gap:0.5rem; align-items:center; font-size:0.86rem; color:#334155; margin-bottom:0.9rem; cursor:pointer;"><input type="checkbox" id="czEtq" checked onchange="cefPreviaTrazado()" style="width:17px;height:17px;"/> Mostrar el nombre de cada punto</label>'
+          + '<div style="border:1px solid var(--border); border-radius:10px; overflow:hidden; background:#f8fafc; margin-bottom:0.9rem;"><img id="czPrev" style="width:100%; display:block;"/></div>'
+          + '<div style="display:flex; gap:0.5rem; flex-wrap:wrap;">'
+          +   '<button class="btn" onclick="cefTrazadoDescargar()" style="flex:1; background:#0e7490; color:white; font-weight:800; font-size:0.82rem;"><i class="fa-solid fa-download"></i> Guardar en el dispositivo</button>'
+          +   '<button class="btn" onclick="cefTrazadoCompartir()" style="flex:1; background:#25D366; color:white; font-weight:800; font-size:0.82rem;"><i class="fa-solid fa-share-nodes"></i> Compartir</button>'
+          + '</div>'
+          + '<button class="btn btn-outline" onclick="cefTrazadoAEstudio()" style="width:100%; margin-top:0.5rem; border-color:#7c3aed; color:#6d28d9; font-weight:800; font-size:0.82rem;"><i class="fa-solid fa-folder-plus"></i> Guardar en el expediente (Estudios)</button>'
+          + '<p style="font-size:0.74rem; color:#94a3b8; margin-top:0.7rem; line-height:1.5;"><i class="fa-solid fa-circle-info"></i> En celular, "Compartir" abre el menú del sistema y puedes enviarlo directo por WhatsApp. En computadora conviene guardarlo y adjuntarlo tú.</p>';
+        setTimeout(cefPreviaTrazado, 60);
+    }
+
+    function cefOpcTrazado(){
+        return {
+            rx: $('czRx') ? $('czRx').value : 'completa',
+            mono: $('czMono') ? $('czMono').checked : false,
+            etiquetas: $('czEtq') ? $('czEtq').checked : true
+        };
+    }
+    function cefPreviaTrazado(){
+        try {
+            const cv = cefComponerTrazado(cefOpcTrazado());
+            if(cv && $('czPrev')) $('czPrev').src = cv.toDataURL('image/png');
+        } catch(e){ console.warn('previa', e); }
+    }
+    function cefNombreTrazado(ext){
+        const p = db.curr ? db.pats[db.curr] : null;
+        const nom = (p && p.name) ? p.name.replace(/[^a-zA-Z0-9 ]/g,'').replace(/\s+/g,'-').slice(0,28) : 'paciente';
+        return 'Trazado_' + nom + '_' + (typeof sfFechaLegible==='function' ? sfFechaLegible() : Date.now()) + '.' + (ext||'png');
+    }
+    function cefTrazadoDescargar(){
+        try {
+            const cv = cefComponerTrazado(cefOpcTrazado()); if(!cv) return;
+            const a = document.createElement('a');
+            a.href = cv.toDataURL('image/png');
+            a.download = cefNombreTrazado('png');
+            a.click();
+            if(typeof daniSpeak==='function') daniSpeak('🖼️ Trazado guardado en tus descargas.', 5000, 'info');
+        } catch(e){ alert('No se pudo guardar la imagen.'); }
+    }
+    async function cefTrazadoCompartir(){
+        try {
+            const cv = cefComponerTrazado(cefOpcTrazado()); if(!cv) return;
+            const blob = await new Promise(r => cv.toBlob(r, 'image/png'));
+            const file = new File([blob], cefNombreTrazado('png'), { type:'image/png' });
+            if(navigator.canShare && navigator.canShare({ files:[file] }) && navigator.share){
+                await navigator.share({ files:[file], title:'Trazado cefalométrico' });
+            } else {
+                cefTrazadoDescargar();
+                alert('Este navegador no permite compartir archivos directamente.\n\nSe descargó la imagen: adjúntala tú en WhatsApp o correo.');
+            }
+        } catch(e){ if(e && e.name !== 'AbortError') console.warn('compartir', e); }
+    }
+    function cefTrazadoAEstudio(){
+        try {
+            if(!db.curr) return alert('Selecciona un paciente primero.');
+            const cv = cefComponerTrazado(cefOpcTrazado()); if(!cv) return;
+            const dataUrl = cv.toDataURL('image/jpeg', 0.85);
+            const p = db.pats[db.curr];
+            p.estudios = p.estudios || [];
+            const nomAn = (CEF_ANALISIS[cefState.analisis] || CEF_ANALISIS.steiner).nombre;
+            p.estudios.push({ id:'est_'+Date.now(), tipo:'Lateral de cráneo', nota:'Trazado ' + nomAn, img:dataUrl, fecha:new Date().toLocaleDateString('es-MX'), tipoArchivo:'img' });
+            saveDB();
+            if(typeof renderEstudios === 'function') try{ renderEstudios(); }catch(e){}
+            if(typeof pushHist === 'function') pushHist('est', new Date().toISOString().split('T')[0], '[Cefalometría] Trazado ' + nomAn + ' guardado en estudios');
+            const ov = document.querySelector('div[style*="z-index:99999"]'); if(ov) ov.remove();
+            if(typeof daniSpeak==='function') daniSpeak('📁 Trazado guardado en Estudios del paciente.', 6000, 'info');
+        } catch(e){ alert('No se pudo guardar en el expediente.'); }
+    }
+
+    // Pregunta cómo quiere el trazado en el PDF. Por defecto SIN radiografía
+    // (solo líneas): es lo que ahorra tinta.
+    function cefImprimirHoja(){
+        if(!db.curr) return alert('Selecciona un paciente primero.');
+        const m = cefState._lastM || {};
+        if(Object.keys(m).length === 0) return alert('Marca los puntos y calcula antes de imprimir.');
+        const hayImg = !!(cefState.loaded && cefState.imgEl);
+        const { body } = sfOverlay('<i class="fa-solid fa-print"></i> Imprimir hoja cefalométrica', '#1f5b9e');
+        body.innerHTML =
+            '<label style="font-weight:800; font-size:0.85rem; color:#334155;">Trazado en el PDF</label>'
+          + '<select id="cpRx" class="input-field" style="margin:0.3rem 0 0.8rem;">'
+          +   '<option value="ninguna">Solo las líneas (ahorra tinta) — recomendado</option>'
+          +   (hayImg ? '<option value="tenue">Con radiografía tenue (poca tinta, con referencia)</option>' : '')
+          +   (hayImg ? '<option value="completa">Con radiografía completa</option>' : '')
+          + '</select>'
+          + (hayImg ? '' : '<p style="font-size:0.78rem; color:#b45309; background:#fffbeb; border:1px solid #fde68a; border-radius:8px; padding:0.6rem 0.8rem; margin-bottom:0.8rem;">No hay radiografía cargada, así que solo se puede imprimir el trazado de líneas.</p>')
+          + '<label style="display:flex; gap:0.5rem; align-items:center; font-size:0.86rem; color:#334155; margin-bottom:1rem; cursor:pointer;"><input type="checkbox" id="cpMono" style="width:17px;height:17px;"/> Trazado en un solo color oscuro (menos tinta de color)</label>'
+          + '<button class="btn" onclick="cefImprimirHojaGo()" style="width:100%; background:#1f5b9e; color:white; font-weight:800; padding:0.8rem;"><i class="fa-solid fa-file-pdf"></i> Generar PDF</button>';
+    }
+    function cefImprimirHojaGo(){
+        const op = { rx: $('cpRx') ? $('cpRx').value : 'ninguna', mono: $('cpMono') ? $('cpMono').checked : false };
+        const ov = document.querySelector('div[style*="z-index:99999"]'); if(ov) ov.remove();
+        setTimeout(() => cefImprimirHojaPDF(op), 80);
+    }
+
+    function cefImprimirHojaPDF(opPDF) {
+        opPDF = opPDF || { rx:'ninguna', mono:false };
         if(!db.curr) return alert("Selecciona un paciente primero.");
         if(!ensurePdfMake()) return;
         const m = cefState._lastM || {};
@@ -8650,8 +8902,15 @@ El doctor adjunta una fotografía clínica para una lectura de APOYO (nunca diag
         // Diagnóstico resumido (reusar interpretación)
         const dxResumen = cefArmarDxResumen(m);
 
-        // Trazado
-        const trazado = cefTrazadoCanvas();
+        // Trazado: con radiografía (compuesto) o solo líneas (esquema, ahorra tinta)
+        let trazado = null;
+        if(opPDF.rx && opPDF.rx !== 'ninguna'){
+            try {
+                const cv = cefComponerTrazado({ rx:opPDF.rx, mono:opPDF.mono, etiquetas:true });
+                if(cv) trazado = { dataUrl: cv.toDataURL('image/jpeg', 0.85), w: cv.width/2, h: cv.height/2 };
+            } catch(e){ console.warn('trazado pdf', e); }
+        }
+        if(!trazado) trazado = cefTrazadoCanvas(opPDF.mono);
         const trazadoBlock = trazado
             ? { image: trazado.dataUrl, width: Math.min(260, trazado.w*1.4), alignment:'center', margin:[0,6,0,6] }
             : { text:'(Sin trazado disponible)', italics:true, color:'#94a3b8', alignment:'center', margin:[0,10,0,10] };
@@ -8885,7 +9144,7 @@ El doctor adjunta una fotografía clínica para una lectura de APOYO (nunca diag
             const divider = (i === splitAt) ? '<div class="odonto-divider"></div>' : '';
             const surfBadge = (o.surfaces && o.surfaces.length) ? `<span class="tooth-surfaces-badge">${o.surfaces.join('')}</span>` : '';
             const protBadge = prot ? `<span class="tooth-prot-badge">${prot.esPuente ? '🌉' : '👑'}${protAbrev[prot.rol]||''}</span>` : '';
-            const clickHandler = hasPatient ? `onclick="selectTooth(${t})"` : '';
+            const clickHandler = hasPatient ? `onclick="selectTooth(${t}, event)"` : '';
             return `${divider}<div class="tooth-cell" id="tc${t}" ${clickHandler}>
                 ${surfBadge}${protBadge}${toothSVG(t, s, isInf, prot)}<span class="tooth-num">${t}</span>
             </div>`;
@@ -8956,8 +9215,106 @@ El doctor adjunta una fotografía clínica para una lectura de APOYO (nunca diag
         }
     }
 
-    function selectTooth(t) {
+        // ===== ODONTOGRAMA: SELECCIÓN MÚLTIPLE =====
+    // Permite marcar lo mismo en varios dientes (p. ej. los 4 terceros molares
+    // para extracción por indicación ortodóncica). El modo se apaga al aplicar.
+    let odoMulti = false;
+    let odoSel = [];
+
+    const ODO_PRESETS = {
+        terceros:    { lbl:'4 terceros molares',   dientes:[18,28,38,48] },
+        primeros_pm: { lbl:'4 primeros premolares',dientes:[14,24,34,44] },
+        pm_sup:      { lbl:'Premolares superiores',dientes:[14,15,24,25] },
+        pm_inf:      { lbl:'Premolares inferiores',dientes:[34,35,44,45] },
+        arcada_sup:  { lbl:'Arcada superior',      dientes:[18,17,16,15,14,13,12,11,21,22,23,24,25,26,27,28] },
+        arcada_inf:  { lbl:'Arcada inferior',      dientes:[48,47,46,45,44,43,42,41,31,32,33,34,35,36,37,38] }
+    };
+
+    function odoPintarSeleccion(){
+        document.querySelectorAll('.tooth-cell').forEach(el => el.classList.remove('selected'));
+        odoSel.forEach(t => { if($('tc'+t)) $('tc'+t).classList.add('selected'); });
+        const info = $('odoMultiInfo');
+        if(info) info.innerHTML = odoSel.length
+            ? '<b>' + odoSel.length + ' seleccionado(s):</b> ' + odoSel.slice().sort((a,b)=>a-b).join(' · ')
+            : 'Toca los dientes que quieras marcar igual.';
+    }
+
+    function odoActivarMulti(silencioso){
+        odoMulti = true;
+        const btn = $('odoMultiBtn');
+        if(btn){ btn.style.background = '#7c3aed'; btn.style.color = 'white'; btn.innerHTML = '<i class="fa-solid fa-check-double"></i> Selección múltiple ACTIVA'; }
+        if($('odoMultiPanel')) $('odoMultiPanel').style.display = 'block';
+        if(!silencioso && typeof daniSpeak === 'function') daniSpeak('Modo selección múltiple: toca varios dientes y aplica el estado una sola vez. Se apaga al aplicar.', 8000, 'info');
+    }
+    function odoApagarMulti(){
+        odoMulti = false; odoSel = [];
+        const btn = $('odoMultiBtn');
+        if(btn){ btn.style.background = ''; btn.style.color = ''; btn.innerHTML = '<i class="fa-solid fa-check-double"></i> Selección múltiple'; }
+        if($('odoMultiPanel')) $('odoMultiPanel').style.display = 'none';
+        document.querySelectorAll('.tooth-cell').forEach(el => el.classList.remove('selected'));
+        if($('odo-controls')) $('odo-controls').classList.add('hidden');
+    }
+    function odoToggleMulti(){
+        if(!db.curr) return alert('Selecciona un paciente primero.');
+        if(odoMulti) odoApagarMulti(); else odoActivarMulti();
+    }
+    function odoPreset(k){
+        if(!db.curr) return alert('Selecciona un paciente primero.');
+        const pr = ODO_PRESETS[k]; if(!pr) return;
+        if(!odoMulti) odoActivarMulti(true);
+        odoSel = pr.dientes.slice();
+        odoPintarSeleccion();
+        activeTooth = odoSel[0];
+        if($('odo-controls')) $('odo-controls').classList.remove('hidden');
+        if($('odo-selected-tooth')) $('odo-selected-tooth').innerText = odoSel.length + ' dientes';
+        if($('odo-tooth-type')) $('odo-tooth-type').innerText = '(' + pr.lbl + ')';
+    }
+
+    // ¿Todos los seleccionados son del mismo tipo? (necesario para caras)
+    function odoMismoTipo(){
+        if(odoSel.length < 2) return true;
+        const ant = getToothType(odoSel[0]).anterior;
+        return odoSel.every(t => getToothType(t).anterior === ant);
+    }
+
+    // Aplica el mismo estado a todos los seleccionados y deja UNA entrada en el historial.
+    function odoAplicarLote(status, surfaces, motivo){
+        const lista = odoSel.slice().sort((a,b)=>a-b);
+        if(!lista.length) return false;
+        const detalle = status + (surfaces && surfaces.length ? ' (' + surfaces.join('') + ')' : '') + (motivo ? ' — ' + motivo : '');
+        if(!confirm('Vas a marcar «' + detalle + '» en ' + lista.length + ' dientes:\n\n' + lista.join(' · ') + '\n\n¿Continuar?')) return true;
+        const previo = activeTooth;
+        lista.forEach(t => { activeTooth = t; try { applyStatus(status, surfaces, motivo); } catch(e){ console.warn('lote', t, e); } });
+        activeTooth = previo;
+        try { if(typeof pushHist === 'function') pushHist('odo', new Date().toISOString().split('T')[0], '[Odontograma] ' + detalle + ' en: ' + lista.join(', ')); } catch(e){}
+        saveDB();
+        try { renderOdonto(); } catch(e){}
+        odoApagarMulti();
+        if(typeof daniSpeak === 'function') daniSpeak('✅ ' + detalle + ' aplicado en ' + lista.length + ' dientes (' + lista.join(', ') + ').', 9000, 'info');
+        return true;
+    }
+
+function selectTooth(t, ev) {
         if(!db.curr) return alert("Debes seleccionar o crear un paciente primero.");
+        // Modo múltiple (botón) o Ctrl/Cmd+clic: acumula dientes en vez de reemplazar
+        const conCtrl = ev && (ev.ctrlKey || ev.metaKey);
+        if(odoMulti || conCtrl){
+            if(!odoMulti) odoActivarMulti(true);
+            const i = odoSel.indexOf(t);
+            if(i >= 0) odoSel.splice(i, 1); else odoSel.push(t);
+            odoPintarSeleccion();
+            if(odoSel.length){
+                activeTooth = odoSel[odoSel.length - 1];
+                if($('odo-controls')) $('odo-controls').classList.remove('hidden');
+                if($('odo-selected-tooth')) $('odo-selected-tooth').innerText = odoSel.length > 1 ? (odoSel.length + ' dientes') : String(activeTooth);
+                if($('odo-tooth-type')) $('odo-tooth-type').innerText = odoSel.length > 1 ? '(selección múltiple)' : ('(' + getToothType(activeTooth).nombre + ')');
+            }
+            pendingStatus = null; selectedSurfaces = [];
+            if($('surfaceMenu')) $('surfaceMenu').classList.add('hidden');
+            if($('extractMenu')) $('extractMenu').classList.add('hidden');
+            return;
+        }
+        odoSel = [];
         document.querySelectorAll('.tooth-cell').forEach(el => el.classList.remove('selected'));
         if($('tc'+t)) $('tc'+t).classList.add('selected');
         activeTooth = t;
@@ -9010,6 +9367,34 @@ El doctor adjunta una fotografía clínica para una lectura de APOYO (nunca diag
 
     function setOdoStatus(s) {
         if(!activeTooth || !db.curr) return;
+        // Selección múltiple: los estados de diente completo se aplican en lote.
+        // Caries y Resina piden cara, y las caras cambian entre anteriores y
+        // posteriores: solo se permiten si todos los seleccionados son del mismo tipo.
+        if(odoMulti && odoSel.length > 1){
+            if(s === 'Caries' || s === 'Resina'){
+                if(!odoMismoTipo()){
+                    alert('«' + s + '» necesita elegir cara, y mezclaste dientes anteriores con posteriores (sus caras son distintas).\n\nSelecciona solo anteriores o solo posteriores, o usa un estado de diente completo.');
+                    return;
+                }
+                pendingStatus = s;
+                buildSurfaceButtons();
+                if($('surfaceMenu')){
+                    $('surfaceMenu').classList.remove('hidden');
+                    $('surfaceMenu').style.background = (s==='Resina') ? '#eff6ff' : '#fef2f2';
+                    $('surfaceMenu').style.borderColor = (s==='Resina') ? '#93c5fd' : '#fca5a5';
+                }
+                return;
+            }
+            if(s === 'Extracción'){
+                const lbl = $('extractToothLbl'); if(lbl) lbl.textContent = odoSel.slice().sort((a,b)=>a-b).join(' · ');
+                document.querySelectorAll('input[name="extractReason"]').forEach(r=>r.checked=false);
+                const otro = $('extractOtherTxt'); if(otro){ otro.value=''; otro.style.display='none'; }
+                if($('extractMenu')) $('extractMenu').classList.remove('hidden');
+                return;
+            }
+            odoAplicarLote(s, null, null);
+            return;
+        }
 
         // Caries y Resina despliegan menú de superficies
         if(s === 'Caries' || s === 'Resina') {
@@ -15589,25 +15974,63 @@ Reglas: español de México; terminología dental correcta; máximo 6 líneas; u
     async function checkDriveFile() { updateGlobalSyncStatus('syncing');
         const okT = await ensureDriveToken();
         if(!okT) { updateGlobalSyncStatus('offline'); daniSpeak('🔌 La sesión de Google expiró. Pulsa "Conectar" para volver a entrar.', 8000, 'warn'); return; }
-        try { if(typeof gapi!=='undefined'&&gapi.client&&!gapi.client.drive) await gapi.client.load('drive','v3'); let r=await gapi.client.drive.files.list({q:"name='SmileFlow_Database.json' and trashed=false",fields:'files(id)',spaces:'drive'}); let f=r.result.files; if(f&&f.length>0){driveFileId=f[0].id; localStorage.setItem('sf_drive_file_id',driveFileId); await downloadFromDrive(driveFileId); updateGlobalSyncStatus('online'); daniSpeak("✅ Base descargada.",5000,'info');}else{if(Object.keys(db.pats).length>0) await uploadToDrive(true); else updateGlobalSyncStatus('online');} try{ setTimeout(sfNubeRevisarNuevo, 2500); }catch(e){} }catch(e){updateGlobalSyncStatus('offline'); daniSpeak("❌ No pude sincronizar con Drive. Reintenta; si persiste, desconecta y vuelve a conectar la nube.",9000,'error'); console.error('Drive:', e);} }
-    async function downloadFromDrive(fid) { try { let r=await gapi.client.drive.files.get({fileId:fid, alt:'media'}); let rDb=r.result; if(typeof rDb==='string'){ try{rDb=JSON.parse(rDb);}catch(e){} } if(rDb&&rDb.sf_enc){ let cp=localStorage.getItem('sf_cloud_pass') || prompt('🔐 Tu nube está protegida. Contraseña de nube:'); if(!cp) return; try{ rDb=JSON.parse(await sfDecrypt(rDb, cp.trim())); localStorage.setItem('sf_cloud_pass', cp.trim()); }catch(e){ alert('❌ Contraseña de nube incorrecta.'); return; } }
+        try { if(typeof gapi!=='undefined'&&gapi.client&&!gapi.client.drive) await gapi.client.load('drive','v3'); sfSyncInicialPendiente = true; let r=await gapi.client.drive.files.list({q:"name='SmileFlow_Database.json' and trashed=false",fields:'files(id,modifiedTime)',spaces:'drive'}); let f=r.result.files; if(f&&f.length>0){driveFileId=f[0].id; localStorage.setItem('sf_drive_file_id',driveFileId); await downloadFromDrive(driveFileId, f[0].modifiedTime); updateGlobalSyncStatus('online');}else{if(Object.keys(db.pats).length>0) await uploadToDrive(true); else updateGlobalSyncStatus('online');} sfSyncInicialPendiente = false; try{ setTimeout(sfNubeRevisarNuevo, 2500); }catch(e){} }catch(e){ sfSyncInicialPendiente = false; updateGlobalSyncStatus('offline'); daniSpeak("❌ No pude sincronizar con Drive. Reintenta; si persiste, desconecta y vuelve a conectar la nube.",9000,'error'); console.error('Drive:', e);} }
+    async function downloadFromDrive(fid, mtimeServidor) { try { let r=await gapi.client.drive.files.get({fileId:fid, alt:'media'}); let rDb=r.result; if(typeof rDb==='string'){ try{rDb=JSON.parse(rDb);}catch(e){} } if(rDb&&rDb.sf_enc){ let cp=localStorage.getItem('sf_cloud_pass') || prompt('🔐 Tu nube está protegida. Contraseña de nube:'); if(!cp) return; try{ rDb=JSON.parse(await sfDecrypt(rDb, cp.trim())); localStorage.setItem('sf_cloud_pass', cp.trim()); }catch(e){ alert('❌ Contraseña de nube incorrecta.'); return; } }
         if(!(rDb&&rDb.cfg)) return;
-        // PROTECCIÓN ANTI-PÉRDIDA: si lo local es MÁS RECIENTE que la copia de Drive
-        // (p. ej. guardaste escudos/firmas estando offline), NO sobrescribir; al contrario,
-        // subir lo local para que la nube se ponga al día.
-        const localMod = (db && db.lastMod) || 0;
+
+        // ===== DECISIÓN DE SINCRONIZACIÓN =====
+        // Se compara con la marca tal como se cargó del disco (no db.lastMod, que
+        // cambia en cada guardado) y con la fecha del SERVIDOR de Google, que no
+        // depende del reloj de cada computadora. Si algo se puede perder, se pregunta.
+        const nLocal  = (db && db.pats) ? Object.keys(db.pats).length : 0;
+        const nRemoto = (rDb && rDb.pats) ? Object.keys(rDb.pats).length : 0;
+        const localMod  = sfLastModAlCargar || 0;
         const remoteMod = rDb.lastMod || 0;
-        if(localMod > remoteMod) {
-            console.warn('Drive tiene una copia más vieja (local:'+localMod+' > drive:'+remoteMod+'). Subiendo la local.');
-            if(typeof daniSpeak === 'function') daniSpeak('☁️ Tus datos locales son más recientes que los de Drive. Subiendo tu versión a la nube...', 6000, 'info');
+        const vistoAntes = parseInt(localStorage.getItem('sf_drive_seen') || '0', 10);
+        const tsServidor = mtimeServidor ? new Date(mtimeServidor).getTime() : 0;
+        const nubeConNovedades = tsServidor > 0 ? (tsServidor > vistoAntes) : (remoteMod > localMod);
+
+        const aplicarNube = () => {
+            db = rDb;
+            if(tsServidor) localStorage.setItem('sf_drive_seen', String(tsServidor));
+            try { const rq=sfOpenMainDB(); rq.onsuccess=(e)=>{ try{ e.target.result.transaction('clinica','readwrite').objectStore('clinica').put({id:'main_data',data:db}); }catch(err){} }; } catch(e){}
+            sfLastModAlCargar = db.lastMod || 0;
+            sfSyncInicialPendiente = false;
+            loadConfigUI(); renderPatSelect(); if(db.curr) loadPatient(); else newPatient();
+            if(typeof daniSpeak === 'function') daniSpeak('Datos actualizados desde tu nube (' + nRemoto + ' pacientes).', 6000, 'info');
+        };
+        const conservarLocal = () => {
+            sfSyncInicialPendiente = false;
+            if(typeof daniSpeak === 'function') daniSpeak('Se conservaron los datos de este equipo. Subiendolos a la nube...', 7000, 'info');
             uploadToDrive(false);
-            return;
-        }
-        db=rDb;
-        // Persistir en IndexedDB (localStorage truena con imágenes grandes por límite de 5MB)
-        try { const rq=sfOpenMainDB(); rq.onsuccess=(e)=>{ try{ e.target.result.transaction('clinica','readwrite').objectStore('clinica').put({id:'main_data',data:db}); }catch(err){} }; } catch(e){}
-        loadConfigUI(); renderPatSelect(); if(db.curr) loadPatient(); else newPatient(); }catch(e){} }
-    async function uploadToDrive(isNew=false) { let t=null; try{t=gapi.client.getToken();}catch(e){} if(!t) return; updateGlobalSyncStatus('syncing'); let _payload=JSON.stringify(db); const _cp=localStorage.getItem('sf_cloud_pass'); if(_cp){ try{ _payload=JSON.stringify(await sfEncrypt(_payload,_cp)); }catch(e){} } const bnd='31415926535897'; const body="\r\n--"+bnd+"\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n{\"name\":\"SmileFlow_Database.json\",\"mimeType\":\"application/json\"}\r\n--"+bnd+"\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n"+_payload+"\r\n--"+bnd+"--"; let url=isNew?'https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart':`https://www.googleapis.com/upload/drive/v3/files/${driveFileId}?uploadType=multipart`; try { let res=await fetch(url,{method:isNew?'POST':'PATCH',headers:new Headers({'Authorization':'Bearer '+t.access_token,'Content-Type':'multipart/related; boundary='+bnd}),body:body}); let val=await res.json(); if(res.ok){if(isNew){driveFileId=val.id; localStorage.setItem('sf_drive_file_id',driveFileId);} setTimeout(()=>{updateGlobalSyncStatus('online'); checkTopAlert();},1000);} else throw new Error(); }catch(e){updateGlobalSyncStatus('offline'); setDaniStatus('error');} }
+        };
+
+        if(nLocal === 0) { aplicarNube(); return; }
+        if(nubeConNovedades && nRemoto >= nLocal) { aplicarNube(); return; }
+
+        // Puede costar informacion: decide el clinico, no el reloj.
+        const fFmt = t => t ? new Date(t).toLocaleString('es-MX') : 'fecha desconocida';
+        try {
+            const { body } = sfOverlay('<i class="fa-solid fa-cloud-arrow-down"></i> Cual version conservas?', '#b45309');
+            body.innerHTML =
+                '<p style="color:#475569; font-size:0.9rem; line-height:1.6; margin:0 0 1rem;">Los datos de tu nube y los de este equipo <b>no coinciden</b>. Para no perder nada, elige tu cual se queda.</p>'
+              + '<div style="border:1px solid var(--border); border-left:4px solid #2563eb; border-radius:10px; padding:0.9rem 1.1rem; margin-bottom:0.6rem;">'
+              +   '<div style="font-weight:800; color:#1d4ed8;">En tu Google Drive</div>'
+              +   '<div style="font-size:0.87rem; color:#475569; margin-top:3px;"><b>' + nRemoto + ' paciente(s)</b><br>Ultima modificacion: ' + fFmt(tsServidor || remoteMod) + '</div>'
+              +   '<button class="btn" onclick="sfElegirNube()" style="width:100%; margin-top:0.6rem; background:#2563eb; color:white; font-weight:800; font-size:0.83rem;">Usar los de la nube</button>'
+              + '</div>'
+              + '<div style="border:1px solid var(--border); border-left:4px solid #059669; border-radius:10px; padding:0.9rem 1.1rem;">'
+              +   '<div style="font-weight:800; color:#047857;">En este equipo</div>'
+              +   '<div style="font-size:0.87rem; color:#475569; margin-top:3px;"><b>' + nLocal + ' paciente(s)</b><br>Ultima modificacion: ' + fFmt(localMod) + '</div>'
+              +   '<button class="btn" onclick="sfElegirLocal()" style="width:100%; margin-top:0.6rem; background:#059669; color:white; font-weight:800; font-size:0.83rem;">Conservar los de este equipo</button>'
+              + '</div>'
+              + '<p style="font-size:0.76rem; color:#94a3b8; margin-top:0.9rem; line-height:1.5;">Consejo: si trabajaste en las dos computadoras, descarga primero un respaldo de este equipo antes de elegir la nube.</p>';
+            window.sfElegirNube = () => { const ov=document.querySelector('div[style*="z-index:99999"]'); if(ov) ov.remove(); aplicarNube(); };
+            window.sfElegirLocal = () => { const ov=document.querySelector('div[style*="z-index:99999"]'); if(ov) ov.remove(); conservarLocal(); };
+        } catch(e){ console.warn('dialogo conflicto', e); conservarLocal(); }
+        return;
+        }catch(e){ console.warn('downloadFromDrive', e); } }
+    async function uploadToDrive(isNew=false) { let t=null; try{t=gapi.client.getToken();}catch(e){} if(!t) return; updateGlobalSyncStatus('syncing'); let _payload=JSON.stringify(db); const _cp=localStorage.getItem('sf_cloud_pass'); if(_cp){ try{ _payload=JSON.stringify(await sfEncrypt(_payload,_cp)); }catch(e){} } const bnd='31415926535897'; const body="\r\n--"+bnd+"\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n{\"name\":\"SmileFlow_Database.json\",\"mimeType\":\"application/json\"}\r\n--"+bnd+"\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n"+_payload+"\r\n--"+bnd+"--"; let url=isNew?'https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart':`https://www.googleapis.com/upload/drive/v3/files/${driveFileId}?uploadType=multipart`; try { let res=await fetch(url,{method:isNew?'POST':'PATCH',headers:new Headers({'Authorization':'Bearer '+t.access_token,'Content-Type':'multipart/related; boundary='+bnd}),body:body}); let val=await res.json(); if(res.ok){if(isNew){driveFileId=val.id; localStorage.setItem('sf_drive_file_id',driveFileId);} try{ localStorage.setItem('sf_drive_seen', String(val && val.modifiedTime ? new Date(val.modifiedTime).getTime() : Date.now())); }catch(e){} setTimeout(()=>{updateGlobalSyncStatus('online'); checkTopAlert();},1000);} else throw new Error(); }catch(e){updateGlobalSyncStatus('offline'); setDaniStatus('error');} }
 
     // --- CARGA Y CONFIGURACIONES ---
     function loadConfigUI() {
@@ -15690,7 +16113,7 @@ function saveDB() {
             tx.onabort  = () => sfSaveError(tx.error ? (tx.error.name+': '+tx.error.message) : 'guardado cancelado');
             tx.oncomplete = () => {
                 sfSaveOK();
-                if(typeof uploadToDrive === 'function') uploadToDrive(false);
+                if(typeof uploadToDrive === 'function' && !sfSyncInicialPendiente) uploadToDrive(false);
                 if(typeof sfAutoRespaldo === 'function') { try{ sfAutoRespaldo(); }catch(e){} }
                 if(typeof sfBlindaje === 'function') { try{ sfBlindaje(); }catch(e){} }
             };
