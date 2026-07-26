@@ -671,6 +671,9 @@ window._pdfReady=true;
 <div class="sync-badge offline" id="globalSyncStatus" onclick="openSection('s-admin-sys', document.querySelector('.nav-item[onclick*=\'s-admin-sys\']'))" title="Ir a configuración de Nube">
 <i class="fa-solid fa-cloud-xmark"></i> <span class="bdg-txt">Offline</span>
                 </div>
+<div class="sync-badge" id="sfSyncTime" onclick="sfInfoSync()" title="Última sincronización con la nube" style="display:none; background:#f1f5f9; color:#475569; border-color:#cbd5e1;">
+<i class="fa-solid fa-clock-rotate-left"></i> <span class="bdg-txt" id="sfSyncTimeTxt">—</span>
+                </div>
 <div class="sync-badge online" id="sfLocalBadge" onclick="sfPanelRespaldos()" title="Estado de tus respaldos">
 <i class="fa-solid fa-shield-halved"></i> <span class="bdg-txt">Protegido</span>
                 </div>
@@ -15905,7 +15908,59 @@ Reglas: español de México; terminología dental correcta; máximo 6 líneas; u
     }
 
     // --- GOOGLE DRIVE SYNC ---
-    function updateGlobalSyncStatus(s) { const b = $('globalSyncStatus'); if(!b) return; b.className = 'sync-badge ' + s; b.innerHTML = s === 'offline' ? '<i class="fa-solid fa-cloud-xmark"></i> <span class="bdg-txt">Offline</span>' : (s === 'syncing' ? '<i class="fa-solid fa-arrows-rotate fa-spin"></i> <span class="bdg-txt">Sync...</span>' : '<i class="fa-solid fa-cloud-check"></i> <span class="bdg-txt">En Nube</span>'); }
+    // Texto corto y humano del tiempo transcurrido: "hace 5 min", "hoy 12:50", "ayer", etc.
+    function sfSyncRelativo(ts){
+        if(!ts) return null;
+        const d = new Date(ts), ahora = new Date();
+        const min = Math.floor((ahora - d) / 60000);
+        const hh = String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0');
+        if(min < 1) return 'recién';
+        if(min < 60) return 'hace ' + min + ' min';
+        const mismoDia = d.toDateString() === ahora.toDateString();
+        if(mismoDia) return 'hoy ' + hh;
+        const ayer = new Date(ahora); ayer.setDate(ahora.getDate()-1);
+        if(d.toDateString() === ayer.toDateString()) return 'ayer ' + hh;
+        return d.toLocaleDateString('es-MX', { day:'2-digit', month:'short' }) + ' ' + hh;
+    }
+    function sfActualizarBadgeSync(){
+        try {
+            const b = $('sfSyncTime'); if(!b) return;
+            const ts = parseInt(localStorage.getItem('sf_drive_seen') || '0', 10);
+            if(!ts){ b.style.display = 'none'; return; }
+            b.style.display = '';
+            const rel = sfSyncRelativo(ts);
+            if($('sfSyncTimeTxt')) $('sfSyncTimeTxt').textContent = rel;
+            // color según antigüedad: verde reciente, ámbar si ya lleva rato
+            const horas = (Date.now() - ts) / 3600000;
+            if(horas < 24){ b.style.background='#dcfce7'; b.style.color='#047857'; b.style.borderColor='#86efac'; }
+            else { b.style.background='#fef3c7'; b.style.color='#92400e'; b.style.borderColor='#fde68a'; }
+            b.title = 'Última sincronización con la nube: ' + new Date(ts).toLocaleString('es-MX');
+        } catch(e){}
+    }
+    function sfInfoSync(){
+        try {
+            const ts = parseInt(localStorage.getItem('sf_drive_seen') || '0', 10);
+            const nPats = (db && db.pats) ? Object.keys(db.pats).length : 0;
+            const { body } = sfOverlay('<i class="fa-solid fa-clock-rotate-left"></i> Sincronización con la nube', '#1d4ed8');
+            const conectado = (typeof gapi !== 'undefined' && gapi.client && gapi.client.getToken && gapi.client.getToken());
+            body.innerHTML =
+                '<div style="text-align:center; padding:0.5rem 0 1rem;">'
+              + (ts
+                  ? '<div style="font-size:1.4rem; font-weight:800; color:#1d4ed8;">' + new Date(ts).toLocaleDateString('es-MX', {weekday:'long', day:'2-digit', month:'long'}) + '</div>'
+                    + '<div style="font-size:1.1rem; color:#334155; margin-top:2px;">' + new Date(ts).toLocaleTimeString('es-MX', {hour:'2-digit', minute:'2-digit'}) + ' h</div>'
+                    + '<div style="font-size:0.85rem; color:#64748b; margin-top:6px;">(' + sfSyncRelativo(ts) + ')</div>'
+                  : '<div style="font-size:1rem; color:#b45309; font-weight:700;">Aún no se ha sincronizado con la nube.</div>')
+              + '</div>'
+              + '<div style="border-top:1px solid var(--border); padding-top:0.9rem; font-size:0.88rem; color:#475569; line-height:1.7;">'
+              +   'Estado de la nube: <b>' + (conectado ? 'conectada' : 'sin conectar') + '</b><br>'
+              +   'Pacientes en este equipo: <b>' + nPats + '</b>'
+              + '</div>'
+              + '<p style="font-size:0.78rem; color:#94a3b8; margin-top:0.9rem; line-height:1.5;"><i class="fa-solid fa-circle-info"></i> La hora corresponde a la última vez que este equipo subió o bajó datos de tu Google Drive.</p>'
+              + '<button class="btn btn-outline" onclick="openSection(\'s-admin-sys\', document.querySelector(\'.nav-item[onclick*=s-admin-sys]\')); (document.querySelector(\'div[style*=z-index:99999]\')||{}).remove&&document.querySelector(\'div[style*=z-index:99999]\').remove();" style="width:100%; margin-top:0.8rem; border-color:#1d4ed8; color:#1d4ed8; font-weight:700;"><i class="fa-solid fa-gear"></i> Ir a Sistema y Nube</button>';
+        } catch(e){ console.warn('info sync', e); }
+    }
+
+    function updateGlobalSyncStatus(s) { const b = $('globalSyncStatus'); if(!b) return; try{ sfActualizarBadgeSync(); }catch(e){} b.className = 'sync-badge ' + s; b.innerHTML = s === 'offline' ? '<i class="fa-solid fa-cloud-xmark"></i> <span class="bdg-txt">Offline</span>' : (s === 'syncing' ? '<i class="fa-solid fa-arrows-rotate fa-spin"></i> <span class="bdg-txt">Sync...</span>' : '<i class="fa-solid fa-cloud-check"></i> <span class="bdg-txt">En Nube</span>'); }
     function showConnectedUI() { if($('btnAuthAdmin')) $('btnAuthAdmin').style.display='none'; if($('btnSyncNow')) $('btnSyncNow').style.display='block'; if($('btnSignout')) $('btnSignout').style.display='inline-block'; updateGlobalSyncStatus('online'); }
     
     const CLIENT_ID = localStorage.getItem('sf_gclient') || '798639911007-sv5lg6p0qbmfkqj35uvdi8s8dmhfp8jg.apps.googleusercontent.com'; const SCOPES = 'https://www.googleapis.com/auth/drive.file'; let tokenClient; let gisInited = false; let driveFileId = localStorage.getItem('sf_drive_file_id') || null;
@@ -16189,6 +16244,7 @@ function saveDB() {
         try { checkBackupReminder(); } catch(e) { console.error("Error BackupReminder", e); }
         try { sfRefrescarEstadoRespaldo(); setInterval(sfRefrescarEstadoRespaldo, 120000); } catch(e) {}
         try { setTimeout(sfVigilanteEspacio, 9000); setInterval(sfVigilanteEspacio, 600000); } catch(e) {}
+        try { sfActualizarBadgeSync(); setInterval(sfActualizarBadgeSync, 60000); } catch(e) {}
         try { const _ai=$('astImg'); if(_ai && !window._avatarBase) window._avatarBase=_ai.src; } catch(e){}
         try { refreshAvatarOnline(); } catch(e) { console.error("Error AvatarOnline", e); }
         if(db.curr) { loadPatient(); }
