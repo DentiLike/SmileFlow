@@ -16051,8 +16051,14 @@ Reglas: español de México; terminología dental correcta; máximo 6 líneas; u
             try { const rq=sfOpenMainDB(); rq.onsuccess=(e)=>{ try{ e.target.result.transaction('clinica','readwrite').objectStore('clinica').put({id:'main_data',data:db}); }catch(err){} }; } catch(e){}
             sfLastModAlCargar = db.lastMod || 0;
             sfSyncInicialPendiente = false;
-            loadConfigUI(); renderPatSelect(); if(db.curr) loadPatient(); else newPatient();
-            if(typeof daniSpeak === 'function') daniSpeak('Datos actualizados desde tu nube (' + nRemoto + ' pacientes).', 6000, 'info');
+            // Cada redibujado por separado y protegido: si uno falla, no cuelga el resto.
+            try { loadConfigUI(); } catch(e){ console.warn('loadConfigUI', e); }
+            try { renderPatSelect(); } catch(e){ console.warn('renderPatSelect', e); }
+            try { updateGlobalSyncStatus('online'); } catch(e){}
+            try { if(typeof sfActualizarBadgeSync==='function') sfActualizarBadgeSync(); } catch(e){}
+            if(typeof daniSpeak === 'function') daniSpeak('✅ Datos actualizados desde tu nube (' + nRemoto + ' pacientes).', 6000, 'info');
+            // El expediente (parte más pesada) se dibuja aparte, sin bloquear.
+            setTimeout(() => { try { if(db.curr && db.pats && db.pats[db.curr]) loadPatient(); else newPatient(); } catch(e){ console.warn('loadPatient post-sync', e); } }, 50);
         };
         const conservarLocal = () => {
             sfSyncInicialPendiente = false;
@@ -16080,25 +16086,22 @@ Reglas: español de México; terminología dental correcta; máximo 6 líneas; u
               +   '<button class="btn" onclick="sfElegirLocal()" style="width:100%; margin-top:0.6rem; background:#059669; color:white; font-weight:800; font-size:0.83rem;">Conservar los de este equipo</button>'
               + '</div>'
               + '<p style="font-size:0.76rem; color:#94a3b8; margin-top:0.9rem; line-height:1.5;">Consejo: si trabajaste en las dos computadoras, descarga primero un respaldo de este equipo antes de elegir la nube.</p>';
-            // Muestra un estado de "procesando" dentro del mismo modal y evita
-            // que se pueda picar dos veces mientras aplica.
+            // Evita doble clic. Cierra el modal DE INMEDIATO (para que nunca se
+            // quede pegado) y hace el trabajo pesado justo después, mostrando el
+            // avance con el avatar en vez de con una ventana bloqueante.
             let _sfSyncEligiendo = false;
-            const _mostrarCargando = (texto) => {
-                if(body) body.innerHTML = '<div style="text-align:center; padding:2rem 1rem;">'
-                    + '<i class="fa-solid fa-arrows-rotate fa-spin" style="font-size:2rem; color:#1d4ed8;"></i>'
-                    + '<p style="margin-top:1rem; font-weight:800; color:#334155;">' + texto + '</p>'
-                    + '<p style="font-size:0.82rem; color:#94a3b8;">Un momento, no cierres esta ventana.</p></div>';
-            };
-            const _cerrar = () => { const ov=document.querySelector('div[style*="z-index:99999"]'); if(ov) ov.remove(); };
+            const _cerrarYa = () => { try { const ov=document.querySelector('div[style*="z-index:99999"]'); if(ov) ov.remove(); } catch(e){} };
             window.sfElegirNube = () => {
                 if(_sfSyncEligiendo) return; _sfSyncEligiendo = true;
-                _mostrarCargando('Trayendo tus datos de la nube...');
-                setTimeout(() => { try { aplicarNube(); } catch(e){ console.warn(e); } _cerrar(); }, 400);
+                _cerrarYa();
+                if(typeof daniSpeak === 'function') daniSpeak('☁️ Trayendo tus datos de la nube...', 4000, 'info');
+                setTimeout(() => { try { aplicarNube(); } catch(e){ console.warn('aplicarNube', e); sfSyncInicialPendiente = false; if(typeof daniSpeak==='function') daniSpeak('No se pudo aplicar la versión de la nube. Tus datos locales siguen intactos.', 8000, 'warn'); } }, 60);
             };
             window.sfElegirLocal = () => {
                 if(_sfSyncEligiendo) return; _sfSyncEligiendo = true;
-                _mostrarCargando('Conservando los datos de este equipo y subiendolos...');
-                setTimeout(() => { try { conservarLocal(); } catch(e){ console.warn(e); } _cerrar(); }, 400);
+                _cerrarYa();
+                if(typeof daniSpeak === 'function') daniSpeak('💻 Conservando los datos de este equipo y subiéndolos...', 5000, 'info');
+                setTimeout(() => { try { conservarLocal(); } catch(e){ console.warn('conservarLocal', e); sfSyncInicialPendiente = false; } }, 60);
             };
         } catch(e){ console.warn('dialogo conflicto', e); conservarLocal(); }
         return;
