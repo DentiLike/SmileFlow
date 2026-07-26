@@ -16080,8 +16080,26 @@ Reglas: español de México; terminología dental correcta; máximo 6 líneas; u
               +   '<button class="btn" onclick="sfElegirLocal()" style="width:100%; margin-top:0.6rem; background:#059669; color:white; font-weight:800; font-size:0.83rem;">Conservar los de este equipo</button>'
               + '</div>'
               + '<p style="font-size:0.76rem; color:#94a3b8; margin-top:0.9rem; line-height:1.5;">Consejo: si trabajaste en las dos computadoras, descarga primero un respaldo de este equipo antes de elegir la nube.</p>';
-            window.sfElegirNube = () => { const ov=document.querySelector('div[style*="z-index:99999"]'); if(ov) ov.remove(); aplicarNube(); };
-            window.sfElegirLocal = () => { const ov=document.querySelector('div[style*="z-index:99999"]'); if(ov) ov.remove(); conservarLocal(); };
+            // Muestra un estado de "procesando" dentro del mismo modal y evita
+            // que se pueda picar dos veces mientras aplica.
+            let _sfSyncEligiendo = false;
+            const _mostrarCargando = (texto) => {
+                if(body) body.innerHTML = '<div style="text-align:center; padding:2rem 1rem;">'
+                    + '<i class="fa-solid fa-arrows-rotate fa-spin" style="font-size:2rem; color:#1d4ed8;"></i>'
+                    + '<p style="margin-top:1rem; font-weight:800; color:#334155;">' + texto + '</p>'
+                    + '<p style="font-size:0.82rem; color:#94a3b8;">Un momento, no cierres esta ventana.</p></div>';
+            };
+            const _cerrar = () => { const ov=document.querySelector('div[style*="z-index:99999"]'); if(ov) ov.remove(); };
+            window.sfElegirNube = () => {
+                if(_sfSyncEligiendo) return; _sfSyncEligiendo = true;
+                _mostrarCargando('Trayendo tus datos de la nube...');
+                setTimeout(() => { try { aplicarNube(); } catch(e){ console.warn(e); } _cerrar(); }, 400);
+            };
+            window.sfElegirLocal = () => {
+                if(_sfSyncEligiendo) return; _sfSyncEligiendo = true;
+                _mostrarCargando('Conservando los datos de este equipo y subiendolos...');
+                setTimeout(() => { try { conservarLocal(); } catch(e){ console.warn(e); } _cerrar(); }, 400);
+            };
         } catch(e){ console.warn('dialogo conflicto', e); conservarLocal(); }
         return;
         }catch(e){ console.warn('downloadFromDrive', e); } }
