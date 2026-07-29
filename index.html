@@ -509,6 +509,7 @@
 .cef-measurement-normal { font-size:0.7rem; color:#94a3b8; }
 @media (max-width:1024px){ .cef-layout { grid-template-columns:1fr; } .cef-canvas-area { height:400px; } }
 
+.sf-nota-op:hover { background:#f1f5f9; }
 </style>
 <!-- Stub temprano: los scripts de Google pueden cargar ANTES de que el script principal
      (3+ MB) defina las funciones de inicialización. Aquí solo marcamos banderas; el script
@@ -702,7 +703,16 @@ window._pdfReady=true;
 </div>
 <!-- Acceso rápido del paciente: acciones de cada cita, sin escarbar el menú -->
 <div id="sfQuickBar" style="display:none; flex-wrap:wrap; gap:0.5rem; margin:-0.9rem 0 1.3rem 0;">
-<button onclick="sfQuickGo('s-nota-gen')" style="border:none; border-radius:10px; padding:0.55rem 0.9rem; font-weight:800; font-size:0.85rem; cursor:pointer; display:inline-flex; align-items:center; gap:0.4rem; white-space:nowrap; background:#1f5b9e; color:white;" title="Nota clínica de hoy"><i class="fa-solid fa-notes-medical"></i> Nota</button>
+<div style="position:relative; display:inline-block;">
+<button onclick="sfMenuNota(event)" style="border:none; border-radius:10px; padding:0.55rem 0.9rem; font-weight:800; font-size:0.85rem; cursor:pointer; display:inline-flex; align-items:center; gap:0.4rem; white-space:nowrap; background:#1f5b9e; color:white;" title="Nota clínica de hoy"><i class="fa-solid fa-notes-medical"></i> Nota <i class="fa-solid fa-caret-down" style="font-size:0.75rem;"></i></button>
+<div id="sfNotaMenu" style="display:none; position:absolute; top:calc(100% + 4px); left:0; z-index:50; background:white; border:1px solid var(--border); border-radius:10px; box-shadow:0 8px 24px rgba(0,0,0,0.15); overflow:hidden; min-width:200px;">
+<div onclick="sfIrNota('s-nota-gen')" class="sf-nota-op" style="padding:0.6rem 0.9rem; cursor:pointer; display:flex; align-items:center; gap:0.6rem; font-size:0.86rem; font-weight:600;"><i class="fa-solid fa-stethoscope" style="color:#1f5b9e; width:18px;"></i> Odontología general</div>
+<div onclick="sfIrNota('s-nota-orto')" class="sf-nota-op" style="padding:0.6rem 0.9rem; cursor:pointer; display:flex; align-items:center; gap:0.6rem; font-size:0.86rem; font-weight:600; border-top:1px solid #f1f5f9;"><i class="fa-solid fa-tooth" style="color:#0e7490; width:18px;"></i> Ortodoncia</div>
+<div onclick="sfIrNota('s-nota-endo')" class="sf-nota-op" style="padding:0.6rem 0.9rem; cursor:pointer; display:flex; align-items:center; gap:0.6rem; font-size:0.86rem; font-weight:600; border-top:1px solid #f1f5f9;"><i class="fa-solid fa-diagram-project" style="color:#7c3aed; width:18px;"></i> Endodoncia</div>
+<div onclick="sfIrNota('s-nota-protesis')" class="sf-nota-op" style="padding:0.6rem 0.9rem; cursor:pointer; display:flex; align-items:center; gap:0.6rem; font-size:0.86rem; font-weight:600; border-top:1px solid #f1f5f9;"><i class="fa-solid fa-crown" style="color:#b45309; width:18px;"></i> Prótesis fija</div>
+<div onclick="sfIrNota('s-nota-removible')" class="sf-nota-op" style="padding:0.6rem 0.9rem; cursor:pointer; display:flex; align-items:center; gap:0.6rem; font-size:0.86rem; font-weight:600; border-top:1px solid #f1f5f9;"><i class="fa-solid fa-teeth" style="color:#0e7490; width:18px;"></i> Prótesis removible</div>
+</div>
+</div>
 <button onclick="sfQuickGo('s-receta')" style="border:none; border-radius:10px; padding:0.55rem 0.9rem; font-weight:800; font-size:0.85rem; cursor:pointer; display:inline-flex; align-items:center; gap:0.4rem; white-space:nowrap; background:#7c3aed; color:white;" title="Emitir receta"><i class="fa-solid fa-prescription"></i> Receta</button>
 <button onclick="sfQuickGo('s-odontograma')" style="border:none; border-radius:10px; padding:0.55rem 0.9rem; font-weight:800; font-size:0.85rem; cursor:pointer; display:inline-flex; align-items:center; gap:0.4rem; white-space:nowrap; background:#0891b2; color:white;" title="Odontograma"><i class="fa-solid fa-teeth-open"></i> Odontograma</button>
 <button onclick="sfQuickGo('s-tratamientos')" style="border:none; border-radius:10px; padding:0.55rem 0.9rem; font-weight:800; font-size:0.85rem; cursor:pointer; display:inline-flex; align-items:center; gap:0.4rem; white-space:nowrap; background:#059669; color:white;" title="Plan de tratamiento"><i class="fa-solid fa-list-check"></i> Plan</button>
@@ -864,9 +874,10 @@ window._pdfReady=true;
     <button class="btn btn-outline" type="button" onclick="cefPanelTrazado()" style="width:100%; font-size:0.8rem; padding:0.55rem; margin-top:0.5rem; border-color:#0e7490; color:#0e7490; font-weight:700;"><i class="fa-solid fa-image"></i> Guardar / compartir trazado</button>
     <div class="cef-sec-title" style="margin-top:1.2rem;"><i class="fa-solid fa-chart-simple"></i> Mediciones</div>
     <div id="cefMeasurementsList"></div>
-    <div id="cefAlertaQuir" style="margin-top:0.8rem;"></div>
   </aside>
 </div>
+<!-- Recomendación de tratamiento: a todo lo ancho, DEBAJO de la radiografía -->
+<div id="cefAlertaQuir" style="margin-top:1rem;"></div>
 </div>
 
 <div class="app-section" id="s-recopilador">
@@ -1271,7 +1282,7 @@ window._pdfReady=true;
 </div>
 <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
 <button class="btn btn-success" onclick="savePatient()" style="padding:0.6rem 1.1rem; font-size:0.9rem; font-weight:800; white-space:nowrap;"><i class="fa-solid fa-floppy-disk"></i> Guardar</button>
-<button class="btn btn-outline" onclick="imprimirHistoriaClinica()" style="padding:0.6rem 1.1rem; font-size:0.9rem; font-weight:800; border-color:#7c3aed; color:#6d28d9; white-space:nowrap;"><i class="fa-solid fa-print"></i> Imprimir</button>
+<button class="btn btn-outline" onclick="imprimirHistoriaClinica()" style="padding:0.6rem 1.1rem; font-size:0.9rem; font-weight:800; border-color:#1f5b9e; color:#1f5b9e; white-space:nowrap;"><i class="fa-solid fa-print"></i> Imprimir</button>
 </div>
 </div>
 <!-- ============ HISTORIAL MÉDICO ============ -->
@@ -1286,6 +1297,12 @@ window._pdfReady=true;
 <div><span style="font-weight:900;">Atención clínica:</span><br><span id="medAlertTxt" style="font-weight:600;"></span></div>
 </div>
 
+<!-- Ocupación -->
+<div class="input-group" style="margin-bottom:1.2rem;">
+<label><i class="fa-solid fa-briefcase"></i> Ocupación</label>
+<input class="input-field" id="hcOcupacion" oninput="triggerUnsavedWarning()" placeholder="Ej. Estudiante, docente, comerciante..." type="text"/>
+</div>
+
 <!-- Motivo de consulta y padecimiento actual -->
 <div style="background:#f0fdf4; border:1px solid #bbf7d0; border-radius:10px; padding:1.2rem; margin-bottom:1.2rem;">
 <label style="font-size:0.95rem; font-weight:800; color:#15803d; display:block; margin-bottom:0.7rem;"><i class="fa-solid fa-comment-medical"></i> Motivo de consulta y padecimiento actual</label>
@@ -1296,30 +1313,46 @@ window._pdfReady=true;
 <div style="background:#fef9c3; border:1px solid #fde68a; border-radius:10px; padding:1.2rem; margin-bottom:1.2rem;">
 <label style="font-size:0.95rem; font-weight:800; color:#a16207; display:block; margin-bottom:0.9rem;"><i class="fa-solid fa-people-roof"></i> Antecedentes heredofamiliares <span style="font-weight:400; font-size:0.8rem;">(enfermedades en la familia)</span></label>
 <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:0.6rem 1rem;">
-<label class="med-chk"><input id="hfDiabetes" type="checkbox" onchange="triggerUnsavedWarning();"/> Diabetes</label>
-<label class="med-chk"><input id="hfHipertension" type="checkbox" onchange="triggerUnsavedWarning();"/> Hipertensión</label>
-<label class="med-chk"><input id="hfCardio" type="checkbox" onchange="triggerUnsavedWarning();"/> Cardiopatías</label>
-<label class="med-chk"><input id="hfCancer" type="checkbox" onchange="triggerUnsavedWarning();"/> Cáncer</label>
-<label class="med-chk"><input id="hfTiroides" type="checkbox" onchange="triggerUnsavedWarning();"/> Tiroides</label>
-<label class="med-chk"><input id="hfAlergias" type="checkbox" onchange="triggerUnsavedWarning();"/> Alergias</label>
-<label class="med-chk"><input id="hfPsiquiatricos" type="checkbox" onchange="triggerUnsavedWarning();"/> Psiquiátricos</label>
+<label class="med-chk"><input id="hfDiabetes" type="checkbox" onchange="hfRenderWho(); triggerUnsavedWarning();"/> Diabetes</label>
+<label class="med-chk"><input id="hfHipertension" type="checkbox" onchange="hfRenderWho(); triggerUnsavedWarning();"/> Hipertensión</label>
+<label class="med-chk"><input id="hfCardio" type="checkbox" onchange="hfRenderWho(); triggerUnsavedWarning();"/> Cardiopatías</label>
+<label class="med-chk"><input id="hfCancer" type="checkbox" onchange="hfRenderWho(); triggerUnsavedWarning();"/> Cáncer</label>
+<label class="med-chk"><input id="hfTiroides" type="checkbox" onchange="hfRenderWho(); triggerUnsavedWarning();"/> Tiroides</label>
+<label class="med-chk"><input id="hfAlergias" type="checkbox" onchange="hfRenderWho(); triggerUnsavedWarning();"/> Alergias</label>
+<label class="med-chk"><input id="hfPsiquiatricos" type="checkbox" onchange="hfRenderWho(); triggerUnsavedWarning();"/> Psiquiátricos</label>
 </div>
+<div id="hfWhoContainer" style="margin-top:0.8rem;"></div>
 <div style="display:flex; align-items:center; gap:0.5rem; margin-top:0.9rem;">
 <label style="font-size:0.9rem; font-weight:700; color:#a16207; white-space:nowrap;"><i class="fa-solid fa-circle-plus"></i> Otros:</label>
 <input class="input-field" id="hfOtros" oninput="triggerUnsavedWarning()" placeholder="Otros antecedentes familiares" style="border-color:#fde68a; padding:0.4rem; min-height:auto;" type="text"/>
 </div>
 </div>
 
-<!-- Antecedentes personales no patológicos (hábitos) -->
+<!-- Hábitos (incluye hábitos orales relevantes en ortodoncia) -->
 <div style="background:#eff6ff; border:1px solid #bfdbfe; border-radius:10px; padding:1.2rem; margin-bottom:1.2rem;">
-<label style="font-size:0.95rem; font-weight:800; color:#1d4ed8; display:block; margin-bottom:0.9rem;"><i class="fa-solid fa-heart"></i> Antecedentes personales no patológicos (hábitos)</label>
+<label style="font-size:0.95rem; font-weight:800; color:#1d4ed8; display:block; margin-bottom:0.9rem;"><i class="fa-solid fa-heart"></i> Hábitos</label>
 <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:0.6rem 1rem;">
 <label class="med-chk"><input id="hbTabaco" type="checkbox" onchange="checkMedAlerts(); triggerUnsavedWarning();"/> Tabaquismo</label>
 <label class="med-chk"><input id="hbAlcohol" type="checkbox" onchange="triggerUnsavedWarning();"/> Alcohol</label>
 <label class="med-chk"><input id="hbDrogas" type="checkbox" onchange="triggerUnsavedWarning();"/> Otras sustancias</label>
 <label class="med-chk"><input id="hbBruxismo" type="checkbox" onchange="triggerUnsavedWarning();"/> Bruxismo (rechinar)</label>
 </div>
-<div class="grid-2" style="margin-top:0.9rem; gap:0.7rem;">
+<div style="font-size:0.82rem; font-weight:800; color:#1d4ed8; margin:1rem 0 0.5rem;"><i class="fa-solid fa-tooth"></i> Hábitos orales</div>
+<div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:0.6rem 1rem;">
+<label class="med-chk"><input id="hbDeglucion" type="checkbox" onchange="triggerUnsavedWarning();"/> Deglución atípica</label>
+<label class="med-chk"><input id="hbApnea" type="checkbox" onchange="triggerUnsavedWarning();"/> Ronquido / apnea</label>
+<label class="med-chk"><input id="hbOnicofagia" type="checkbox" onchange="triggerUnsavedWarning();"/> Onicofagia (morder uñas)</label>
+<label class="med-chk"><input id="hbLabios" type="checkbox" onchange="triggerUnsavedWarning();"/> Morder labios</label>
+<label class="med-chk"><input id="hbChuparDedo" type="checkbox" onchange="triggerUnsavedWarning();"/> Succión digital (chupar dedo)</label>
+<label class="med-chk"><input id="hbMorderObj" type="checkbox" onchange="triggerUnsavedWarning();"/> Morder objetos extraños</label>
+<label class="med-chk"><input id="hbRespBucal" type="checkbox" onchange="triggerUnsavedWarning();"/> Respiración bucal</label>
+</div>
+</div>
+
+<!-- Higiene bucal -->
+<div style="background:#f0fdfa; border:1px solid #99f6e4; border-radius:10px; padding:1.2rem; margin-bottom:1.2rem;">
+<label style="font-size:0.95rem; font-weight:800; color:#0e7490; display:block; margin-bottom:0.9rem;"><i class="fa-solid fa-toothbrush"></i> Higiene bucal</label>
+<div class="grid-2" style="gap:0.7rem;">
 <div class="input-group" style="margin:0;">
 <label style="font-size:0.82rem;"><i class="fa-solid fa-tooth"></i> Frecuencia de cepillado</label>
 <select class="input-select" id="hbCepillado" onchange="triggerUnsavedWarning()" style="padding:0.5rem;">
@@ -1331,9 +1364,18 @@ window._pdfReady=true;
 </select>
 </div>
 <div class="input-group" style="margin:0;">
-<label style="font-size:0.82rem;"><i class="fa-solid fa-circle-plus"></i> Otros hábitos</label>
-<input class="input-field" id="hbOtros" oninput="triggerUnsavedWarning()" placeholder="Uso de hilo dental, onicofagia, etc." style="padding:0.5rem;" type="text"/>
+<label style="font-size:0.82rem;"><i class="fa-solid fa-tooth"></i> Uso de hilo dental</label>
+<select class="input-select" id="hbHilo" onchange="triggerUnsavedWarning()" style="padding:0.5rem;">
+<option value="">No especificado</option>
+<option value="Diario">Diario</option>
+<option value="Ocasional">Ocasional</option>
+<option value="No usa">No usa</option>
+</select>
 </div>
+</div>
+<div class="input-group" style="margin:0.7rem 0 0;">
+<label style="font-size:0.82rem;"><i class="fa-solid fa-circle-plus"></i> Otras observaciones de higiene</label>
+<input class="input-field" id="hbOtros" oninput="triggerUnsavedWarning()" placeholder="Enjuague, técnica, aparatología, etc." style="padding:0.5rem;" type="text"/>
 </div>
 </div>
 
@@ -1388,7 +1430,7 @@ window._pdfReady=true;
 <div id="rxSearchResults" style="margin-top:0.4rem;"></div>
 <div id="rxPatientList" style="margin-top:0.8rem; display:flex; flex-wrap:wrap; gap:0.5rem;"></div>
 </div>
-<button class="btn btn-outline" onclick="imprimirHistoriaClinica()" style="width:100%; margin-top:0.3rem; padding:0.9rem; border-color:#7c3aed; color:#6d28d9; font-weight:800;"><i class="fa-solid fa-file-medical"></i> Imprimir Historia Clínica General</button>
+<button class="btn btn-outline" onclick="imprimirHistoriaClinica()" style="width:100%; margin-top:0.3rem; padding:0.9rem; border-color:#1f5b9e; color:#1f5b9e; font-weight:800;"><i class="fa-solid fa-file-medical"></i> Imprimir Historia Clínica General</button>
 <button class="btn btn-success" onclick="firmarHistoriaClinica()" style="width:100%; margin-top:0.5rem; padding:0.9rem; font-weight:800;"><i class="fa-solid fa-signature"></i> Firmar y generar Historia Clínica</button>
 </div>
 </div>
@@ -1435,7 +1477,8 @@ window._pdfReady=true;
 <div style="display:flex; gap:1rem;">
 <div class="input-group" style="margin:0; flex:2;">
 <label><i class="fa-solid fa-calendar-day"></i> Fecha de Nacimiento</label>
-<input class="input-field" id="pBirth" onchange="calcPatientAge(); triggerUnsavedWarning();" type="date"/>
+<input class="input-field" id="pBirth" oninput="sfBirthMask(this); calcPatientAge(); triggerUnsavedWarning();" type="text" inputmode="numeric" maxlength="10" placeholder="DD/MM/AAAA" autocomplete="off"/>
+<div id="pBirthConfirm" style="font-size:0.78rem; margin-top:3px; min-height:16px; color:#059669; font-weight:600;"></div>
 </div>
 <div class="input-group" style="margin:0; flex:1;">
 <label><i class="fa-solid fa-cake-candles"></i> Edad</label>
@@ -1454,7 +1497,12 @@ window._pdfReady=true;
 </div>
 <div class="input-group" style="margin:0;">
 <label><i class="fa-solid fa-location-dot"></i> Dirección Física</label>
-<input class="input-field" id="pAddress" oninput="triggerUnsavedWarning()" placeholder="Calle, Número, Colonia..." type="text"/>
+<div style="display:grid; grid-template-columns:1fr 1fr; gap:0.5rem;">
+<input class="input-field" id="pAddrCalle" oninput="sfSyncDireccion(); triggerUnsavedWarning()" placeholder="Calle y número" type="text" style="grid-column:1 / -1;"/>
+<input class="input-field" id="pAddrCol" oninput="sfSyncDireccion(); triggerUnsavedWarning()" placeholder="Colonia / Fraccionamiento" type="text"/>
+<input class="input-field" id="pAddrCiudad" oninput="sfSyncDireccion(); triggerUnsavedWarning()" placeholder="Ciudad / C.P." type="text"/>
+<input type="hidden" id="pAddress"/>
+</div>
 </div>
 </div>
 <div class="input-group hidden" id="divGuardian" style="margin-bottom:1.5rem;">
@@ -3642,6 +3690,25 @@ No hay forma de recuperarlo: el cifrado es real y ni nosotros podemos abrirlo. G
     
     // --- ACCESO RÁPIDO DEL PACIENTE ---
     // Salta a la acción sin recorrer el menú; si hay ancla, baja hasta ella.
+    // Menú desplegable del botón Nota: elige el tipo antes de entrar.
+    function sfMenuNota(ev){
+        if(ev){ ev.stopPropagation(); }
+        const m = document.getElementById('sfNotaMenu');
+        if(!m) return;
+        const abierto = m.style.display === 'block';
+        m.style.display = abierto ? 'none' : 'block';
+        if(!abierto){
+            setTimeout(() => {
+                const cerrar = () => { m.style.display='none'; document.removeEventListener('click', cerrar); };
+                document.addEventListener('click', cerrar);
+            }, 0);
+        }
+    }
+    function sfIrNota(sec){
+        const m = document.getElementById('sfNotaMenu'); if(m) m.style.display='none';
+        sfQuickGo(sec);
+    }
+
     function sfQuickGo(sec, ancla){
         try {
             const nav = document.querySelector('#sidebar [onclick*="' + sec + '"]');
@@ -4854,8 +4921,67 @@ db = {
     function openWaPatient(pid) { const p = db.pats[pid]; if(!p || !p.phone) return alert("Paciente sin teléfono."); window.open(`https://wa.me/52${p.phone.replace(/\D/g,'')}?text=${encodeURIComponent(`Hola ${p.name}, excelente día 👋. Te escribimos de ${db.cfg.cli} para confirmar tu cita programada.`)}`, '_blank'); }
 
     // --- CUMPLEAÑOS Y EDAD AUTOMÁTICA ---
+    // Fecha de nacimiento escribible: DD/MM/AAAA en pantalla, ISO (AAAA-MM-DD) al guardar.
+    const SF_MESES = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+    function sfBirthMask(el){
+        let v = el.value.replace(/[^0-9]/g,'').slice(0,8);
+        if(v.length >= 5) v = v.slice(0,2) + '/' + v.slice(2,4) + '/' + v.slice(4);
+        else if(v.length >= 3) v = v.slice(0,2) + '/' + v.slice(2);
+        el.value = v;
+        sfBirthConfirm(v);
+    }
+    function sfBirthConfirm(v){
+        const box = document.getElementById('pBirthConfirm'); if(!box) return;
+        const m = (v||'').match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+        if(!m){ box.textContent = ''; return; }
+        const dia = parseInt(m[1],10), mes = parseInt(m[2],10), anio = parseInt(m[3],10);
+        if(mes < 1 || mes > 12 || dia < 1 || dia > 31){
+            box.style.color = '#dc2626';
+            box.textContent = '\u26a0\ufe0f Revisa la fecha (dia o mes fuera de rango).';
+            return;
+        }
+        box.style.color = '#059669';
+        box.textContent = '\u2713 ' + dia + ' de ' + SF_MESES[mes-1] + ' de ' + anio;
+    }
+    function sfBirthToISO(str){
+        if(!str) return '';
+        str = str.trim();
+        // Si ya viene en ISO (compatibilidad con datos viejos), se respeta.
+        if(/^\d{4}-\d{2}-\d{2}$/.test(str)) return str;
+        const m = str.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+        if(!m) return '';
+        const d = m[1].padStart(2,'0'), mo = m[2].padStart(2,'0'), y = m[3];
+        return y + '-' + mo + '-' + d;
+    }
+    function sfISOToBirth(iso){
+        if(!iso) return '';
+        const m = String(iso).match(/^(\d{4})-(\d{2})-(\d{2})$/);
+        if(m) return m[3] + '/' + m[2] + '/' + m[1];
+        // Si ya viene DD/MM/AAAA (por si acaso), se deja igual.
+        return iso;
+    }
+
+    // Dirección en campos separados que se combinan en un solo texto (pAddress),
+    // para que recetas y PDFs sigan recibiendo la dirección completa sin cambios.
+    function sfSyncDireccion(){
+        const calle = $('pAddrCalle') ? $('pAddrCalle').value.trim() : '';
+        const col = $('pAddrCol') ? $('pAddrCol').value.trim() : '';
+        const ciudad = $('pAddrCiudad') ? $('pAddrCiudad').value.trim() : '';
+        const full = [calle, col, ciudad].filter(Boolean).join(', ');
+        if($('pAddress')) $('pAddress').value = full;
+    }
+    // Al cargar un paciente: si tiene los campos separados los usa; si no, pone
+    // la dirección vieja (texto completo) en el primer campo, sin perder nada.
+    function sfCargarDireccion(p){
+        const a = p.addr || {};
+        if($('pAddrCalle')) $('pAddrCalle').value = a.calle || (a.calle===undefined && !a.col && !a.ciudad ? (p.address||'') : '');
+        if($('pAddrCol')) $('pAddrCol').value = a.col || '';
+        if($('pAddrCiudad')) $('pAddrCiudad').value = a.ciudad || '';
+        sfSyncDireccion();
+    }
+
     function calcPatientAge() {
-        const b = $('pBirth').value; if(!b) { $('pAge').value = ''; if($('pCakeIcon')) $('pCakeIcon').style.display = 'none'; return; }
+        const b = sfBirthToISO($('pBirth').value); if(!b) { $('pAge').value = ''; if($('pCakeIcon')) $('pCakeIcon').style.display = 'none'; return; }
         const t = new Date(), bd = new Date(b); let a = t.getFullYear() - bd.getFullYear();
         if (t.getMonth() - bd.getMonth() < 0 || (t.getMonth() === bd.getMonth() && t.getDate() < bd.getDate())) a--;
         $('pAge').value = a > 0 ? a : 0; checkAge(); 
@@ -6183,6 +6309,7 @@ db = {
             mensaje = `Discrepancia esquelética leve (ANB ${anb.toFixed(1)}°). Dentro de los rangos donde el <b>camuflaje ortodóncico</b> suele ser una opción realista, si el patrón facial es aceptable y la compensación dentaria es viable.`;
         }
 
+        window._cefUltimoTitulo = titulo; window._cefUltimoMensaje = mensaje;
         const usarAvatar = (typeof db!=='undefined' && db.cfg && db.cfg.daniEn!==false);
         const avatarImg = nivel==='quirurgico' ? AVATAR_ALERTA : (nivel==='camuflaje' ? AVATAR_EXITO : AVATAR_PENSANDO);
         cont.innerHTML = `
@@ -6192,6 +6319,12 @@ db = {
                     <div style="font-weight:800; color:${color}; margin-bottom:2px;"><i class="fa-solid fa-triangle-exclamation"></i> ${titulo}</div>
                     ${mensaje}
                     <div style="font-size:0.72rem; color:#94a3b8; margin-top:5px;">Orientación basada en ANB e inclinación del incisivo inferior. La decisión definitiva requiere examen clínico, perfil de tejidos blandos, evaluación de vías aéreas e imagenología 3D. No sustituye el criterio profesional.</div>
+                    <div style="display:flex; gap:0.5rem; margin-top:0.8rem; flex-wrap:wrap;">
+                        <button class="btn btn-outline" onclick="cefVerVersion('clinico', this)" style="font-size:0.75rem; padding:0.35rem 0.8rem; border-color:${color}; color:${color}; font-weight:700;"><i class="fa-solid fa-user-doctor"></i> Versión clínica</button>
+                        <button class="btn btn-outline" onclick="cefVerVersion('px', this)" style="font-size:0.75rem; padding:0.35rem 0.8rem; border-color:#25D366; color:#128C7E; font-weight:700;"><i class="fa-brands fa-whatsapp"></i> Versión para el paciente</button>
+                    </div>
+                    <div id="cefVersionTexto" style="display:none; margin-top:0.7rem; background:white; border:1px solid var(--border); border-radius:8px; padding:0.8rem; font-size:0.83rem; color:#334155; line-height:1.55; white-space:pre-wrap;"></div>
+                    <div id="cefVersionCopiar" style="display:none; margin-top:0.5rem;"><button class="btn" onclick="cefCopiarVersion()" style="font-size:0.75rem; padding:0.35rem 0.8rem; background:#1f5b9e; color:white; font-weight:700;"><i class="fa-solid fa-copy"></i> Copiar texto</button></div>
                 </div>
             </div>`;
     }
@@ -6399,6 +6532,54 @@ db = {
     // Genera una versión amable, en lenguaje sencillo, para enviar al paciente por WhatsApp
     // Paso previo: pregunta al clínico lo que la cefalometría no puede saber
     // (apiñamiento y bracket a indicar) y si este es el último mensaje.
+    // Muestra, debajo de la radiografía, la recomendación en dos versiones:
+    // clínica (técnica, para el doctor) o amable (para el paciente), lista para copiar.
+    function cefVerVersion(modo, btn){
+        try {
+            const cont = $('cefVersionTexto');
+            const copiarBox = $('cefVersionCopiar');
+            if(!cont) return;
+            let texto = '';
+            if(modo === 'clinico'){
+                const m = cefState._lastM || {};
+                const partes = [];
+                if(m.ANB!=null) partes.push('ANB: ' + m.ANB.toFixed(1) + '° (Clase ' + (m.ANB<0?'III':(m.ANB>4?'II':'I')) + ' esquelética)');
+                if(m.SNA!=null) partes.push('SNA: ' + m.SNA.toFixed(1) + '°');
+                if(m.SNB!=null) partes.push('SNB: ' + m.SNB.toFixed(1) + '°');
+                if(m.InclIncInf!=null) partes.push('Incisivo inferior: ' + m.InclIncInf.toFixed(1) + '°');
+                if(m.VERT!=null) partes.push('Patrón vertical: ' + (m.VERT<=-0.5?'dolicofacial':(m.VERT>=0.5?'braquifacial':'mesofacial')));
+                texto = (window._cefUltimoTitulo || 'Recomendación') + '\n\n'
+                      + (window._cefUltimoMensaje || '').replace(/<[^>]+>/g,'') + '\n\n'
+                      + (partes.length ? 'Mediciones clave:\n• ' + partes.join('\n• ') : '');
+                copiarBox.style.display = 'block';
+            } else {
+                // Reutiliza el generador del mensaje amable, sin cierre ni firma.
+                if(typeof cefDxPacienteTexto === 'function'){
+                    try { texto = cefDxPacienteTexto({ ultimo:false, _soloTexto:true }) || ''; } catch(e){ texto = ''; }
+                }
+                if(!texto){
+                    // Fallback: abre el flujo con preguntas (apiñamiento/bracket)
+                    cefDxPaciente();
+                    return;
+                }
+                copiarBox.style.display = 'block';
+            }
+            cont.textContent = texto;
+            cont.style.display = 'block';
+            window._cefTextoCopiar = texto;
+        } catch(e){ console.warn('cefVerVersion', e); }
+    }
+    function cefCopiarVersion(){
+        const t = window._cefTextoCopiar || '';
+        if(!t) return;
+        try {
+            navigator.clipboard.writeText(t).then(
+                () => { if(typeof daniSpeak==='function') daniSpeak('📋 Texto copiado. Ya puedes pegarlo donde lo necesites.', 4000, 'info'); },
+                () => alert('Copia manualmente el texto seleccionándolo.')
+            );
+        } catch(e){ alert('Copia manualmente el texto.'); }
+    }
+
     function cefDxPaciente() {
         const { body } = sfOverlay('<i class="fa-brands fa-whatsapp"></i> Antes de escribir el mensaje', '#128C7E');
         const ult = localStorage.getItem('sf_dx_ultimo') !== '0';
@@ -6462,6 +6643,18 @@ db = {
         else if(op.apin === 'moderado') puntos.push('Tienes un apiñamiento moderado: tus dientes no cuentan con todo el espacio que necesitan. El tratamiento se encargará de generar ese espacio y alinearlos.');
         else if(op.apin === 'severo') puntos.push('El apiñamiento es marcado, así que tu plan será más detallado para crear el espacio necesario y alinear correctamente tus dientes.');
 
+        // Enfoque del tratamiento (camuflaje / cirugía), traducido a lenguaje de paciente.
+        // Usa el mismo criterio que la recomendación clínica para que coincidan.
+        if(m.ANB != null){
+            const anb = m.ANB;
+            if(anb <= -4 || anb >= 9)
+                puntos.push('Por las proporciones de tus huesos, tu caso puede necesitar un enfoque más completo (a veces con apoyo de cirugía) para lograr el mejor resultado. En tu cita lo valoramos con calma y te explicamos las opciones.');
+            else if((anb > -4 && anb < 0) || (anb >= 6 && anb < 9))
+                puntos.push('Tu caso está en un punto donde tenemos varias rutas posibles; en la valoración elegimos juntos la que mejor se ajuste a ti.');
+            else
+                puntos.push('La buena noticia es que tu caso se puede resolver alineando y acomodando tus dientes (sin necesidad de cirugía), buscando una sonrisa equilibrada.');
+        }
+
         const saludo = nombre ? `¡Hola, ${nombre}! 😊` : '¡Hola! 😊';
         let cuerpo = saludo + '\n\nGracias por tu confianza. Revisé con detalle tu estudio de ortodoncia y te comparto, en palabras sencillas, lo que encontré:\n\n';
         if(puntos.length) cuerpo += puntos.map(x=>'• '+x).join('\n');
@@ -6472,6 +6665,9 @@ db = {
             texto += '\n\nCon esta información diseñaremos un plan personalizado para ti. Cualquier duda, con gusto te explico en tu próxima cita. 🦷✨';
             texto += (activeD && activeD.name) ? `\n\n${activeD.name}${activeD.spec?' · '+activeD.spec:''}\n${clinica}` : `\n\n${clinica}`;
         }
+
+        // Si solo se pide el texto (para mostrarlo inline), devolverlo sin abrir modal.
+        if(op._soloTexto) return texto;
 
         // Modal con el texto editable + opciones
         let modal = $('cefDxPacModal');
@@ -11020,7 +11216,7 @@ ${patientText}`;
     // --- GESTIÓN DE PACIENTES ---
     function checkAge() { const a=$('pAge').value; if($('divGuardian')) $('divGuardian').classList.toggle('hidden', a===''||a>=18); }
     
-    function newPatient() { db.curr=null; saveDB(); $('pSelect').value=''; $('lblId').innerHTML='<i class="fa-solid fa-address-card"></i> Nuevo Px'; ['pName','pBirth','pAge','pGuardian','pPhone','pEmail','pAddress','pSum','pAlert','pBrackets'].forEach(id=>{if($(id))$(id).value='';}); ['pRetra','pFactReq','pHasAl','pAlPen','pAlAin','pAlLat','pAlSulfa'].forEach(id=>{if($(id))$(id).checked=false;}); if($('pAlOther')) $('pAlOther').value=''; if($('pCostoTotal'))$('pCostoTotal').value='';if($('pNotaPago'))$('pNotaPago').value=''; if($('listaAbonos'))$('listaAbonos').innerHTML=''; recalcSaldo(); clearMedHistory(); if($('pCakeIcon')) $('pCakeIcon').style.display='none'; autoLoadWaDate(); checkAge(); toggleAllergies(); loadTreats({}); renderOdonto(); renderTimeline(); setAlertLabel(null); if($('txtReceta')) $('txtReceta').value=''; if($('chkAntibiotico')) $('chkAntibiotico').checked=false; loadFacturacion({}); renderMedsList(); try{ sfQuickBar(); }catch(e){} try{ sfLimpiarImagenesPaciente(); sfRefrescarVistasPaciente(); }catch(e){} }
+    function newPatient() { db.curr=null; saveDB(); $('pSelect').value=''; $('lblId').innerHTML='<i class="fa-solid fa-address-card"></i> Nuevo Px'; ['pName','pBirth','pAge','pGuardian','pPhone','pEmail','pAddress','pAddrCalle','pAddrCol','pAddrCiudad','pSum','pAlert','pBrackets'].forEach(id=>{if($(id))$(id).value='';}); ['pRetra','pFactReq','pHasAl','pAlPen','pAlAin','pAlLat','pAlSulfa'].forEach(id=>{if($(id))$(id).checked=false;}); if($('pAlOther')) $('pAlOther').value=''; if($('pCostoTotal'))$('pCostoTotal').value='';if($('pNotaPago'))$('pNotaPago').value=''; if($('listaAbonos'))$('listaAbonos').innerHTML=''; recalcSaldo(); clearMedHistory(); if($('pCakeIcon')) $('pCakeIcon').style.display='none'; autoLoadWaDate(); checkAge(); toggleAllergies(); loadTreats({}); renderOdonto(); renderTimeline(); setAlertLabel(null); if($('txtReceta')) $('txtReceta').value=''; if($('chkAntibiotico')) $('chkAntibiotico').checked=false; loadFacturacion({}); renderMedsList(); try{ sfQuickBar(); }catch(e){} try{ sfLimpiarImagenesPaciente(); sfRefrescarVistasPaciente(); }catch(e){} }
     
     function savePatientAlert() { if(!db.curr) return; db.pats[db.curr].alert=$('pAlert').value; db.pats[db.curr].alertDate=new Date().toISOString().split('T')[0]; saveDB(); setAlertLabel(db.pats[db.curr].alertDate); }
 
@@ -12782,9 +12978,9 @@ Reglas: español de México; terminología dental correcta; máximo 6 líneas; u
         if(typeof daniSpeak === 'function') daniSpeak('🧪 Paciente de Prueba creado con datos en todos los módulos: odontograma, alertas médicas, endodoncia, prótesis, Smile Plan, laboratorio dental y abonos. ¡Explóralos!', 9000, 'info');
     }
 
-    function savePatient() { const n=$('pName').value.trim(); if(!n) return alert("Falta Nombre."); const dId='Px-'+n; if(!db.curr){ db.curr='p_'+Date.now(); db.pats[db.curr]={id:db.curr,displayId:dId,notas:[],treats:{},alertDate:new Date().toISOString().split('T')[0],factReq:false,factData:{},odonto:{}}; }else db.pats[db.curr].displayId=dId; let p=db.pats[db.curr]; p.name=n;p.birth=$('pBirth').value;p.age=$('pAge').value;p.guardian=$('pGuardian').value;p.phone=$('pPhone').value;p.email=$('pEmail').value;p.address=$('pAddress').value;p.sum=$('pSum').value;p.brackets=$('pBrackets').value;p.retra=$('pRetra').checked;p.factReq=$('pFactReq').checked;p.hasAl=$('pHasAl').checked;p.alPen=$('pAlPen').checked;p.alAin=$('pAlAin').checked;p.alLat=$('pAlLat').checked;p.alSulfa=$('pAlSulfa').checked;p.alOther=$('pAlOther').value; p.costoTotal=$('pCostoTotal')?$('pCostoTotal').value:'';p.notaPago=$('pNotaPago')?$('pNotaPago').value:''; saveMedHistory(p); saveTreats(p); saveDB(); renderPatSelect(); $('lblId').innerHTML=`<i class="fa-solid fa-address-card"></i> ${dId}`; renderPendingTreatsMain(p); renderMedsList(); renderAgendaList(); if(typeof daniSpeak === 'function') daniSpeak("💾 Px guardado."); }
+    function savePatient() { const n=$('pName').value.trim(); if(!n) return alert("Falta Nombre."); const dId='Px-'+n; if(!db.curr){ db.curr='p_'+Date.now(); db.pats[db.curr]={id:db.curr,displayId:dId,notas:[],treats:{},alertDate:new Date().toISOString().split('T')[0],factReq:false,factData:{},odonto:{}}; }else db.pats[db.curr].displayId=dId; let p=db.pats[db.curr]; p.name=n;p.birth=sfBirthToISO($('pBirth').value);p.age=$('pAge').value;p.guardian=$('pGuardian').value;p.phone=$('pPhone').value;p.email=$('pEmail').value; sfSyncDireccion(); p.address=$('pAddress').value; p.addr={ calle:($('pAddrCalle')?$('pAddrCalle').value:''), col:($('pAddrCol')?$('pAddrCol').value:''), ciudad:($('pAddrCiudad')?$('pAddrCiudad').value:'') };p.sum=$('pSum').value;p.brackets=$('pBrackets').value;p.retra=$('pRetra').checked;p.factReq=$('pFactReq').checked;p.hasAl=$('pHasAl').checked;p.alPen=$('pAlPen').checked;p.alAin=$('pAlAin').checked;p.alLat=$('pAlLat').checked;p.alSulfa=$('pAlSulfa').checked;p.alOther=$('pAlOther').value; p.costoTotal=$('pCostoTotal')?$('pCostoTotal').value:'';p.notaPago=$('pNotaPago')?$('pNotaPago').value:''; saveMedHistory(p); saveTreats(p); saveDB(); renderPatSelect(); $('lblId').innerHTML=`<i class="fa-solid fa-address-card"></i> ${dId}`; renderPendingTreatsMain(p); renderMedsList(); renderAgendaList(); if(typeof daniSpeak === 'function') daniSpeak("💾 Px guardado."); }
     
-    function loadPatient() { const v=$('pSelect').value; if(!v) return newPatient(); db.curr=v; saveDB(); try{ sfLimpiarImagenesPaciente(); }catch(e){} const p=db.pats[v]; $('lblId').innerHTML=`<i class="fa-solid fa-address-card"></i> ${p.displayId}`; $('pName').value=p.name||'';$('pBirth').value=p.birth||'';$('pGuardian').value=p.guardian||'';$('pPhone').value=p.phone||'';$('pEmail').value=p.email||'';$('pAddress').value=p.address||'';$('pSum').value=p.sum||'';$('pAlert').value=p.alert||'';$('pBrackets').value=p.brackets||'';$('pRetra').checked=p.retra||false;$('pFactReq').checked=p.factReq||false;$('pHasAl').checked=p.hasAl||false;$('pAlPen').checked=p.alPen||false;$('pAlAin').checked=p.alAin||false;$('pAlLat').checked=p.alLat||false;$('pAlSulfa').checked=p.alSulfa||false;$('pAlOther').value=p.alOther||''; if($('pCostoTotal'))$('pCostoTotal').value=p.costoTotal||'';if($('pNotaPago'))$('pNotaPago').value=p.notaPago||''; renderAbonos(); loadMedHistory(p); calcPatientAge(); autoLoadWaDate(); toggleAllergies(); loadTreats(p); renderOdonto(); renderTimeline(); setAlertLabel(p.alertDate); if($('txtReceta'))$('txtReceta').value=''; if($('chkAntibiotico'))$('chkAntibiotico').checked=false; loadFacturacion(p); renderMedsList(); openSection('s-perfil', document.querySelector('.nav-item.active')); autoAbrirAbonosSiDeuda(); window._resenaSug=false; try{ checkResenaSugerencia(); }catch(e){} try{ sfQuickBar(); }catch(e){} try{ sfRefrescarVistasPaciente(); }catch(e){} }
+    function loadPatient() { const v=$('pSelect').value; if(!v) return newPatient(); db.curr=v; saveDB(); try{ sfLimpiarImagenesPaciente(); }catch(e){} const p=db.pats[v]; $('lblId').innerHTML=`<i class="fa-solid fa-address-card"></i> ${p.displayId}`; $('pName').value=p.name||'';$('pBirth').value=sfISOToBirth(p.birth||'');try{sfBirthConfirm($('pBirth').value);}catch(e){}$('pGuardian').value=p.guardian||'';$('pPhone').value=p.phone||'';$('pEmail').value=p.email||''; sfCargarDireccion(p);$('pSum').value=p.sum||'';$('pAlert').value=p.alert||'';$('pBrackets').value=p.brackets||'';$('pRetra').checked=p.retra||false;$('pFactReq').checked=p.factReq||false;$('pHasAl').checked=p.hasAl||false;$('pAlPen').checked=p.alPen||false;$('pAlAin').checked=p.alAin||false;$('pAlLat').checked=p.alLat||false;$('pAlSulfa').checked=p.alSulfa||false;$('pAlOther').value=p.alOther||''; if($('pCostoTotal'))$('pCostoTotal').value=p.costoTotal||'';if($('pNotaPago'))$('pNotaPago').value=p.notaPago||''; renderAbonos(); loadMedHistory(p); calcPatientAge(); autoLoadWaDate(); toggleAllergies(); loadTreats(p); renderOdonto(); renderTimeline(); setAlertLabel(p.alertDate); if($('txtReceta'))$('txtReceta').value=''; if($('chkAntibiotico'))$('chkAntibiotico').checked=false; loadFacturacion(p); renderMedsList(); openSection('s-perfil', document.querySelector('.nav-item.active')); autoAbrirAbonosSiDeuda(); window._resenaSug=false; try{ checkResenaSugerencia(); }catch(e){} try{ sfQuickBar(); }catch(e){} try{ sfRefrescarVistasPaciente(); }catch(e){} }
 
     function autoAbrirAbonosSiDeuda() {
         try {
@@ -13221,7 +13417,7 @@ Reglas: español de México; terminología dental correcta; máximo 6 líneas; u
     const MED_DISEASE_IDS = ['mdHipertension','mdDiabetes','mdTiroides','mdCardio','mdCoagulacion','mdAsma','mdRenal','mdHepatico','mdEpilepsia','mdEmbarazo','mdInmuno','mdCancer','mdOsteoporosis','mdArtritis','mdGastrico'];
     const MED_RX_IDS = ['rxAnticoag','rxAntihiper','rxDiabetes','rxTiroides','rxBifosfonatos','rxCorticoides','rxAntidepre','rxAnticoncep','rxAspirina'];
     const HC_HF_IDS = ['hfDiabetes','hfHipertension','hfCardio','hfCancer','hfTiroides','hfAlergias','hfPsiquiatricos'];
-    const HC_HB_IDS = ['hbTabaco','hbAlcohol','hbDrogas','hbBruxismo'];
+    const HC_HB_IDS = ['hbTabaco','hbAlcohol','hbDrogas','hbBruxismo','hbDeglucion','hbApnea','hbOnicofagia','hbLabios','hbChuparDedo','hbMorderObj','hbRespBucal'];
 
     // Catálogo de medicamentos comunes: genérico, comerciales, condición, y checkbox de categoría que activa
     const RX_CATALOG = [
@@ -13352,6 +13548,40 @@ Reglas: español de México; terminología dental correcta; máximo 6 líneas; u
             list.map((m, i) => `<span style="display:inline-flex; align-items:center; gap:0.4rem; background:#dbeafe; color:#1e40af; padding:4px 10px; border-radius:14px; font-size:0.82rem; font-weight:600;">${m.display} <i class="fa-solid fa-xmark" onclick="removePatientMed(${i})" style="cursor:pointer; color:#3b82f6;" title="Quitar"></i></span>`).join('');
     }
 
+    // ¿Qué familiar? por enfermedad heredofamiliar. Aditivo: el checkbox sigue
+    // significando "hay antecedente"; esto agrega quién, sin romper datos viejos.
+    const HF_MIEMBROS = [
+        {k:'madre', l:'Madre'}, {k:'padre', l:'Padre'},
+        {k:'abMat', l:'Ab. maternos'}, {k:'abPat', l:'Ab. paternos'},
+        {k:'hermanos', l:'Hermanos'}, {k:'otros', l:'Otros'}
+    ];
+    const HF_ENFERM = { hfDiabetes:'Diabetes', hfHipertension:'Hipertensión', hfCardio:'Cardiopatías', hfCancer:'Cáncer', hfTiroides:'Tiroides', hfAlergias:'Alergias', hfPsiquiatricos:'Psiquiátricos' };
+    let hfWhoState = {};   // { hfDiabetes: {madre:true, abMat:true}, ... }
+
+    function hfToggleMiembro(enf, k){
+        if(!hfWhoState[enf]) hfWhoState[enf] = {};
+        hfWhoState[enf][k] = !hfWhoState[enf][k];
+        hfRenderWho();
+        try { triggerUnsavedWarning(); } catch(e){}
+    }
+    function hfRenderWho(){
+        const cont = $('hfWhoContainer'); if(!cont) return;
+        let html = '';
+        Object.keys(HF_ENFERM).forEach(enf => {
+            const chk = $(enf);
+            if(!chk || !chk.checked) return;
+            const sel = hfWhoState[enf] || {};
+            const chips = HF_MIEMBROS.map(mi => {
+                const on = !!sel[mi.k];
+                return '<span onclick="hfToggleMiembro(\'' + enf + '\',\'' + mi.k + '\')" style="cursor:pointer; user-select:none; font-size:0.76rem; font-weight:700; padding:0.25rem 0.6rem; border-radius:14px; border:1.5px solid ' + (on?'#059669':'#fde68a') + '; background:' + (on?'#059669':'#fffbeb') + '; color:' + (on?'white':'#a16207') + ';">' + (on?'✓ ':'') + mi.l + '</span>';
+            }).join(' ');
+            html += '<div style="display:flex; align-items:center; gap:0.6rem; flex-wrap:wrap; padding:0.5rem 0; border-top:1px dashed #fde68a;">'
+                  + '<span style="font-size:0.82rem; font-weight:800; color:#a16207; min-width:100px;">' + HF_ENFERM[enf] + ':</span>'
+                  + chips + '</div>';
+        });
+        cont.innerHTML = html ? ('<div style="font-size:0.78rem; color:#a16207; font-weight:700; margin-bottom:0.2rem;"><i class="fa-solid fa-hand-pointer"></i> ¿Qué familiar? (toca para marcar)</div>' + html) : '';
+    }
+
     function saveMedHistory(p) {
         p.med = p.med || {};
         MED_DISEASE_IDS.forEach(id => { if($(id)) p.med[id] = $(id).checked; });
@@ -13360,10 +13590,13 @@ Reglas: español de México; terminología dental correcta; máximo 6 líneas; u
         p.med.rxOtros = $('rxOtros') ? $('rxOtros').value : '';
         // Nuevos campos HC general
         p.med.hcMotivo = $('hcMotivo') ? $('hcMotivo').value : '';
+        p.med.hcOcupacion = $('hcOcupacion') ? $('hcOcupacion').value : '';
         HC_HF_IDS.forEach(id => { if($(id)) p.med[id] = $(id).checked; });
         HC_HB_IDS.forEach(id => { if($(id)) p.med[id] = $(id).checked; });
         p.med.hfOtros = $('hfOtros') ? $('hfOtros').value : '';
+        p.med.hfWho = JSON.parse(JSON.stringify(hfWhoState || {}));
         p.med.hbCepillado = $('hbCepillado') ? $('hbCepillado').value : '';
+        p.med.hbHilo = $('hbHilo') ? $('hbHilo').value : '';
         p.med.hbOtros = $('hbOtros') ? $('hbOtros').value : '';
     }
     function loadMedHistory(p) {
@@ -13374,10 +13607,14 @@ Reglas: español de México; terminología dental correcta; máximo 6 líneas; u
         if($('rxOtros')) $('rxOtros').value = m.rxOtros || '';
         // Nuevos campos HC general
         if($('hcMotivo')) $('hcMotivo').value = m.hcMotivo || '';
+        if($('hcOcupacion')) $('hcOcupacion').value = m.hcOcupacion || '';
         HC_HF_IDS.forEach(id => { if($(id)) $(id).checked = !!m[id]; });
         HC_HB_IDS.forEach(id => { if($(id)) $(id).checked = !!m[id]; });
         if($('hfOtros')) $('hfOtros').value = m.hfOtros || '';
+        hfWhoState = (m.hfWho && typeof m.hfWho === 'object') ? JSON.parse(JSON.stringify(m.hfWho)) : {};
+        try { hfRenderWho(); } catch(e){}
         if($('hbCepillado')) $('hbCepillado').value = m.hbCepillado || '';
+        if($('hbHilo')) $('hbHilo').value = m.hbHilo || '';
         if($('hbOtros')) $('hbOtros').value = m.hbOtros || '';
         renderPatientMeds();
         checkMedAlerts();
@@ -13387,7 +13624,10 @@ Reglas: español de México; terminología dental correcta; máximo 6 líneas; u
         if($('mdOtras')) $('mdOtras').value = '';
         if($('rxOtros')) $('rxOtros').value = '';
         if($('hcMotivo')) $('hcMotivo').value = '';
+        if($('hcOcupacion')) $('hcOcupacion').value = '';
+        if($('hbHilo')) $('hbHilo').value = '';
         if($('hfOtros')) $('hfOtros').value = '';
+        hfWhoState = {}; try { hfRenderWho(); } catch(e){}
         if($('hbCepillado')) $('hbCepillado').value = '';
         if($('hbOtros')) $('hbOtros').value = '';
         if($('rxSearch')) $('rxSearch').value = '';
@@ -13946,7 +14186,7 @@ Reglas: español de México; terminología dental correcta; máximo 6 líneas; u
         const m = p.med || {};
         const cfg = db.cfg || {};
         const activeD = (db.docs && db.activeDoc && db.docs[db.activeDoc]) ? db.docs[db.activeDoc] : {};
-        const accent = '#7c3aed';
+        const accent = '#1f5b9e';
         const d = new Date();
         const ds = `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}`;
 
@@ -13954,11 +14194,17 @@ Reglas: español de México; terminología dental correcta; máximo 6 líneas; u
         const enfLabels = { mdHipertension:'Hipertensión', mdDiabetes:'Diabetes', mdTiroides:'Tiroides', mdCardio:'Cardiopatía', mdCoagulacion:'Coagulación/sangrado', mdAsma:'Asma', mdRenal:'Renal', mdHepatico:'Hepática', mdEpilepsia:'Epilepsia', mdEmbarazo:'Embarazo/lactancia', mdInmuno:'VIH/inmunosupresión', mdCancer:'Cáncer/quimio', mdOsteoporosis:'Osteoporosis', mdArtritis:'Artritis reumatoide', mdGastrico:'Gastritis/úlcera' };
 
         // Recolectar datos
-        const hf = HC_HF_IDS.filter(id=>m[id]).map(id=>hfLabels[id]); if(m.hfOtros) hf.push(m.hfOtros);
+        const hfWhoLbl = { madre:'madre', padre:'padre', abMat:'ab. maternos', abPat:'ab. paternos', hermanos:'hermanos', otros:'otros' };
+        const hf = HC_HF_IDS.filter(id=>m[id]).map(id=>{
+            let base = hfLabels[id];
+            const w = (m.hfWho && m.hfWho[id]) ? Object.keys(m.hfWho[id]).filter(k=>m.hfWho[id][k]).map(k=>hfWhoLbl[k]||k) : [];
+            return base + (w.length ? ' (' + w.join(', ') + ')' : '');
+        }); if(m.hfOtros) hf.push(m.hfOtros);
         const enf = MED_DISEASE_IDS.filter(id=>m[id]).map(id=>enfLabels[id]); if(m.mdOtras) enf.push(m.mdOtras);
         const habitos = [];
         if(m.hbTabaco) habitos.push('Tabaquismo'); if(m.hbAlcohol) habitos.push('Alcohol'); if(m.hbDrogas) habitos.push('Otras sustancias'); if(m.hbBruxismo) habitos.push('Bruxismo');
-        if(m.hbCepillado) habitos.push('Cepillado: '+m.hbCepillado); if(m.hbOtros) habitos.push(m.hbOtros);
+        if(m.hbDeglucion) habitos.push('Deglución atípica'); if(m.hbApnea) habitos.push('Ronquido/apnea'); if(m.hbOnicofagia) habitos.push('Onicofagia'); if(m.hbLabios) habitos.push('Morder labios'); if(m.hbChuparDedo) habitos.push('Succión digital'); if(m.hbMorderObj) habitos.push('Morder objetos'); if(m.hbRespBucal) habitos.push('Respiración bucal');
+        if(m.hbCepillado) habitos.push('Cepillado: '+m.hbCepillado); if(m.hbHilo) habitos.push('Hilo dental: '+m.hbHilo); if(m.hbOtros) habitos.push(m.hbOtros);
         const al = []; if(p.alPen) al.push('Penicilinas'); if(p.alAin) al.push('AINEs'); if(p.alLat) al.push('Látex'); if(p.alSulfa) al.push('Sulfas'); if(p.alOther) al.push(p.alOther);
         const meds = (p.medList || []).map(x=>x.display);
         const rxTipos = MED_RX_IDS.filter(id=>m[id]).map(id=>({rxAnticoag:'Anticoagulantes',rxAntihiper:'Antihipertensivos',rxDiabetes:'Insulina/antidiabéticos',rxTiroides:'Levotiroxina',rxBifosfonatos:'Bifosfonatos',rxCorticoides:'Corticoides',rxAntidepre:'Antidepresivos',rxAnticoncep:'Anticonceptivos',rxAspirina:'Aspirina/antiagregantes'})[id]);
@@ -13997,7 +14243,7 @@ Reglas: español de México; terminología dental correcta; máximo 6 líneas; u
                 dato('Teléfono:', p.phone),
                 dato('Correo:', p.email),
                 dato('Dirección:', p.address || p.dir),
-                dato('Ocupación:', p.job || p.ocupacion)
+                dato('Ocupación:', (p.med && p.med.hcOcupacion) || p.job || p.ocupacion)
             ]}, layout:{ hLineWidth:()=>0.3, vLineWidth:()=>0, hLineColor:()=>'#e2e8f0', paddingTop:()=>2, paddingBottom:()=>2 }, margin:[0,0,0,10] },
 
             // 2. Motivo de consulta
