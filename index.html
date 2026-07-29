@@ -544,7 +544,7 @@ window._pdfReady=true;
         <h2 style="margin: 0 !important; font-size: 1.5rem !important; color: white !important;">SmileFlow</h2>
         <a href="https://www.dentilike.com.mx" target="_blank" style="color: #bae6fd; font-size: 0.75rem; text-decoration: none; font-weight: 600; cursor: pointer; transition: color 0.2s;" onmouseover="this.style.color='white'" onmouseout="this.style.color='#bae6fd'">www.dentilike.com.mx</a>
         <a href="mailto:soporte@dentilike.com.mx" style="color: #bae6fd; font-size: 0.75rem; text-decoration: none; font-weight: 600; cursor: pointer; transition: color 0.2s;" onmouseover="this.style.color='white'" onmouseout="this.style.color='#bae6fd'">soporte@dentilike.com.mx</a>
-<span style="color:#7dd3fc; font-size:0.62rem; opacity:0.8; margin-top:2px;">© 2026 Dentilike · Todos los derechos reservados · <b id="sfVersion">v2.0</b></span>
+<span style="color:#7dd3fc; font-size:0.62rem; opacity:0.8; margin-top:2px;">© 2026 Dentilike · Todos los derechos reservados · <b id="sfVersion">v86</b></span>
     </div></div>
     
 <ul class="nav-list">
@@ -682,6 +682,9 @@ window._pdfReady=true;
 <div class="topbar-appearance" style="display:flex; align-items:center; gap:0.3rem; padding:0.3rem; background:#f1f5f9; border-radius:24px; border:1px solid var(--border);">
 <button class="tb-icon" id="tbDarkMode" onclick="toggleDarkModeTopbar()" title="Modo oscuro/claro" style="width:34px; height:34px; border:none; background:transparent; border-radius:50%; cursor:pointer; color:#64748b; display:inline-flex; align-items:center; justify-content:center; transition:all 0.2s; font-size:0.95rem;">
 <i class="fa-solid fa-moon"></i>
+</button>
+<button id="tbGuardar" onclick="sfGuardarYCerrarDia()" title="Guardar todo y cerrar el dia" style="border:none; background:var(--success); color:white; border-radius:8px; cursor:pointer; font-weight:800; font-size:0.78rem; padding:0.45rem 0.8rem; display:inline-flex; align-items:center; gap:0.4rem; white-space:nowrap;">
+<i class="fa-solid fa-floppy-disk"></i><span class="tbGuardarTxt">Guardar</span>
 </button>
 <span style="width:1px; height:20px; background:var(--border);"></span>
 <button class="tb-icon active" id="tbModePC" onclick="setScreenMode('pc')" title="Vista PC / Normal" style="width:34px; height:34px; border:none; background:white; border-radius:50%; cursor:pointer; color:var(--primary); display:inline-flex; align-items:center; justify-content:center; transition:all 0.2s; font-size:0.9rem; box-shadow:0 1px 2px rgba(0,0,0,0.1);">
@@ -4359,6 +4362,12 @@ No hay forma de recuperarlo: el cifrado es real y ni nosotros podemos abrirlo. G
     
 // --- MOTOR IDB INYECTADO ---
 let db = null;
+// CANDADO ANTI-BORRADO: mientras esto sea false, la base local todavia no
+// termino de cargar. Ni la nube ni saveDB() pueden tocar nada. Sin este
+// candado, una carga lenta hacia creer que no habia pacientes y la copia
+// de Drive (a veces vieja) se aplicaba sola, borrando el dia de trabajo.
+window.sfDatosListos = false;
+window._sfSinPersistencia = false;
     // Marca de tiempo de los datos TAL COMO SE CARGARON del disco. Se compara
     // contra Drive; usar db.lastMod (que cambia en cada guardado) haría creer
     // que lo local es más nuevo y bloquearía la descarga.
@@ -4455,6 +4464,10 @@ function sfAvisoAlmacenamiento(texto, textoAvatar){
 
 // Arranque en modo temporal: la app SIEMPRE abre, aunque el almacenamiento falle.
 function arrancarDegradado(motivo){
+    // Sin persistencia confiable la app pasa a SOLO LECTURA: es preferible no
+    // poder guardar que sobreescribir el expediente bueno con uno vacio.
+    window._sfSinPersistencia = true;
+    window.sfDatosListos = false;
     try { console.warn('SmileFlow en modo temporal (sin persistencia):', motivo); } catch(_){}
     const ctx = sfNavCtx();
     const donde = ctx.esApp ? ('el navegador de <b>' + ctx.app + '</b>') : 'este navegador o el <b>modo incógnito</b>';
@@ -4517,10 +4530,14 @@ async function initDB() {
                 // La base existe pero sin el store (quedó vacía). No hay datos: recrear limpia.
                 dbInstance.close();
                 const del = indexedDB.deleteDatabase('SmileFlowDB_DentiLike');
-                del.onsuccess = del.onerror = del.onblocked = () => {
+                // onblocked NO debe continuar: si otra pestana tiene la base abierta,
+                // el borrado no ocurrio y seguir adelante escribiria un db vacio encima.
+                del.onblocked = () => { listo(); arrancarDegradado('otra pestana de SmileFlow tiene la base abierta: cierra las demas y recarga'); resolve(); };
+                del.onerror   = () => { listo(); arrancarDegradado('no se pudo reparar la base local'); resolve(); };
+                del.onsuccess = () => {
                     const r2 = sfOpenMainDB();
                     r2.onerror = () => { listo(); arrancarDegradado('recreate error'); resolve(); };
-                    r2.onsuccess = (ev2) => { listo(); try { ev2.target.result.transaction('clinica','readwrite').objectStore('clinica').put({ id:'main_data', data: db }); } catch(_){} resolve(); };
+                    r2.onsuccess = (ev2) => { listo(); try { ev2.target.result.transaction('clinica','readwrite').objectStore('clinica').put({ id:'main_data', data: db }); } catch(_){} window.sfDatosListos = true; resolve(); };
                 };
                 return;
             }
@@ -4535,12 +4552,14 @@ async function initDB() {
                     if (getReq.result) {
                         db = getReq.result.data;
                         try { sfLastModAlCargar = (db && db.lastMod) || 0; } catch(e){}
+                        window.sfDatosListos = true;   // datos reales en memoria
                         resolve();
                     } else {
                         const legacy = localStorage.getItem('sf_db_v10');
                         db = legacy ? JSON.parse(legacy) : { pats: {}, curr: null, inv: {Sup:{},Inf:{}}, log: [], cfg: {}, fin: {} };
                         store.put({ id: 'main_data', data: db });
                         localStorage.removeItem('sf_db_v10');
+                        window.sfDatosListos = true;   // instalacion nueva: base vacia legitima
                         resolve();
                     }
                 };
@@ -16272,7 +16291,16 @@ Reglas: español de México; terminología dental correcta; máximo 6 líneas; u
         } tokenClient.callback=async(r)=>{if(r.error)return; showConnectedUI(); await checkDriveFile();}; let t=null; try{t=gapi.client.getToken();}catch(e){} if(t===null) tokenClient.requestAccessToken({prompt:'consent'}); else tokenClient.requestAccessToken({prompt:''}); }
     function handleSignoutClick() { try{const t=gapi.client.getToken(); if(t!==null){google.accounts.oauth2.revoke(t.access_token); gapi.client.setToken('');}}catch(e){} if($('btnAuthAdmin')) $('btnAuthAdmin').style.display='block'; if($('btnSyncNow')) $('btnSyncNow').style.display='none'; if($('btnSignout')) $('btnSignout').style.display='none'; updateGlobalSyncStatus('offline'); alert("Desconectado."); }
     
-    async function checkDriveFile() { updateGlobalSyncStatus('syncing');
+    async function checkDriveFile() {
+        // No comparar contra la nube hasta tener la base local en memoria.
+        if(!window.sfDatosListos){
+            if(!window._sfEsperaSync) window._sfEsperaSync = 0;
+            if(window._sfEsperaSync++ < 30){ setTimeout(checkDriveFile, 800); return; }
+            console.warn('Sync cancelada: la base local nunca termino de cargar.');
+            try { updateGlobalSyncStatus('offline'); } catch(e){}
+            return;
+        }
+        updateGlobalSyncStatus('syncing');
         const okT = await ensureDriveToken();
         if(!okT) { updateGlobalSyncStatus('offline'); daniSpeak('🔌 La sesión de Google expiró. Pulsa "Conectar" para volver a entrar.', 8000, 'warn'); return; }
         try { if(typeof gapi!=='undefined'&&gapi.client&&!gapi.client.drive) await gapi.client.load('drive','v3'); sfSyncInicialPendiente = true; let r=await gapi.client.drive.files.list({q:"name='SmileFlow_Database.json' and trashed=false",fields:'files(id,modifiedTime)',spaces:'drive'}); let f=r.result.files; if(f&&f.length>0){driveFileId=f[0].id; localStorage.setItem('sf_drive_file_id',driveFileId); await downloadFromDrive(driveFileId, f[0].modifiedTime); updateGlobalSyncStatus('online');}else{if(Object.keys(db.pats).length>0) await uploadToDrive(true); else updateGlobalSyncStatus('online');} sfSyncInicialPendiente = false; try{ setTimeout(sfNubeRevisarNuevo, 2500); }catch(e){} }catch(e){ sfSyncInicialPendiente = false; updateGlobalSyncStatus('offline'); daniSpeak("❌ No pude sincronizar con Drive. Reintenta; si persiste, desconecta y vuelve a conectar la nube.",9000,'error'); console.error('Drive:', e);} }
@@ -16342,8 +16370,10 @@ Reglas: español de México; terminología dental correcta; máximo 6 líneas; u
             uploadToDrive(false);
         };
 
-        if(nLocal === 0) { aplicarNube(); return; }
-        if(nubeConNovedades && nRemoto >= nLocal) { aplicarNube(); return; }
+        if(!window.sfDatosListos){ sfSyncInicialPendiente = false; return; }
+        if(nLocal === 0 && nRemoto > 0) { aplicarNube(); return; }
+        // Empate en numero de pacientes con contenido distinto: NO decidir solo.
+        if(nubeConNovedades && nRemoto > nLocal) { aplicarNube(); return; }
 
         // Puede costar informacion: decide el clinico, no el reloj.
         const fFmt = t => t ? new Date(t).toLocaleString('es-MX') : 'fecha desconocida';
@@ -16428,10 +16458,16 @@ Reglas: español de México; terminología dental correcta; máximo 6 líneas; u
         set('resGoogle',gv('cResGoogle')); set('resDoctoralia',gv('cResDoctoralia'));
         saveDB(); loadConfigUI(); alert('Ajustes Guardados.'); }
     
+// Si el ultimo guardado fallo, avisar antes de cerrar la pestana.
+window.addEventListener('beforeunload', (e) => {
+    if (window._sfSaveFailedFlag) { e.preventDefault(); e.returnValue = ''; return ''; }
+});
+
 // ===== BLINDAJE: estado de guardado visible =====
 let _sfSaveFailed = false;
 function sfSaveError(msg) {
     _sfSaveFailed = true;
+    window._sfSaveFailedFlag = true;
     const quota = /quota|exceed/i.test(msg || '');
     const bar = document.getElementById('topSaveAlert');
     if(bar) {
@@ -16447,13 +16483,110 @@ function sfSaveError(msg) {
 function sfSaveOK() {
     if(!_sfSaveFailed) return;
     _sfSaveFailed = false;
+    window._sfSaveFailedFlag = false;
     try { sfActualizarBadgeLocal(); } catch(e){}
     const bar = document.getElementById('topSaveAlert');
     if(bar) bar.style.display = 'none';
 }
 
+// ============================================================
+// GUARDAR Y CERRAR EL DIA  (boton verde del topbar)
+// Confirma con hechos, no con optimismo: espera el oncomplete real de
+// IndexedDB, verifica leyendo de vuelta, y solo entonces dice "listo".
+// ============================================================
+function sfGuardarConfirmado() {
+    return new Promise((resolve) => {
+        if (!db) return resolve({ ok:false, motivo:'no hay datos en memoria' });
+        if (window._sfSinPersistencia || !window.sfDatosListos) {
+            return resolve({ ok:false, motivo:'la base local no cargo bien; no se sobreescribio nada' });
+        }
+        db.lastMod = Date.now();
+        const req = sfOpenMainDB();
+        req.onerror   = () => resolve({ ok:false, motivo:'no se pudo abrir la base local' });
+        req.onblocked = () => resolve({ ok:false, motivo:'otra pestana de SmileFlow tiene la base abierta' });
+        req.onsuccess = (e) => {
+            const bd = e.target.result;
+            try {
+                const tx = bd.transaction('clinica', 'readwrite');
+                tx.onerror = () => resolve({ ok:false, motivo: (tx.error && tx.error.message) || 'error de transaccion' });
+                tx.onabort = () => resolve({ ok:false, motivo: (tx.error && tx.error.message) || 'guardado cancelado' });
+                tx.oncomplete = () => {
+                    // VERIFICACION: leer de vuelta y contar pacientes.
+                    try {
+                        const tx2 = bd.transaction('clinica', 'readonly');
+                        const g = tx2.objectStore('clinica').get('main_data');
+                        g.onerror = () => resolve({ ok:false, motivo:'se guardo pero no se pudo verificar' });
+                        g.onsuccess = () => {
+                            const leido = g.result && g.result.data;
+                            const n = (leido && leido.pats) ? Object.keys(leido.pats).length : 0;
+                            const esperados = (db.pats) ? Object.keys(db.pats).length : 0;
+                            if (leido && leido.lastMod === db.lastMod && n === esperados) {
+                                resolve({ ok:true, pacientes:n });
+                            } else {
+                                resolve({ ok:false, motivo:'la verificacion no coincide (guardo ' + n + ' de ' + esperados + ')' });
+                            }
+                        };
+                    } catch (err) { resolve({ ok:false, motivo:'se guardo pero fallo la verificacion' }); }
+                };
+                tx.objectStore('clinica').put({ id:'main_data', data: db });
+            } catch (err) { resolve({ ok:false, motivo:(err && err.message) || String(err) }); }
+        };
+    });
+}
+
+async function sfGuardarYCerrarDia() {
+    const btn = document.getElementById('tbGuardar');
+    const txt = btn ? btn.querySelector('.tbGuardarTxt') : null;
+    const pintar = (bg, ico, t) => {
+        if (!btn) return;
+        btn.style.background = bg;
+        const i = btn.querySelector('i');
+        if (i) i.className = 'fa-solid ' + ico;
+        if (txt) txt.textContent = t;
+    };
+    pintar('#64748b', 'fa-spinner fa-spin', 'Guardando...');
+
+    const r = await sfGuardarConfirmado();
+
+    if (!r.ok) {
+        pintar('var(--danger)', 'fa-triangle-exclamation', 'NO guardo');
+        try { sfSaveError(r.motivo); } catch (e) {}
+        alert('\u26a0\ufe0f NO SE PUDO GUARDAR\n\nMotivo: ' + r.motivo +
+              '\n\nQue hacer AHORA, en este orden:\n' +
+              '1) Configuracion \u2192 Sistema y Nube \u2192 Descargar respaldo.\n' +
+              '2) Cierra las OTRAS pestanas de SmileFlow y recarga.\n\n' +
+              'No sigas capturando hasta que este boton se ponga verde.');
+        return;
+    }
+
+    try { sfSaveOK(); } catch (e) {}
+    try { if (typeof registrarCambio === 'function') registrarCambio(); } catch (e) {}
+    try { if (typeof sfActualizarBadgeLocal === 'function') sfActualizarBadgeLocal(); } catch (e) {}
+
+    // Subida a la nube: es un extra, no una condicion. Si falla, el guardado
+    // local YA quedo firme y eso es lo que protege el trabajo del dia.
+    let nube = 'sin conexion a Drive';
+    try {
+        if (typeof ensureDriveToken === 'function' && await ensureDriveToken()) {
+            await uploadToDrive(false);
+            nube = 'copia enviada a tu Google Drive';
+        }
+    } catch (e) { nube = 'la nube fallo (tu equipo SI quedo guardado)'; }
+
+    pintar('var(--success)', 'fa-circle-check', 'Guardado');
+    if (typeof daniSpeak === 'function') {
+        daniSpeak('\u2705 Guardado y verificado: ' + r.pacientes + ' paciente(s) en este equipo. ' + nube + '.', 8000, 'info');
+    }
+    setTimeout(() => pintar('var(--success)', 'fa-floppy-disk', 'Guardar'), 4000);
+}
+
 function saveDB() {
     if (!db) return;
+    // CANDADO: nunca escribir encima si la base no cargo correctamente.
+    if (window._sfSinPersistencia || !window.sfDatosListos) {
+        sfSaveError('la base local no cargo bien: NO se sobreescribe nada para no perder tus datos. Descarga un respaldo y recarga la app');
+        return;
+    }
     db.lastMod = Date.now(); // sello de tiempo: protege contra sobrescritura por copias viejas de Drive
     const req = sfOpenMainDB();
     req.onerror = () => sfSaveError('no se pudo abrir la base local');
@@ -16577,83 +16710,9 @@ function saveDB() {
     });
 
 </script>
-<script>
-(function() {
-    // Sistema de Sincronización Avanzado (IndexedDB + Drive Dividido + Cola Offline)
-    const SmileSyncAdvanced = {
-        dbName: 'SmileFlowDB_DentiLike',
-        dbInstance: null,
-        
-        async init() {
-            return new Promise((resolve) => {
-                const req = indexedDB.open(this.dbName, 1);
-                req.onupgradeneeded = (e) => {
-                    const base = e.target.result;
-                    // Almacenamiento sin límite de peso para pacientes individuales
-                    if(!base.objectStoreNames.contains('pacientes')) base.createObjectStore('pacientes', { keyPath: 'id' });
-                    // Cola de espera para cuando no hay internet
-                    if(!base.objectStoreNames.contains('cola_espera')) base.createObjectStore('cola_espera', { autoIncrement: true });
-                };
-                req.onsuccess = (e) => {
-                    this.dbInstance = e.target.result;
-                    console.log("✅ DentiLike: Sistema de seguridad de datos profundo iniciado.");
-                    resolve();
-                };
-            });
-        },
-
-        async respaldarPaciente(paciente) {
-            if (!this.dbInstance || !paciente) return;
-            
-            // 1. Guardar en memoria profunda local (supera el límite de 5MB de tu sistema actual)
-            const tx = this.dbInstance.transaction('pacientes', 'readwrite');
-            tx.objectStore('pacientes').put(paciente);
-            
-            // 2. Gestionar la subida a Drive
-            if (navigator.onLine) {
-                this.subirADriveIndividual(paciente);
-            } else {
-                // 3. Cola de espera si falla la conexión en el consultorio
-                const txQueue = this.dbInstance.transaction('cola_espera', 'readwrite');
-                txQueue.objectStore('cola_espera').add({ data: paciente, fecha: Date.now() });
-                console.log("⚠️ Sin conexión: Expediente guardado en cola de espera local.");
-            }
-        },
-        
-        subirADriveIndividual(paciente) {
-            // Este bloque preparará el archivo independiente para que si tu base general 
-            // se corrompe, no pierdas a este paciente.
-            console.log("☁️ Preparando archivo individual para Drive del paciente: ", paciente.nombre || paciente.id);
-            
-            // Aquí el sistema usará el token de GAPI que ya tienes activo en la parte 
-            // superior de tu código para subir el JSON dividido.
-        }
-    };
-
-    // Arrancar silenciosamente al abrir el archivo
-    window.addEventListener('DOMContentLoaded', async () => {
-        await SmileSyncAdvanced.init();
-    });
-
-    // CONEXIÓN AUTOMÁTICA CON TU BOTÓN DE GUARDAR
-    // Esperamos 2 segundos a que cargue tu código original y luego le inyectamos esta mejora
-    setTimeout(() => {
-        if (typeof window.saveDB === 'function') {
-            const guardadoOriginal = window.saveDB;
-            window.saveDB = function() {
-                // 1. Ejecuta tu guardado normal del archivo completo
-                guardadoOriginal(); 
-                
-                // 2. Ejecuta la nueva protección individual para el paciente activo
-                if (window.db && window.db.curr && window.db.pats[window.db.curr]) {
-                    SmileSyncAdvanced.respaldarPaciente(window.db.pats[window.db.curr]);
-                }
-            };
-            console.log("✅ DentiLike: Botón de guardado sincronizado con la mejora extrema.");
-        }
-    }, 2000);
-})();
-</script>
+<!-- Bloque SmileSyncAdvanced retirado: no respaldaba nada (solo console.log)
+     y abria SmileFlowDB_DentiLike con version 1, lo que podia dejar la base
+     sin el store 'clinica' y disparar el borrado de reparacion. -->
 
     <script>
     window.addEventListener('DOMContentLoaded', async () => {

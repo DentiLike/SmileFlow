@@ -1,5 +1,5 @@
-/* SmileFlow — Service Worker v85 */
-const CACHE = 'smileflow-v85';
+/* SmileFlow — Service Worker v86 */
+const CACHE = 'smileflow-v86';
 const FILES = ['./', './index.html', './manifest.json', './icon-192.png', './icon-512.png'];
 
 self.addEventListener('install', e => {
