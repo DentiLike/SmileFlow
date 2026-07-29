@@ -99,6 +99,8 @@
         .sync-badge.offline { background: #fee2e2; color: #dc2626; border-color: #fca5a5; }
         .sync-badge.syncing { background: #fef3c7; color: #d97706; border-color: #fde047; }
         .sync-badge.online { background: #dcfce7; color: #059669; border-color: #86efac; }
+        /* Fuentes del semaforo unico: viven en el DOM pero no se ven nunca. */
+        .sf-fuente-oculta { display: none !important; }
         .sync-badge:hover { filter: brightness(0.95); transform: translateY(-1px); box-shadow: var(--shadow-sm);}
 
         /* ESTRUCTURA DE PANTALLAS */
@@ -348,6 +350,7 @@
             color: #fca5a5 !important;
         }
 
+        #dSelect option { color:#0f172a; background:white; }
         /* Selector de doctor en topbar */
         body.dark-mode #dSelect,
         body.dark-mode .topbar-actions select {
@@ -470,7 +473,17 @@
     body.dark-mode .topbar-appearance .tb-icon:hover { background:#334155 !important; color:white !important; }
     body.dark-mode .topbar-appearance .tb-icon.active { background:#1e293b !important; color:#38bdf8 !important; }
     body.dark-mode .topbar-appearance span { background:#334155 !important; }
-    @media(max-width: 768px) { .topbar-appearance { display:none !important; } .agenda-btn-txt { display:none; } }
+    @media(max-width: 768px) {
+        .topbar-appearance { display:none !important; }
+        .agenda-btn-txt { display:none; }
+        /* El boton Guardar SIEMPRE se ve: solo se le quita la palabra. */
+        .tbGuardarTxt { display:none; }
+        #tbGuardar { padding:0.55rem 0.7rem !important; font-size:0.95rem !important; }
+        #sfEstadoUno .bdg-txt { display:none; }
+    }
+    /* Aviso visual: hay cambios que aun no confirmas con el boton Guardar. */
+    #tbGuardar.pendiente { background:#f59e0b !important; }
+    #tbGuardar.pendiente::after { content:''; width:7px; height:7px; border-radius:50%; background:white; display:inline-block; }
     .med-chk { font-size:0.9rem; font-weight:600; color:var(--text); cursor:pointer; display:flex; align-items:center; gap:0.5rem; }
     .med-chk input { width:17px; height:17px; accent-color:#7c3aed; flex-shrink:0; }
     
@@ -544,7 +557,7 @@ window._pdfReady=true;
         <h2 style="margin: 0 !important; font-size: 1.5rem !important; color: white !important;">SmileFlow</h2>
         <a href="https://www.dentilike.com.mx" target="_blank" style="color: #bae6fd; font-size: 0.75rem; text-decoration: none; font-weight: 600; cursor: pointer; transition: color 0.2s;" onmouseover="this.style.color='white'" onmouseout="this.style.color='#bae6fd'">www.dentilike.com.mx</a>
         <a href="mailto:soporte@dentilike.com.mx" style="color: #bae6fd; font-size: 0.75rem; text-decoration: none; font-weight: 600; cursor: pointer; transition: color 0.2s;" onmouseover="this.style.color='white'" onmouseout="this.style.color='#bae6fd'">soporte@dentilike.com.mx</a>
-<span style="color:#7dd3fc; font-size:0.62rem; opacity:0.8; margin-top:2px;">© 2026 Dentilike · Todos los derechos reservados · <b id="sfVersion">v86</b></span>
+<span style="color:#7dd3fc; font-size:0.62rem; opacity:0.8; margin-top:2px;">© 2026 Dentilike · Todos los derechos reservados · <b id="sfVersion">v88</b></span>
     </div></div>
     
 <ul class="nav-list">
@@ -669,35 +682,32 @@ window._pdfReady=true;
 <button class="btn" onclick="irAgendaHoy()" style="padding: 0.5rem 0.9rem; background:#1f5b9e; color:white; white-space:nowrap;" title="Ver las citas de hoy"><i class="fa-solid fa-calendar-day"></i> <span class="agenda-btn-txt">Hoy</span></button>
 </div>
 <div class="topbar-actions">
-<div class="sync-badge offline" id="globalSyncStatus" onclick="openSection('s-admin-sys', document.querySelector('.nav-item[onclick*=\'s-admin-sys\']'))" title="Ir a configuración de Nube">
+<!-- GUARDAR: fuera del bloque de apariencia para que sobreviva en movil -->
+<button id="tbGuardar" onclick="sfGuardarYCerrarDia()" title="Guardar todo y verificar" style="border:none; background:var(--success); color:white; border-radius:8px; cursor:pointer; font-weight:800; font-size:0.8rem; padding:0.5rem 0.85rem; display:inline-flex; align-items:center; gap:0.4rem; white-space:nowrap; flex-shrink:0;">
+<i class="fa-solid fa-floppy-disk"></i><span class="tbGuardarTxt">Guardar</span>
+</button>
+<!-- SEMAFORO UNICO: resume nube + sincronizacion + respaldos -->
+<div class="sync-badge online" id="sfEstadoUno" onclick="sfPanelEstado()" title="Estado del sistema. Toca para ver el detalle.">
+<i class="fa-solid fa-circle-check"></i> <span class="bdg-txt" id="sfEstadoUnoTxt">En orden</span>
+</div>
+<!-- Fuentes ocultas: las alimentan las funciones existentes; no borrar. -->
+<div class="sync-badge offline sf-fuente-oculta" id="globalSyncStatus" title="Nube de Google Drive">
 <i class="fa-solid fa-cloud-xmark"></i> <span class="bdg-txt">Offline</span>
-                </div>
-<div class="sync-badge" id="sfSyncTime" onclick="sfInfoSync()" title="Última sincronización con la nube" style="display:none; background:#f1f5f9; color:#475569; border-color:#cbd5e1;">
+</div>
+<div class="sync-badge sf-fuente-oculta" id="sfSyncTime" title="Ultima sincronizacion con la nube">
 <i class="fa-solid fa-clock-rotate-left"></i> <span class="bdg-txt" id="sfSyncTimeTxt">—</span>
-                </div>
-<div class="sync-badge online" id="sfLocalBadge" onclick="sfPanelRespaldos()" title="Estado de tus respaldos">
+</div>
+<div class="sync-badge online sf-fuente-oculta" id="sfLocalBadge" title="Estado de tus respaldos">
 <i class="fa-solid fa-shield-halved"></i> <span class="bdg-txt">Protegido</span>
-                </div>
+</div>
 <!-- Controles de Apariencia (Topbar) -->
 <div class="topbar-appearance" style="display:flex; align-items:center; gap:0.3rem; padding:0.3rem; background:#f1f5f9; border-radius:24px; border:1px solid var(--border);">
 <button class="tb-icon" id="tbDarkMode" onclick="toggleDarkModeTopbar()" title="Modo oscuro/claro" style="width:34px; height:34px; border:none; background:transparent; border-radius:50%; cursor:pointer; color:#64748b; display:inline-flex; align-items:center; justify-content:center; transition:all 0.2s; font-size:0.95rem;">
 <i class="fa-solid fa-moon"></i>
 </button>
-<button id="tbGuardar" onclick="sfGuardarYCerrarDia()" title="Guardar todo y cerrar el dia" style="border:none; background:var(--success); color:white; border-radius:8px; cursor:pointer; font-weight:800; font-size:0.78rem; padding:0.45rem 0.8rem; display:inline-flex; align-items:center; gap:0.4rem; white-space:nowrap;">
-<i class="fa-solid fa-floppy-disk"></i><span class="tbGuardarTxt">Guardar</span>
-</button>
-<span style="width:1px; height:20px; background:var(--border);"></span>
-<button class="tb-icon active" id="tbModePC" onclick="setScreenMode('pc')" title="Vista PC / Normal" style="width:34px; height:34px; border:none; background:white; border-radius:50%; cursor:pointer; color:var(--primary); display:inline-flex; align-items:center; justify-content:center; transition:all 0.2s; font-size:0.9rem; box-shadow:0 1px 2px rgba(0,0,0,0.1);">
-<i class="fa-solid fa-display"></i>
-</button>
-<button class="tb-icon" id="tbModeTablet" onclick="setScreenMode('tablet')" title="Vista Tablet" style="width:34px; height:34px; border:none; background:transparent; border-radius:50%; cursor:pointer; color:#64748b; display:inline-flex; align-items:center; justify-content:center; transition:all 0.2s; font-size:0.9rem;">
-<i class="fa-solid fa-tablet-screen-button"></i>
-</button>
-<button class="tb-icon" id="tbModePhone" onclick="setScreenMode('phone')" title="Vista Smartphone" style="width:34px; height:34px; border:none; background:transparent; border-radius:50%; cursor:pointer; color:#64748b; display:inline-flex; align-items:center; justify-content:center; transition:all 0.2s; font-size:0.9rem;">
-<i class="fa-solid fa-mobile-screen-button"></i>
-</button>
+<!-- Simuladores de vista retirados del topbar (setScreenMode sigue disponible). -->
 </div>
-<select id="dSelect" onchange="changeActiveDoc()"></select>
+<!-- Selector de doctor movido al panel de Inicio (mas visible y con espacio). -->
 </div>
 </header>
 <main class="content-area">
@@ -725,7 +735,12 @@ window._pdfReady=true;
 <div style="background:linear-gradient(135deg, var(--primary), var(--secondary)); color:white; border-radius:14px; padding:1.2rem 1.5rem; margin-bottom:1.2rem; box-shadow:0 6px 16px rgba(31,91,158,0.22); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.8rem;">
 <div>
 <h2 id="inicioSaludo" style="margin:0 0 0.2rem 0; font-size:1.35rem; font-weight:800;">Bienvenido</h2>
-<p id="inicioFrase" style="margin:0; font-size:0.85rem; opacity:0.9; font-style:italic;"></p>
+<p id="inicioFrase" style="margin:0 0 0.6rem 0; font-size:0.85rem; opacity:0.9; font-style:italic;"></p>
+<div style="display:flex; align-items:center; gap:0.5rem; flex-wrap:wrap;">
+<i class="fa-solid fa-user-doctor" style="font-size:0.8rem; opacity:0.85;"></i>
+<select id="dSelect" onchange="changeActiveDoc()" style="background:rgba(255,255,255,0.18); color:white; border:1px solid rgba(255,255,255,0.35); border-radius:8px; padding:0.35rem 0.6rem; font-weight:700; font-size:0.82rem; cursor:pointer; max-width:100%;"></select>
+<button class="btn" onclick="openSection('s-admin-id', document.querySelector('.nav-item[onclick*=\'s-admin-id\']'))" title="Editar perfil del doctor" style="background:rgba(255,255,255,0.18); color:white; border:1px solid rgba(255,255,255,0.35); font-size:0.75rem; font-weight:700; padding:0.35rem 0.6rem;"><i class="fa-solid fa-pen"></i></button>
+</div>
 </div>
 <button class="btn" onclick="openSection('s-agenda', document.querySelector('.nav-item[onclick*=\'s-agenda\']'))" style="background:rgba(255,255,255,0.2); color:white; font-weight:700; white-space:nowrap; border:1px solid rgba(255,255,255,0.3);"><i class="fa-solid fa-calendar-plus"></i> Citar</button>
 </div>
@@ -2978,7 +2993,8 @@ AVISO PRÓX. CITA (Recordatorio local):
 <div id="docFormBox" style="background:#f8fafc; padding:1.5rem; border-radius:var(--radius-md); border:1px solid #cbd5e1; margin-top:1.5rem;">
 <input id="dId" type="hidden"/>
 <div class="grid-2">
-<div class="input-group"><label><i class="fa-solid fa-user-doctor"></i> Nombre Completo con Título</label><input class="input-field" id="dName" placeholder="Ej. Dr. Miguel Alvarado" style="font-weight:800;" type="text"/></div>
+<div class="input-group"><label><i class="fa-solid fa-venus-mars"></i> Título</label><select class="input-field" id="dTitulo"><option value="Dr.">Dr.</option><option value="Dra.">Dra.</option></select></div>
+<div class="input-group"><label><i class="fa-solid fa-user-doctor"></i> Nombre Completo (sin el título)</label><input class="input-field" id="dName" placeholder="Ej. Miguel Alvarado" style="font-weight:800;" type="text"/></div>
 <div class="input-group"><label><i class="fa-solid fa-graduation-cap"></i> Especialidades (Para Recetario)</label><input class="input-field" id="dSpec" placeholder="Ej. Ortodoncia y Ortopedia Maxilar" type="text"/></div>
 </div>
 <h5 style="margin-top:1.5rem; font-size:0.95rem; color:#0f172a; border-bottom:1px solid #e2e8f0; padding-bottom:0.4rem;"><i class="fa-solid fa-phone"></i> Contacto Directo (Impreso en sus recetas)</h5>
@@ -4155,6 +4171,115 @@ No hay forma de recuperarlo: el cifrado es real y ni nosotros podemos abrirlo. G
         return Math.floor((Date.now() - new Date(last).getTime()) / 86400000);
     }
 
+    // ============================================================
+    // SEMAFORO UNICO DEL TOPBAR
+    // Lee los tres indicadores originales (ahora ocultos) y muestra el
+    // PEOR estado. Si algo falla, dice QUE falla; al tocarlo se abre el
+    // detalle con el boton que lleva directo al problema.
+    // ============================================================
+    const SF_FUENTES = [
+        { id:'globalSyncStatus', nombre:'Nube (Google Drive)',   corto:'Nube',     accion:"sfDesdeEstado('nube')",      icono:'fa-cloud' },
+        { id:'sfSyncTime',       nombre:'Ultima sincronizacion', corto:'Sync',     accion:"sfDesdeEstado('sync')",      icono:'fa-clock-rotate-left' },
+        { id:'sfLocalBadge',     nombre:'Respaldos',             corto:'Respaldo', accion:"sfDesdeEstado('respaldos')", icono:'fa-shield-halved' }
+    ];
+    const SF_RANGO = { online:0, syncing:1, offline:2 };
+
+    // Cierra el panel de estado y abre el destino que toca.
+    function sfDesdeEstado(destino){
+        try { if(window._sfOvEstado) { window._sfOvEstado.remove(); window._sfOvEstado = null; } } catch(e){}
+        try {
+            if(destino === 'cerrar')         return;
+            else if(destino === 'nube')      openSection('s-admin-sys', document.querySelector('.nav-item[onclick*="s-admin-sys"]'));
+            else if(destino === 'sync')      sfInfoSync();
+            else if(destino === 'respaldos') sfPanelRespaldos();
+        } catch(e){ console.warn('sfDesdeEstado', e); }
+    }
+
+    // Devuelve el estado leido de cada indicador oculto.
+    function sfLeerFuentes(){
+        return SF_FUENTES.map(f => {
+            const el = document.getElementById(f.id);
+            if(!el) return Object.assign({}, f, { nivel:0, txt:'sin dato', tip:'', hay:false });
+            // Las funciones originales reescriben className y borran la clase
+            // que oculta la fuente: se vuelve a poner en cada lectura.
+            if(el.className.indexOf('sf-fuente-oculta') === -1) el.className += ' sf-fuente-oculta';
+
+            const sp  = el.querySelector('.bdg-txt');
+            const txt = sp ? sp.textContent.trim() : '';
+            let nivel = 0, hay = true, tip = el.title || '';
+
+            if(f.id === 'sfSyncTime'){
+                // Esta fuente pinta con estilos en linea, no con clases:
+                // se calcula igual que en sfActualizarBadgeSync().
+                const ts = parseInt(localStorage.getItem('sf_drive_seen') || '0', 10);
+                if(!ts){ hay = false; tip = 'Todavia no se ha sincronizado con la nube en este equipo.'; }
+                else { nivel = ((Date.now() - ts) / 3600000) < 24 ? 0 : 1; }
+            } else {
+                const cls = el.className || '';
+                const hallada = ['offline','syncing','online'].find(c => cls.indexOf(c) !== -1);
+                nivel = (hallada && SF_RANGO[hallada] !== undefined) ? SF_RANGO[hallada] : 0;
+            }
+            return Object.assign({}, f, { nivel: nivel, txt: txt, tip: tip, hay: hay });
+        });
+    }
+
+    function sfRefrescarEstadoUno(){
+        try {
+            const el = document.getElementById('sfEstadoUno');
+            if(!el) return;
+            const fs = sfLeerFuentes().filter(f => f.hay);
+            const malos = fs.filter(f => f.nivel > 0);
+            const peor  = fs.reduce((a, f) => Math.max(a, f.nivel), 0);
+
+            let clase, icono, texto;
+            if(peor === 0){
+                clase='online';  icono='fa-circle-check'; texto='En orden';
+            } else {
+                clase = (peor === 1) ? 'syncing' : 'offline';
+                icono = (peor === 1) ? 'fa-triangle-exclamation' : 'fa-circle-exclamation';
+                // Nombra el problema mas grave; el color ya dice la gravedad.
+                const orden = malos.slice().sort((a,b) => b.nivel - a.nivel);
+                texto = orden[0].corto + (malos.length > 1 ? (' +' + (malos.length - 1)) : '');
+            }
+            el.className = 'sync-badge ' + clase;
+            const ic = el.querySelector('i');   if(ic) ic.className = 'fa-solid ' + icono;
+            const tx = document.getElementById('sfEstadoUnoTxt'); if(tx) tx.textContent = texto;
+            el.title = malos.length
+                ? (malos.map(m => m.nombre + ': ' + m.txt).join(' \u00b7 ') + '. Toca para ver el detalle.')
+                : 'Nube, sincronizacion y respaldos en orden. Toca para ver el detalle.';
+        } catch(e){}
+    }
+
+    // Panel de detalle: una fila por indicador, con su color y su atajo.
+    function sfPanelEstado(){
+        const fs = sfLeerFuentes();
+        const peor = fs.filter(f=>f.hay).reduce((a,f)=>Math.max(a,f.nivel),0);
+        const cab = peor === 0 ? '#059669' : (peor === 1 ? '#b45309' : '#b91c1c');
+        const { ov, body } = sfOverlay('<i class="fa-solid fa-gauge-high"></i> Estado del sistema', cab);
+        window._sfOvEstado = ov;
+        const COL = { 0:{c:'#059669',b:'#ecfdf5',i:'fa-circle-check',   e:'En orden'},
+                      1:{c:'#b45309',b:'#fffbeb',i:'fa-triangle-exclamation', e:'Requiere atencion'},
+                      2:{c:'#b91c1c',b:'#fef2f2',i:'fa-circle-exclamation',   e:'Falla'} };
+        let html = '<p style="color:#475569; font-size:0.88rem; line-height:1.55; margin:0 0 1rem;">'
+                 + 'Estos son los tres puntos que protegen tu informacion. El del topbar muestra el peor de los tres.</p>';
+        fs.forEach(f => {
+            const k = COL[f.hay ? f.nivel : 0];
+            html += '<div style="border:1px solid var(--border); border-left:4px solid ' + k.c + '; background:' + k.b
+                 +  '; border-radius:10px; padding:0.85rem 1rem; margin-bottom:0.6rem;">'
+                 +  '<div style="display:flex; align-items:center; gap:0.5rem; font-weight:800; color:' + k.c + '; font-size:0.9rem;">'
+                 +    '<i class="fa-solid ' + k.i + '"></i> ' + f.nombre
+                 +    '<span style="margin-left:auto; font-size:0.78rem; font-weight:700; opacity:0.85;">' + (f.hay ? (f.txt || k.e) : 'sin datos aun') + '</span>'
+                 +  '</div>'
+                 +  (f.tip ? '<div style="font-size:0.83rem; color:#475569; margin-top:0.35rem; line-height:1.5;">' + f.tip + '</div>' : '')
+                 +  '<button class="btn btn-outline" onclick="' + f.accion + '" style="width:100%; margin-top:0.6rem; font-size:0.8rem; font-weight:800;">'
+                 +    '<i class="fa-solid ' + f.icono + '"></i> Abrir ' + f.nombre.toLowerCase() + '</button>'
+                 +  '</div>';
+        });
+        html += '<button class="btn btn-success" onclick="sfDesdeEstado(\'cerrar\'); sfGuardarYCerrarDia()" style="width:100%; margin-top:0.4rem; font-weight:800; padding:0.75rem;">'
+             +  '<i class="fa-solid fa-floppy-disk"></i> Guardar y verificar ahora</button>';
+        body.innerHTML = html;
+    }
+
     function sfActualizarBadgeLocal(){
         try {
             const el = document.getElementById('sfLocalBadge');
@@ -4755,7 +4880,7 @@ db = {
         if(h < 12) saludo = 'Buenos días';
         else if(h < 19) saludo = 'Buenas tardes';
         else saludo = 'Buenas noches';
-        const docName = (db.docs && db.activeDoc && db.docs[db.activeDoc] && db.docs[db.activeDoc].name) ? db.docs[db.activeDoc].name : '';
+        const docName = (typeof sfNombreDoc === 'function') ? sfNombreDoc(sfDocActivo()) : '';
         if($('inicioSaludo')) $('inicioSaludo').innerHTML = `<i class="fa-solid fa-tooth"></i> ${saludo}${docName ? ', '+docName : ''}`;
         if($('inicioFrase')) $('inicioFrase').textContent = '“' + FRASES_MOTIVA[Math.floor(Math.random()*FRASES_MOTIVA.length)] + '”';
 
@@ -13022,10 +13147,30 @@ Reglas: español de México; terminología dental correcta; máximo 6 líneas; u
     function abrirDriveSearch() { if(!db.curr) return; window.open(`https://drive.google.com/drive/u/0/search?q=${encodeURIComponent(db.pats[db.curr].displayId)}`, '_blank'); }
 
     // --- ADMINISTRACIÓN Y CONFIGURACIÓN ---
-    function renderDocSelects() { let h=''; Object.values(db.docs).forEach(d=>{h+=`<option value="${d.id}">Dr. ${d.name}</option>`;}); if($('dSelect'))$('dSelect').innerHTML=h; if($('adminDocSelect'))$('adminDocSelect').innerHTML=h; if(db.activeDoc&&$('dSelect')) $('dSelect').value=db.activeDoc; if($('adminDocSelect')){ $('adminDocSelect').value=db.activeDoc||Object.keys(db.docs)[0]; cargarDoctorAdmin(); } }
+    // Nombre para mostrar: titulo + nombre, sin duplicar si el nombre guardado
+    // ya venia con "Dr."/"Dra." (asi estaba antes de separar el campo).
+    function sfNombreDoc(d){
+        if(!d) return '';
+        const t = d.titulo || 'Dr.';
+        const n = String(d.name || '').trim().replace(/^\s*(dra?\.?|doctora|doctor)\s+/i, '').trim();
+        return n ? (t + ' ' + n) : t;
+    }
+    // Quita el titulo del nombre para mostrarlo en el campo de captura.
+    function sfSoloNombre(name){
+        return String(name || '').trim().replace(/^\s*(dra?\.?|doctora|doctor)\s+/i, '').trim();
+    }
+    // Detecta el titulo de un registro viejo que no tenia campo aparte.
+    function sfTituloDe(d){
+        if(!d) return 'Dr.';
+        if(d.titulo) return d.titulo;
+        return /^\s*(dra\.?|doctora)\s+/i.test(String(d.name || '')) ? 'Dra.' : 'Dr.';
+    }
+    function sfDocActivo(){ try { return (db.docs && db.activeDoc) ? db.docs[db.activeDoc] : null; } catch(e){ return null; } }
+
+    function renderDocSelects() { let h=''; Object.values(db.docs).forEach(d=>{h+=`<option value="${d.id}">${sfNombreDoc(d)}</option>`;}); if($('dSelect'))$('dSelect').innerHTML=h; if($('adminDocSelect'))$('adminDocSelect').innerHTML=h; if(db.activeDoc&&$('dSelect')) $('dSelect').value=db.activeDoc; if($('adminDocSelect')){ $('adminDocSelect').value=db.activeDoc||Object.keys(db.docs)[0]; cargarDoctorAdmin(); } }
     function changeActiveDoc() { db.activeDoc=$('dSelect').value; saveDB(); }
-    function crearNuevoDoctor() { $('dId').value='new'; ['dName','dSpec','dCed1','dCed2','dPhone','dEmail','dUni1','dUni2'].forEach(id=>{if($(id))$(id).value='';}); }
-    function cargarDoctorAdmin() { let v=$('adminDocSelect').value; if(!v||!db.docs[v]) return; let d=db.docs[v]; $('dId').value=d.id; $('dName').value=d.name; $('dSpec').value=d.spec; $('dCed1').value=d.ced1; $('dCed2').value=d.ced2; $('dPhone').value=d.phone||''; $('dEmail').value=d.email||''; if($('dCiudad')) $('dCiudad').value=d.ciudad||''; if($('dAutoFirma')) $('dAutoFirma').checked = !!d.autoFirma; if($('dFirmaImg') && $('dFirmaPreview')){ if(d.firma){ $('dFirmaImg').src=d.firma; $('dFirmaPreview').style.display='block'; if($('dFirmaBtnTxt')) $('dFirmaBtnTxt').textContent='Cambiar mi firma'; } else { $('dFirmaPreview').style.display='none'; if($('dFirmaBtnTxt')) $('dFirmaBtnTxt').textContent='Registrar mi firma'; } } ['uni1','uni2'].forEach((k,ix)=>{ const im=$('uniImg'+(ix+1)); if(im){ if(d[k]){ im.src=d[k]; im.style.display='inline-block'; } else { im.src=''; im.style.display='none'; } } }); }
+    function crearNuevoDoctor() { $('dId').value='new'; ['dName','dSpec','dCed1','dCed2','dPhone','dEmail','dUni1','dUni2'].forEach(id=>{if($(id))$(id).value='';}); if($('dTitulo')) $('dTitulo').value='Dr.'; }
+    function cargarDoctorAdmin() { let v=$('adminDocSelect').value; if(!v||!db.docs[v]) return; let d=db.docs[v]; $('dId').value=d.id; $('dName').value=sfSoloNombre(d.name); if($('dTitulo')) $('dTitulo').value = sfTituloDe(d); $('dSpec').value=d.spec; $('dCed1').value=d.ced1; $('dCed2').value=d.ced2; $('dPhone').value=d.phone||''; $('dEmail').value=d.email||''; if($('dCiudad')) $('dCiudad').value=d.ciudad||''; if($('dAutoFirma')) $('dAutoFirma').checked = !!d.autoFirma; if($('dFirmaImg') && $('dFirmaPreview')){ if(d.firma){ $('dFirmaImg').src=d.firma; $('dFirmaPreview').style.display='block'; if($('dFirmaBtnTxt')) $('dFirmaBtnTxt').textContent='Cambiar mi firma'; } else { $('dFirmaPreview').style.display='none'; if($('dFirmaBtnTxt')) $('dFirmaBtnTxt').textContent='Registrar mi firma'; } } ['uni1','uni2'].forEach((k,ix)=>{ const im=$('uniImg'+(ix+1)); if(im){ if(d[k]){ im.src=d[k]; im.style.display='inline-block'; } else { im.src=''; im.style.display='none'; } } }); }
 
     // Abre el modal de firma reutilizado para registrar la firma del doctor
     function abrirFirmaDoctor() {
@@ -13039,7 +13184,7 @@ Reglas: español de México; terminología dental correcta; máximo 6 líneas; u
         setTimeout(initFirmaCanvas, 60);
     }
 
-    function guardarDoctorAdmin() { let i=$('dId').value; if(i==='new') i='doc_'+Date.now(); const prev=db.docs[i]||{}; db.docs[i]={id:i,name:$('dName').value,spec:$('dSpec').value,ced1:$('dCed1').value,ced2:$('dCed2').value,phone:$('dPhone').value,email:$('dEmail').value,ciudad:($('dCiudad')?$('dCiudad').value:'')||prev.ciudad||'',uni1:tempUni1||prev.uni1||'',uni2:tempUni2||prev.uni2||'',firma:prev.firma||'',autoFirma:$('dAutoFirma')?$('dAutoFirma').checked:false}; tempUni1=tempUni2=null; if(!db.activeDoc) db.activeDoc=i; saveDB(); renderDocSelects(); alert("Doctor Guardado."); }
+    function guardarDoctorAdmin() { let i=$('dId').value; if(i==='new') i='doc_'+Date.now(); const prev=db.docs[i]||{}; db.docs[i]={id:i,titulo:($('dTitulo')?$('dTitulo').value:'Dr.'),name:sfNombreDoc({titulo:($('dTitulo')?$('dTitulo').value:'Dr.'),name:$('dName').value}),spec:$('dSpec').value,ced1:$('dCed1').value,ced2:$('dCed2').value,phone:$('dPhone').value,email:$('dEmail').value,ciudad:($('dCiudad')?$('dCiudad').value:'')||prev.ciudad||'',uni1:tempUni1||prev.uni1||'',uni2:tempUni2||prev.uni2||'',firma:prev.firma||'',autoFirma:$('dAutoFirma')?$('dAutoFirma').checked:false}; tempUni1=tempUni2=null; if(!db.activeDoc) db.activeDoc=i; saveDB(); renderDocSelects(); alert("Doctor Guardado."); }
     let tempUni1=null, tempUni2=null;
     // Sube un escudo universitario: lo COMPRIME (máx 400px, PNG), lo guarda DE INMEDIATO
     // en el perfil del doctor (antes solo quedaba en memoria temporal y se perdía si no
@@ -16458,9 +16603,44 @@ Reglas: español de México; terminología dental correcta; máximo 6 líneas; u
         set('resGoogle',gv('cResGoogle')); set('resDoctoralia',gv('cResDoctoralia'));
         saveDB(); loadConfigUI(); alert('Ajustes Guardados.'); }
     
-// Si el ultimo guardado fallo, avisar antes de cerrar la pestana.
+// ============================================================
+// RECORDATORIO DE GUARDAR ANTES DE CERRAR
+// Motivo: el guardado automatico ya existe, pero cuando algo falla en
+// silencio nadie se enteraba hasta el dia siguiente. El boton Guardar SI
+// verifica (lee de vuelta y cuenta pacientes), asi que se empuja el habito
+// de pulsarlo al terminar la jornada.
+// ============================================================
+window._sfPendientes = 0;
+
+function sfMarcarPendiente(){
+    window._sfPendientes = (window._sfPendientes || 0) + 1;
+    const b = document.getElementById('tbGuardar');
+    if(b && !b.classList.contains('pendiente')){
+        b.classList.add('pendiente');
+        b.title = 'Tienes cambios sin verificar. Pulsa Guardar antes de cerrar.';
+    }
+}
+
+function sfLimpiarPendiente(){
+    window._sfPendientes = 0;
+    const b = document.getElementById('tbGuardar');
+    if(b){
+        b.classList.remove('pendiente');
+        b.title = 'Guardar todo y verificar';
+    }
+}
+
 window.addEventListener('beforeunload', (e) => {
-    if (window._sfSaveFailedFlag) { e.preventDefault(); e.returnValue = ''; return ''; }
+    if (window._sfSaveFailedFlag || (window._sfPendientes || 0) > 0) {
+        e.preventDefault(); e.returnValue = ''; return '';
+    }
+});
+
+// Al volver a la pestana, revisar que el semaforo siga al dia.
+document.addEventListener('visibilitychange', () => {
+    if(document.visibilityState === 'visible'){
+        try { if(typeof sfRefrescarEstadoUno === 'function') sfRefrescarEstadoUno(); } catch(e){}
+    }
 });
 
 // ===== BLINDAJE: estado de guardado visible =====
@@ -16560,6 +16740,7 @@ async function sfGuardarYCerrarDia() {
     }
 
     try { sfSaveOK(); } catch (e) {}
+    try { sfLimpiarPendiente(); } catch (e) {}
     try { if (typeof registrarCambio === 'function') registrarCambio(); } catch (e) {}
     try { if (typeof sfActualizarBadgeLocal === 'function') sfActualizarBadgeLocal(); } catch (e) {}
 
@@ -16577,7 +16758,10 @@ async function sfGuardarYCerrarDia() {
     if (typeof daniSpeak === 'function') {
         daniSpeak('\u2705 Guardado y verificado: ' + r.pacientes + ' paciente(s) en este equipo. ' + nube + '.', 8000, 'info');
     }
-    setTimeout(() => pintar('var(--success)', 'fa-floppy-disk', 'Guardar'), 4000);
+    setTimeout(() => {
+        pintar('var(--success)', 'fa-floppy-disk', 'Guardar');
+        if((window._sfPendientes || 0) > 0) { const b=document.getElementById('tbGuardar'); if(b) b.classList.add('pendiente'); }
+    }, 4000);
 }
 
 function saveDB() {
@@ -16605,6 +16789,7 @@ function saveDB() {
             tx.objectStore('clinica').put({ id: 'main_data', data: db });
         } catch(err) { sfSaveError(err && err.message ? err.message : String(err)); }
     };
+    try { sfMarcarPendiente(); } catch(e){}
     if(typeof registrarCambio === 'function') registrarCambio();
 }
 // saveDB actualizado localStorage.setItem('sf_db_v10', JSON.stringify(db)); checkTopAlert(); if(typeof gisInited !== 'undefined' && gisInited && tokenClient && typeof gapi !== 'undefined' && gapi.client && gapi.client.getToken() !== null) uploadToDrive(false); }
@@ -16675,6 +16860,17 @@ function saveDB() {
         try { sfRefrescarEstadoRespaldo(); setInterval(sfRefrescarEstadoRespaldo, 120000); } catch(e) {}
         try { setTimeout(sfVigilanteEspacio, 9000); setInterval(sfVigilanteEspacio, 600000); } catch(e) {}
         try { sfActualizarBadgeSync(); setInterval(sfActualizarBadgeSync, 60000); } catch(e) {}
+        // Semaforo unico: se refresca en cuanto cambia cualquiera de las tres
+        // fuentes ocultas, con un latido de respaldo por si algo se escapa.
+        try {
+            sfRefrescarEstadoUno();
+            setInterval(sfRefrescarEstadoUno, 5000);
+            const obs = new MutationObserver(() => sfRefrescarEstadoUno());
+            ['globalSyncStatus','sfSyncTime','sfLocalBadge'].forEach(id => {
+                const el = document.getElementById(id);
+                if(el) obs.observe(el, { attributes:true, childList:true, subtree:true, attributeFilter:['class','title','style'] });
+            });
+        } catch(e) { console.warn('semaforo unico', e); }
         try { const _ai=$('astImg'); if(_ai && !window._avatarBase) window._avatarBase=_ai.src; } catch(e){}
         try { refreshAvatarOnline(); } catch(e) { console.error("Error AvatarOnline", e); }
         if(db.curr) { loadPatient(); }
@@ -16686,6 +16882,19 @@ function saveDB() {
                 daniSpeak("👋 ¡Hola! Es vital sincronizar tu información en la nube. Consulta el menú 'Ayuda' para más detalles.", 7500, 'info');
             }
         }, 1000);
+
+        // Recordatorio de cierre de jornada: a partir de las 19 h, si hay
+        // cambios sin verificar, se avisa UNA vez al dia.
+        setInterval(() => {
+            try {
+                if((window._sfPendientes || 0) === 0) return;
+                if(new Date().getHours() < 19) return;
+                const hoy = new Date().toISOString().split('T')[0];
+                if(localStorage.getItem('sf_aviso_cierre') === hoy) return;
+                localStorage.setItem('sf_aviso_cierre', hoy);
+                if(typeof daniSpeak === 'function') daniSpeak('\ud83d\udcbe Antes de cerrar, pulsa el bot\u00f3n verde <b>Guardar</b>. Ahi verifico que todo quedo escrito de verdad.', 12000, 'warn');
+            } catch(e){}
+        }, 300000);
 
         // 2. Revisión de Agenda (A los 9 segundos)
         setTimeout(() => { 
@@ -16724,10 +16933,10 @@ function saveDB() {
                 const chk = document.getElementById('chkDarkMode');
                 if(chk) chk.checked = true;
             }
-            const savedMode = localStorage.getItem('sf_screen_mode');
-            if(savedMode === 'tablet') setScreenMode('tablet');
-            else if(savedMode === 'phone') setScreenMode('phone');
-            else setScreenMode('pc');
+            // Los simuladores de vista salieron del topbar: siempre arrancar
+            // normal y dejar que las media queries adapten al dispositivo.
+            localStorage.setItem('sf_screen_mode', 'pc');
+            setScreenMode('pc');
         }, 100); 
     });
 
