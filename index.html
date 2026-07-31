@@ -476,11 +476,35 @@
     @media(max-width: 768px) {
         .topbar-appearance { display:none !important; }
         .agenda-btn-txt { display:none; }
-        /* El boton Guardar SIEMPRE se ve: solo se le quita la palabra. */
-        .tbGuardarTxt { display:none; }
-        #tbGuardar { padding:0.55rem 0.7rem !important; font-size:0.95rem !important; }
+        /* Reparto de espacio: el buscador cede, los botones no. */
+        .topbar { gap:0.45rem !important; padding:0 0.6rem !important; }
+        .topbar > div:first-child { min-width:0 !important; }
+        .search-area { min-width:0 !important; max-width:none !important; padding:0.35rem 0.5rem !important; gap:0.4rem !important; }
+        .search-select { max-width:96px !important; font-size:0.78rem !important; }
+        .topbar-actions { flex-shrink:0 !important; gap:0.4rem !important; }
+        /* En telefono manda el boton flotante; el del topbar estorba. */
+        #tbGuardar { display:none !important; }
         #sfEstadoUno .bdg-txt { display:none; }
+        #sfEstadoUno { padding:0.4rem 0.55rem; }
     }
+    /* BOTON FLOTANTE DE GUARDADO (solo telefono): no puede perderse porque
+       no vive dentro del topbar. Abajo a la izquierda para no chocar con
+       el avatar de Dr. Mikes Molares, que va abajo a la derecha. */
+    #tbGuardarFab { display:none; }
+    @media(max-width: 768px) {
+        /* El asistente sube para dejarle su lugar al boton de guardado. */
+        #dani-container { bottom:86px !important; }
+        /* Boton discreto: circulo chico, solo icono, justo debajo del avatar. */
+        #tbGuardarFab {
+            display:inline-flex !important; position:fixed; bottom:18px; right:22px; z-index:9998;
+            align-items:center; justify-content:center; border:none; background:var(--success); color:white;
+            width:48px; height:48px; border-radius:50%; padding:0; font-size:1.05rem;
+            box-shadow:0 3px 10px rgba(15,23,42,0.28); opacity:0.9; cursor:pointer;
+        }
+        #tbGuardarFab .tbGuardarTxt { display:none !important; }
+        #tbGuardarFab:active { opacity:1; transform:scale(0.94); }
+    }
+    #tbGuardarFab.pendiente { background:#f59e0b !important; opacity:1 !important; box-shadow:0 0 0 3px rgba(245,158,11,0.35), 0 3px 10px rgba(15,23,42,0.28) !important; }
     /* Aviso visual: hay cambios que aun no confirmas con el boton Guardar. */
     #tbGuardar.pendiente { background:#f59e0b !important; }
     #tbGuardar.pendiente::after { content:''; width:7px; height:7px; border-radius:50%; background:white; display:inline-block; }
@@ -557,9 +581,18 @@ window._pdfReady=true;
         <h2 style="margin: 0 !important; font-size: 1.5rem !important; color: white !important;">SmileFlow</h2>
         <a href="https://www.dentilike.com.mx" target="_blank" style="color: #bae6fd; font-size: 0.75rem; text-decoration: none; font-weight: 600; cursor: pointer; transition: color 0.2s;" onmouseover="this.style.color='white'" onmouseout="this.style.color='#bae6fd'">www.dentilike.com.mx</a>
         <a href="mailto:soporte@dentilike.com.mx" style="color: #bae6fd; font-size: 0.75rem; text-decoration: none; font-weight: 600; cursor: pointer; transition: color 0.2s;" onmouseover="this.style.color='white'" onmouseout="this.style.color='#bae6fd'">soporte@dentilike.com.mx</a>
-<span style="color:#7dd3fc; font-size:0.62rem; opacity:0.8; margin-top:2px;">© 2026 Dentilike · Todos los derechos reservados · <b id="sfVersion">v88</b></span>
+<span style="color:#7dd3fc; font-size:0.62rem; opacity:0.8; margin-top:2px;">© 2026 Dentilike · Todos los derechos reservados · <b id="sfVersion">v91</b></span>
     </div></div>
-    
+<!-- Doctor en sesion: informativo, lleva a Configuracion para cambiarlo -->
+<div id="sideDocBox" onclick="openSection('s-admin-id', document.querySelector('.nav-item[onclick*=&quot;s-admin-id&quot;]'))" title="Doctor en sesion. Toca para cambiarlo o editar el perfil." style="margin:0 12px 10px; padding:0.7rem 0.85rem; background:rgba(255,255,255,0.07); border:1px solid rgba(125,211,252,0.28); border-left:3px solid #5DC1BF; border-radius:10px; cursor:pointer; display:flex; align-items:center; gap:0.6rem;">
+<i class="fa-solid fa-user-doctor" style="color:#5DC1BF; font-size:1rem; flex-shrink:0;"></i>
+<div style="min-width:0; flex-grow:1;">
+<div style="color:#7dd3fc; font-size:0.58rem; font-weight:800; letter-spacing:0.06em; text-transform:uppercase;">Sesion activa</div>
+<div id="sideDocName" style="color:white; font-size:0.82rem; font-weight:800; line-height:1.25; word-break:break-word;">—</div>
+</div>
+<i class="fa-solid fa-chevron-right" style="color:#7dd3fc; font-size:0.65rem; opacity:0.7; flex-shrink:0;"></i>
+</div>
+
 <ul class="nav-list">
 <li class="nav-item active" onclick="openSection('s-inicio', this)" style="background:#eff6ff; color:var(--primary-dark); border-left:4px solid var(--primary); margin-bottom: 0.5rem; font-weight:800;">
 <div class="nav-item-content"><i class="fa-solid fa-house"></i> Inicio</div>
@@ -735,12 +768,7 @@ window._pdfReady=true;
 <div style="background:linear-gradient(135deg, var(--primary), var(--secondary)); color:white; border-radius:14px; padding:1.2rem 1.5rem; margin-bottom:1.2rem; box-shadow:0 6px 16px rgba(31,91,158,0.22); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.8rem;">
 <div>
 <h2 id="inicioSaludo" style="margin:0 0 0.2rem 0; font-size:1.35rem; font-weight:800;">Bienvenido</h2>
-<p id="inicioFrase" style="margin:0 0 0.6rem 0; font-size:0.85rem; opacity:0.9; font-style:italic;"></p>
-<div style="display:flex; align-items:center; gap:0.5rem; flex-wrap:wrap;">
-<i class="fa-solid fa-user-doctor" style="font-size:0.8rem; opacity:0.85;"></i>
-<select id="dSelect" onchange="changeActiveDoc()" style="background:rgba(255,255,255,0.18); color:white; border:1px solid rgba(255,255,255,0.35); border-radius:8px; padding:0.35rem 0.6rem; font-weight:700; font-size:0.82rem; cursor:pointer; max-width:100%;"></select>
-<button class="btn" onclick="openSection('s-admin-id', document.querySelector('.nav-item[onclick*=\'s-admin-id\']'))" title="Editar perfil del doctor" style="background:rgba(255,255,255,0.18); color:white; border:1px solid rgba(255,255,255,0.35); font-size:0.75rem; font-weight:700; padding:0.35rem 0.6rem;"><i class="fa-solid fa-pen"></i></button>
-</div>
+<p id="inicioFrase" style="margin:0; font-size:0.85rem; opacity:0.9; font-style:italic;"></p>
 </div>
 <button class="btn" onclick="openSection('s-agenda', document.querySelector('.nav-item[onclick*=\'s-agenda\']'))" style="background:rgba(255,255,255,0.2); color:white; font-weight:700; white-space:nowrap; border:1px solid rgba(255,255,255,0.3);"><i class="fa-solid fa-calendar-plus"></i> Citar</button>
 </div>
@@ -1585,7 +1613,7 @@ Paciente con Alergias Médicas / Materiales
 <div class="grid-2" style="gap:0.7rem; margin-bottom:1rem;">
 <div class="input-group" style="margin:0;">
 <label style="font-size:0.82rem;"><i class="fa-solid fa-sack-dollar"></i> Costo total del tratamiento ($)</label>
-<input class="input-field" id="pCostoTotal" type="number" oninput="recalcSaldo(); triggerUnsavedWarning()" placeholder="0" style="padding:0.5rem;"/>
+<input class="input-field" id="pCostoTotal" type="number" oninput="recalcSaldo(); triggerUnsavedWarning()" onchange="sfAvisarBajaPlan()" placeholder="0" style="padding:0.5rem;"/>
 </div>
 <div class="input-group" style="margin:0;">
 <label style="font-size:0.82rem;"><i class="fa-solid fa-circle-plus"></i> Registrar nuevo abono</label>
@@ -1607,11 +1635,31 @@ Paciente con Alergias Médicas / Materiales
 <div style="font-size:0.72rem; color:#64748b; font-weight:700;">ABONADO</div>
 <div id="resAbonado" style="font-size:1.2rem; font-weight:900; color:#059669;">$0</div>
 </div>
+<div style="flex:1; min-width:110px; background:white; border:1px solid #fcd34d; border-radius:8px; padding:0.7rem; text-align:center;">
+<div style="font-size:0.72rem; color:#64748b; font-weight:700;">CARGOS EXTRA</div>
+<div id="resCargos" style="font-size:1.2rem; font-weight:900; color:#b45309;">$0</div>
+</div>
 <div style="flex:1; min-width:110px; background:white; border:1px solid #fca5a5; border-radius:8px; padding:0.7rem; text-align:center;">
-<div style="font-size:0.72rem; color:#64748b; font-weight:700;">DEBE</div>
+<div id="resDeudaLabel" style="font-size:0.72rem; color:#64748b; font-weight:700;">DEBE</div>
 <div id="resDeuda" style="font-size:1.2rem; font-weight:900; color:#dc2626;">$0</div>
 </div>
 </div>
+
+<div id="avisoSaldoFavor" style="display:none; background:#f5f3ff; border:1px solid #ddd6fe; border-left:4px solid #7c3aed; border-radius:8px; padding:0.7rem 0.9rem; font-size:0.82rem; color:#5b21b6; line-height:1.5; margin-bottom:1rem;"></div>
+
+<!-- CARGOS: lo que se le cobra al paciente aparte del plan -->
+<div style="background:#fffbeb; border:1px solid #fde68a; border-radius:10px; padding:0.9rem; margin-bottom:1rem;">
+<div style="font-weight:800; color:#b45309; font-size:0.85rem; margin-bottom:0.5rem;"><i class="fa-solid fa-file-invoice-dollar"></i> Cargos extra (citas sueltas, brackets despegados, urgencias)</div>
+<input class="input-field" id="pNuevoCargoConcepto" type="text" placeholder="Concepto (ej. 3 brackets despegados)" style="padding:0.5rem; margin-bottom:0.4rem;"/>
+<div style="display:flex; gap:0.4rem; margin-bottom:0.7rem;">
+<input class="input-field" id="pNuevoCargo" type="number" placeholder="Monto $" style="padding:0.5rem;"/>
+<button class="btn" type="button" onclick="agregarCargo()" style="padding:0.5rem 0.9rem; white-space:nowrap; background:#b45309; color:white;"><i class="fa-solid fa-plus"></i></button>
+</div>
+<div id="listaCargos" style="font-size:0.85rem;"></div>
+<p style="font-size:0.72rem; color:#92400e; margin:0.6rem 0 0 0; line-height:1.5;">Usa esto en vez de subir o bajar el costo del plan. Asi queda el historial de que se cobro y cuando.</p>
+</div>
+
+<button class="btn btn-outline" type="button" onclick="panelCorteDelDia()" style="width:100%; margin-bottom:1rem; font-weight:800;"><i class="fa-solid fa-cash-register"></i> Ver abonos del dia (corte de caja)</button>
 
 <!-- Historial de abonos -->
 <div id="listaAbonos" style="font-size:0.85rem;"></div>
@@ -2987,8 +3035,14 @@ AVISO PRÓX. CITA (Recordatorio local):
 <button class="btn btn-success" onclick="crearNuevoDoctor()" style="padding: 0.6rem 1rem;"><i class="fa-solid fa-plus"></i> Crear Nuevo Doctor</button>
 </div>
 <div class="input-group">
+<div style="background:#ecfdf5; border:1px solid #a7f3d0; border-left:4px solid #059669; border-radius:10px; padding:0.9rem 1rem; margin-bottom:1rem;">
+<label style="display:block; font-weight:800; color:#047857; font-size:0.85rem; margin-bottom:0.4rem;"><i class="fa-solid fa-circle-user"></i> Doctor en sesion activa</label>
+<select class="input-select" id="dSelect" onchange="changeActiveDoc()" style="font-weight:800; background:white; border-color:#a7f3d0; font-size:1.02rem;"></select>
+<p style="font-size:0.74rem; color:#065f46; margin:0.45rem 0 0 0; line-height:1.5;">Es el nombre que se imprime en recetas, consentimientos y documentos. Aparece tambien en el menu lateral.</p>
+</div>
 <label><i class="fa-solid fa-user-doctor"></i> Selecciona el Perfil a Editar</label>
 <select class="input-select" id="adminDocSelect" onchange="cargarDoctorAdmin()" style="font-weight:800; background:#f0f9ff; border-color:#bae6fd; font-size:1.05rem;"></select>
+<p style="font-size:0.74rem; color:#64748b; margin:0.45rem 0 0 0;">Editar un perfil no cambia el doctor en sesion.</p>
 </div>
 <div id="docFormBox" style="background:#f8fafc; padding:1.5rem; border-radius:var(--radius-md); border:1px solid #cbd5e1; margin-top:1.5rem;">
 <input id="dId" type="hidden"/>
@@ -4883,6 +4937,7 @@ db = {
         const docName = (typeof sfNombreDoc === 'function') ? sfNombreDoc(sfDocActivo()) : '';
         if($('inicioSaludo')) $('inicioSaludo').innerHTML = `<i class="fa-solid fa-tooth"></i> ${saludo}${docName ? ', '+docName : ''}`;
         if($('inicioFrase')) $('inicioFrase').textContent = '“' + FRASES_MOTIVA[Math.floor(Math.random()*FRASES_MOTIVA.length)] + '”';
+        try { sfPintarDocSidebar(); } catch(e){}
 
         // Pendientes (pacientes con aviso o próxima cita registrada)
         const pend = [];
@@ -11365,15 +11420,128 @@ ${patientText}`;
     function savePatientAlert() { if(!db.curr) return; db.pats[db.curr].alert=$('pAlert').value; db.pats[db.curr].alertDate=new Date().toISOString().split('T')[0]; saveDB(); setAlertLabel(db.pats[db.curr].alertDate); }
 
     // ===== ABONOS Y DEUDAS =====
+    // Fecha de hoy con el mismo formato que usa agregarAbono (dd/mm/aaaa).
+    function sfHoyMX(){ return new Date().toLocaleDateString('es-MX', {day:'2-digit',month:'2-digit',year:'numeric'}); }
+    function sfSuma(lista){ return (lista||[]).reduce((a,x)=>a + (parseFloat(x.monto)||0), 0); }
+
+    // Cuenta completa del paciente en un solo lugar.
+    function sfCuenta(p){
+        p = p || (db.curr ? db.pats[db.curr] : null);
+        const plan    = parseFloat($('pCostoTotal') ? $('pCostoTotal').value : 0) || 0;
+        const cargos  = (p && p.cargos) ? p.cargos : [];
+        const abonos  = (p && p.abonos) ? p.abonos : [];
+        const extra   = sfSuma(cargos);
+        const abonado = sfSuma(abonos);
+        const total   = plan + extra;
+        return { plan, extra, total, abonado, saldo: total - abonado, cargos, abonos };
+    }
+
     function recalcSaldo() {
-        const total = parseFloat($('pCostoTotal') ? $('pCostoTotal').value : 0) || 0;
+        const c = sfCuenta();
+        if($('resCostoTotal')) $('resCostoTotal').textContent = '$' + c.total.toLocaleString('es-MX');
+        if($('resAbonado'))    $('resAbonado').textContent    = '$' + c.abonado.toLocaleString('es-MX');
+        if($('resCargos'))     $('resCargos').textContent     = '$' + c.extra.toLocaleString('es-MX');
+
+        // Un saldo negativo NO es una deuda del consultorio: es dinero que el
+        // paciente pago de mas. Se nombra asi para que nadie lo malinterprete.
+        const et = $('resDeudaLabel'), ev = $('resDeuda');
+        if(ev){
+            const aFavor = c.saldo < 0;
+            ev.textContent = '$' + Math.abs(c.saldo).toLocaleString('es-MX');
+            ev.style.color = c.saldo > 0 ? '#dc2626' : (aFavor ? '#7c3aed' : '#059669');
+            if(et) et.textContent = c.saldo > 0 ? 'DEBE' : (aFavor ? 'A FAVOR' : 'AL CORRIENTE');
+        }
+        const av = $('avisoSaldoFavor');
+        if(av) av.style.display = (c.saldo < 0) ? 'block' : 'none';
+        if(av && c.saldo < 0){
+            av.innerHTML = '<i class="fa-solid fa-circle-info"></i> El paciente lleva <b>$' + Math.abs(c.saldo).toLocaleString('es-MX')
+                         + '</b> pagados de mas. Si falto registrar un cargo (una cita, brackets despegados), agregalo abajo en <b>Cargos</b>. '
+                         + 'No bajes el costo del plan para cuadrarlo: eso borra el historial.';
+        }
+        try { renderCargos(); } catch(e){}
+    }
+
+    // ── CARGOS (lo que se le cobra al paciente, aparte del plan) ─────────
+    function renderCargos(){
+        const cont = $('listaCargos');
+        if(!cont) return;
         const p = db.curr ? db.pats[db.curr] : null;
-        const abonos = (p && p.abonos) ? p.abonos : [];
-        const abonado = abonos.reduce((a,x)=>a + (parseFloat(x.monto)||0), 0);
-        const deuda = total - abonado;
-        if($('resCostoTotal')) $('resCostoTotal').textContent = '$' + total.toLocaleString('es-MX');
-        if($('resAbonado')) $('resAbonado').textContent = '$' + abonado.toLocaleString('es-MX');
-        if($('resDeuda')) { $('resDeuda').textContent = '$' + deuda.toLocaleString('es-MX'); $('resDeuda').style.color = deuda>0 ? '#dc2626' : '#059669'; }
+        const cargos = (p && p.cargos) ? p.cargos : [];
+        if(cargos.length === 0){
+            cont.innerHTML = '<div style="color:#94a3b8; font-style:italic; font-size:0.8rem;">Sin cargos extra. El plan de tratamiento va aparte.</div>';
+            return;
+        }
+        cont.innerHTML = '<div style="font-weight:700; color:#b45309; font-size:0.8rem; margin-bottom:0.4rem;">Cargos registrados:</div>' +
+            cargos.map((a,i)=>`<div style="display:flex; justify-content:space-between; align-items:center; background:white; border:1px solid #fcd34d; border-radius:6px; padding:0.4rem 0.7rem; margin-bottom:0.3rem;">
+                <span style="flex:1; min-width:0;"><i class="fa-solid fa-file-invoice-dollar" style="color:#b45309;"></i> <b>$${(parseFloat(a.monto)||0).toLocaleString('es-MX')}</b> <span style="color:#94a3b8; font-size:0.78rem;">— ${a.fecha||''}</span>${a.concepto?` <span style="color:#475569; font-size:0.8rem;">· ${a.concepto}</span>`:''}</span>
+                <i class="fa-solid fa-xmark" onclick="quitarCargo(${i})" style="cursor:pointer; color:#cbd5e1; flex-shrink:0;" title="Quitar cargo"></i>
+            </div>`).join('');
+    }
+
+    function agregarCargo(){
+        if(!db.curr) return alert("Selecciona o guarda un paciente primero.");
+        const monto = parseFloat($('pNuevoCargo').value) || 0;
+        if(monto <= 0) return alert("Escribe un monto valido.");
+        const concepto = $('pNuevoCargoConcepto') ? $('pNuevoCargoConcepto').value.trim() : '';
+        const p = db.pats[db.curr];
+        p.cargos = p.cargos || [];
+        p.cargos.push({ id:'cg_'+Date.now(), monto: monto, fecha: sfHoyMX(), concepto: concepto });
+        $('pNuevoCargo').value = '';
+        if($('pNuevoCargoConcepto')) $('pNuevoCargoConcepto').value = '';
+        saveDB();
+        recalcSaldo();
+        if(typeof daniSpeak === 'function') daniSpeak(`🧾 Cargo de $${monto.toLocaleString('es-MX')} registrado.`, 4000, 'info');
+    }
+
+    function quitarCargo(i){
+        if(!db.curr) return;
+        const p = db.pats[db.curr];
+        if(!p.cargos) return;
+        if(!confirm("¿Quitar este cargo?")) return;
+        p.cargos.splice(i,1);
+        saveDB();
+        recalcSaldo();
+    }
+
+    // ── CORTE DEL DIA: todos los abonos de hoy, de todos los pacientes ───
+    function sfCorteDelDia(fechaTxt){
+        const dia = fechaTxt || sfHoyMX();
+        const filas = [];
+        Object.values(db.pats || {}).forEach(p => {
+            (p.abonos || []).forEach(a => {
+                if(a.fecha === dia) filas.push({ paciente: p.name || 'Sin nombre', monto: parseFloat(a.monto)||0, concepto: a.concepto || '' });
+            });
+        });
+        return { dia, filas, total: filas.reduce((t,f)=>t+f.monto, 0) };
+    }
+
+    function panelCorteDelDia(){
+        const c = sfCorteDelDia();
+        const { body } = sfOverlay('<i class="fa-solid fa-cash-register"></i> Abonos del dia', '#059669');
+        let h = `<div style="background:#ecfdf5; border:1px solid #a7f3d0; border-radius:10px; padding:1rem; text-align:center; margin-bottom:1rem;">
+            <div style="font-size:0.75rem; color:#047857; font-weight:800; letter-spacing:0.05em;">TOTAL COBRADO · ${c.dia}</div>
+            <div style="font-size:2rem; font-weight:900; color:#047857;">$${c.total.toLocaleString('es-MX')}</div>
+            <div style="font-size:0.78rem; color:#065f46;">${c.filas.length} movimiento(s)</div>
+        </div>`;
+        if(c.filas.length === 0){
+            h += '<p style="color:#64748b; font-style:italic; text-align:center;">No hay abonos registrados hoy.</p>';
+        } else {
+            h += c.filas.map(f=>`<div style="display:flex; justify-content:space-between; gap:0.6rem; border-bottom:1px solid var(--border); padding:0.55rem 0.2rem;">
+                <span style="min-width:0;"><b style="font-size:0.88rem;">${f.paciente}</b>${f.concepto?`<br><span style="font-size:0.78rem; color:#64748b;">${f.concepto}</span>`:''}</span>
+                <b style="color:#059669; white-space:nowrap;">$${f.monto.toLocaleString('es-MX')}</b>
+            </div>`).join('');
+            h += `<button class="btn btn-outline" onclick="sfCorteWA()" style="width:100%; margin-top:1rem; font-weight:800;"><i class="fa-brands fa-whatsapp"></i> Enviar corte por WhatsApp</button>`;
+        }
+        h += '<p style="font-size:0.74rem; color:#64748b; margin-top:0.9rem; line-height:1.5;">Solo cuenta <b>abonos</b> (dinero que entro hoy), no los cargos generados.</p>';
+        body.innerHTML = h;
+    }
+
+    function sfCorteWA(){
+        const c = sfCorteDelDia();
+        let t = `*Corte del dia ${c.dia}*\n\n`;
+        c.filas.forEach(f => { t += `• ${f.paciente}: $${f.monto.toLocaleString('es-MX')}${f.concepto?` (${f.concepto})`:''}\n`; });
+        t += `\n*TOTAL: $${c.total.toLocaleString('es-MX')}* — ${c.filas.length} movimiento(s)`;
+        window.open('https://wa.me/?text=' + encodeURIComponent(t), '_blank');
     }
 
     function renderAbonos() {
@@ -11392,6 +11560,20 @@ ${patientText}`;
                 </span>
             </div>`).join('');
         recalcSaldo();
+    }
+
+    // Si se baja el costo del plan por debajo de lo ya cobrado, avisar:
+    // ese es justo el movimiento que dejaba el saldo en negativo.
+    function sfAvisarBajaPlan(){
+        try {
+            const c = sfCuenta();
+            if(c.saldo >= 0) return;
+            alert('⚠️ Ojo con el costo del plan\n\nEl paciente ya lleva $' + c.abonado.toLocaleString('es-MX')
+                + ' abonados, pero el total quedo en $' + c.total.toLocaleString('es-MX') + '.\n\n'
+                + 'Eso deja $' + Math.abs(c.saldo).toLocaleString('es-MX') + ' a FAVOR del paciente.\n\n'
+                + 'Si lo que pasa es que falto registrar un cobro, no bajes el plan: agregalo en "Cargos extra". '
+                + 'Asi queda el historial de que se cobro y cuando.');
+        } catch(e){}
     }
 
     function agregarAbono() {
@@ -13167,8 +13349,18 @@ Reglas: español de México; terminología dental correcta; máximo 6 líneas; u
     }
     function sfDocActivo(){ try { return (db.docs && db.activeDoc) ? db.docs[db.activeDoc] : null; } catch(e){ return null; } }
 
-    function renderDocSelects() { let h=''; Object.values(db.docs).forEach(d=>{h+=`<option value="${d.id}">${sfNombreDoc(d)}</option>`;}); if($('dSelect'))$('dSelect').innerHTML=h; if($('adminDocSelect'))$('adminDocSelect').innerHTML=h; if(db.activeDoc&&$('dSelect')) $('dSelect').value=db.activeDoc; if($('adminDocSelect')){ $('adminDocSelect').value=db.activeDoc||Object.keys(db.docs)[0]; cargarDoctorAdmin(); } }
-    function changeActiveDoc() { db.activeDoc=$('dSelect').value; saveDB(); }
+    function renderDocSelects() { let h=''; Object.values(db.docs).forEach(d=>{h+=`<option value="${d.id}">${sfNombreDoc(d)}</option>`;}); if($('dSelect'))$('dSelect').innerHTML=h; if($('adminDocSelect'))$('adminDocSelect').innerHTML=h; if(db.activeDoc&&$('dSelect')) $('dSelect').value=db.activeDoc; try { sfPintarDocSidebar(); } catch(e){} if($('adminDocSelect')){ $('adminDocSelect').value=db.activeDoc||Object.keys(db.docs)[0]; cargarDoctorAdmin(); } }
+    function changeActiveDoc() { db.activeDoc=$('dSelect').value; saveDB(); sfPintarDocSidebar(); try { if(typeof renderInicio === 'function') renderInicio(); } catch(e){} }
+
+    // Nombre del doctor en sesion, en el menu azul marino.
+    function sfPintarDocSidebar(){
+        try {
+            const el = document.getElementById('sideDocName');
+            if(!el) return;
+            const n = sfNombreDoc(sfDocActivo());
+            el.textContent = n || 'Sin doctor asignado';
+        } catch(e){}
+    }
     function crearNuevoDoctor() { $('dId').value='new'; ['dName','dSpec','dCed1','dCed2','dPhone','dEmail','dUni1','dUni2'].forEach(id=>{if($(id))$(id).value='';}); if($('dTitulo')) $('dTitulo').value='Dr.'; }
     function cargarDoctorAdmin() { let v=$('adminDocSelect').value; if(!v||!db.docs[v]) return; let d=db.docs[v]; $('dId').value=d.id; $('dName').value=sfSoloNombre(d.name); if($('dTitulo')) $('dTitulo').value = sfTituloDe(d); $('dSpec').value=d.spec; $('dCed1').value=d.ced1; $('dCed2').value=d.ced2; $('dPhone').value=d.phone||''; $('dEmail').value=d.email||''; if($('dCiudad')) $('dCiudad').value=d.ciudad||''; if($('dAutoFirma')) $('dAutoFirma').checked = !!d.autoFirma; if($('dFirmaImg') && $('dFirmaPreview')){ if(d.firma){ $('dFirmaImg').src=d.firma; $('dFirmaPreview').style.display='block'; if($('dFirmaBtnTxt')) $('dFirmaBtnTxt').textContent='Cambiar mi firma'; } else { $('dFirmaPreview').style.display='none'; if($('dFirmaBtnTxt')) $('dFirmaBtnTxt').textContent='Registrar mi firma'; } } ['uni1','uni2'].forEach((k,ix)=>{ const im=$('uniImg'+(ix+1)); if(im){ if(d[k]){ im.src=d[k]; im.style.display='inline-block'; } else { im.src=''; im.style.display='none'; } } }); }
 
@@ -16612,22 +16804,26 @@ Reglas: español de México; terminología dental correcta; máximo 6 líneas; u
 // ============================================================
 window._sfPendientes = 0;
 
+// Hay dos botones de guardar (topbar en escritorio, flotante en telefono):
+// siempre muestran lo mismo.
+function sfBotonesGuardar(){
+    return ['tbGuardar','tbGuardarFab'].map(id => document.getElementById(id)).filter(Boolean);
+}
+
 function sfMarcarPendiente(){
     window._sfPendientes = (window._sfPendientes || 0) + 1;
-    const b = document.getElementById('tbGuardar');
-    if(b && !b.classList.contains('pendiente')){
+    sfBotonesGuardar().forEach(b => {
         b.classList.add('pendiente');
         b.title = 'Tienes cambios sin verificar. Pulsa Guardar antes de cerrar.';
-    }
+    });
 }
 
 function sfLimpiarPendiente(){
     window._sfPendientes = 0;
-    const b = document.getElementById('tbGuardar');
-    if(b){
+    sfBotonesGuardar().forEach(b => {
         b.classList.remove('pendiente');
         b.title = 'Guardar todo y verificar';
-    }
+    });
 }
 
 window.addEventListener('beforeunload', (e) => {
@@ -16715,14 +16911,12 @@ function sfGuardarConfirmado() {
 }
 
 async function sfGuardarYCerrarDia() {
-    const btn = document.getElementById('tbGuardar');
-    const txt = btn ? btn.querySelector('.tbGuardarTxt') : null;
     const pintar = (bg, ico, t) => {
-        if (!btn) return;
-        btn.style.background = bg;
-        const i = btn.querySelector('i');
-        if (i) i.className = 'fa-solid ' + ico;
-        if (txt) txt.textContent = t;
+        sfBotonesGuardar().forEach(b => {
+            b.style.background = bg;
+            const i = b.querySelector('i');            if (i) i.className = 'fa-solid ' + ico;
+            const x = b.querySelector('.tbGuardarTxt'); if (x) x.textContent = t;
+        });
     };
     pintar('#64748b', 'fa-spinner fa-spin', 'Guardando...');
 
@@ -16760,7 +16954,7 @@ async function sfGuardarYCerrarDia() {
     }
     setTimeout(() => {
         pintar('var(--success)', 'fa-floppy-disk', 'Guardar');
-        if((window._sfPendientes || 0) > 0) { const b=document.getElementById('tbGuardar'); if(b) b.classList.add('pendiente'); }
+        if((window._sfPendientes || 0) > 0) sfBotonesGuardar().forEach(b => b.classList.add('pendiente'));
     }, 4000);
 }
 
@@ -16854,6 +17048,7 @@ function saveDB() {
         try { sfOnboardingCheck(); } catch(e) {}
         // Reacomodo de controles desactivado: la barra se queda como estaba.
         try { loadConfigUI(); } catch(e) { console.error("Error UI Inicial", e); }
+        try { sfPintarDocSidebar(); } catch(e) {}
         try { buildTreats(); } catch(e) { console.error("Error Tratamientos", e); }
         try { ensureOdontoRED(); } catch(e) { console.error("Error OdontoRED", e); }
         try { checkBackupReminder(); } catch(e) { console.error("Error BackupReminder", e); }
@@ -17006,6 +17201,7 @@ function saveDB() {
 
 
 </script>
+    <button id="tbGuardarFab" onclick="sfGuardarYCerrarDia()" title="Guardar y verificar" aria-label="Guardar y verificar"><i class="fa-solid fa-floppy-disk"></i><span class="tbGuardarTxt">Guardar</span></button>
     <button id="pwaInstallBtn" onclick="instalarPWA()" style="display:none; position:fixed; bottom:14px; left:14px; z-index:99999; background:linear-gradient(135deg,#1f5b9e,#0d9488); color:#fff; border:none; border-radius:999px; padding:0.65rem 1.2rem; font-weight:800; font-size:0.85rem; cursor:pointer; box-shadow:0 6px 16px rgba(31,91,158,0.4); align-items:center; gap:7px;"><i class="fa-solid fa-download"></i> Instalar app</button>
 <button id="exitSimBtn" onclick="setScreenMode('pc'); if(typeof localStorage!=='undefined') localStorage.setItem('sf_screen_mode','pc');" title="Volver a la vista de escritorio"><i class="fa-solid fa-display"></i> Vista escritorio</button>
 <!-- Modal: hoja de diseño digital -->
