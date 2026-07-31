@@ -581,7 +581,7 @@ window._pdfReady=true;
         <h2 style="margin: 0 !important; font-size: 1.5rem !important; color: white !important;">SmileFlow</h2>
         <a href="https://www.dentilike.com.mx" target="_blank" style="color: #bae6fd; font-size: 0.75rem; text-decoration: none; font-weight: 600; cursor: pointer; transition: color 0.2s;" onmouseover="this.style.color='white'" onmouseout="this.style.color='#bae6fd'">www.dentilike.com.mx</a>
         <a href="mailto:soporte@dentilike.com.mx" style="color: #bae6fd; font-size: 0.75rem; text-decoration: none; font-weight: 600; cursor: pointer; transition: color 0.2s;" onmouseover="this.style.color='white'" onmouseout="this.style.color='#bae6fd'">soporte@dentilike.com.mx</a>
-<span style="color:#7dd3fc; font-size:0.62rem; opacity:0.8; margin-top:2px;">© 2026 Dentilike · Todos los derechos reservados · <b id="sfVersion">v91</b></span>
+<span style="color:#7dd3fc; font-size:0.62rem; opacity:0.8; margin-top:2px;">© 2026 Dentilike · Todos los derechos reservados · <b id="sfVersion">v92</b></span>
     </div></div>
 <!-- Doctor en sesion: informativo, lleva a Configuracion para cambiarlo -->
 <div id="sideDocBox" onclick="openSection('s-admin-id', document.querySelector('.nav-item[onclick*=&quot;s-admin-id&quot;]'))" title="Doctor en sesion. Toca para cambiarlo o editar el perfil." style="margin:0 12px 10px; padding:0.7rem 0.85rem; background:rgba(255,255,255,0.07); border:1px solid rgba(125,211,252,0.28); border-left:3px solid #5DC1BF; border-radius:10px; cursor:pointer; display:flex; align-items:center; gap:0.6rem;">
@@ -11584,7 +11584,13 @@ ${patientText}`;
         const p = db.pats[db.curr];
         p.abonos = p.abonos || [];
         const f = new Date().toLocaleDateString('es-MX', {day:'2-digit',month:'2-digit',year:'numeric'});
-        p.abonos.push({ id:'ab_'+Date.now(), monto: monto, fecha: f, concepto: concepto });
+        const idAb = 'ab_'+Date.now();
+        p.abonos.push({ id:idAb, monto: monto, fecha: f, concepto: concepto });
+        // Asiento en el libro de ingresos (fecha ISO, que es la que filtran
+        // el panel de Inicio y los reportes). 'ref' permite deshacerlo.
+        db.log = db.log || [];
+        db.log.push({ f: new Date().toISOString().substring(0,10), p: p.name || '', t:'abono',
+                      ing: monto, op: 0, inv: 0, ref: idAb, concepto: concepto });
         $('pNuevoAbono').value = '';
         if($('pNuevoConcepto')) $('pNuevoConcepto').value = '';
         saveDB();
@@ -11597,7 +11603,10 @@ ${patientText}`;
         const p = db.pats[db.curr];
         if(!p.abonos) return;
         if(!confirm("¿Quitar este abono?")) return;
+        const quitado = p.abonos[i];
         p.abonos.splice(i,1);
+        // Quitar tambien su asiento de ingresos para no inflar el corte.
+        try { if(quitado && quitado.id) db.log = (db.log||[]).filter(r => r.ref !== quitado.id); } catch(e){}
         saveDB();
         renderAbonos();
     }
