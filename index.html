@@ -581,7 +581,7 @@ window._pdfReady=true;
         <h2 style="margin: 0 !important; font-size: 1.5rem !important; color: white !important;">SmileFlow</h2>
         <a href="https://www.dentilike.com.mx" target="_blank" style="color: #bae6fd; font-size: 0.75rem; text-decoration: none; font-weight: 600; cursor: pointer; transition: color 0.2s;" onmouseover="this.style.color='white'" onmouseout="this.style.color='#bae6fd'">www.dentilike.com.mx</a>
         <a href="mailto:soporte@dentilike.com.mx" style="color: #bae6fd; font-size: 0.75rem; text-decoration: none; font-weight: 600; cursor: pointer; transition: color 0.2s;" onmouseover="this.style.color='white'" onmouseout="this.style.color='#bae6fd'">soporte@dentilike.com.mx</a>
-<span style="color:#7dd3fc; font-size:0.62rem; opacity:0.8; margin-top:2px;">© 2026 Dentilike · Todos los derechos reservados · <b id="sfVersion">v93</b></span>
+<span style="color:#7dd3fc; font-size:0.62rem; opacity:0.8; margin-top:2px;">© 2026 Dentilike · Todos los derechos reservados · <b id="sfVersion">v95</b></span>
     </div></div>
 <!-- Doctor en sesion: informativo, lleva a Configuracion para cambiarlo -->
 <div id="sideDocBox" onclick="openSection('s-admin-id', document.querySelector('.nav-item[onclick*=&quot;s-admin-id&quot;]'))" title="Doctor en sesion. Toca para cambiarlo o editar el perfil." style="margin:0 12px 10px; padding:0.7rem 0.85rem; background:rgba(255,255,255,0.07); border:1px solid rgba(125,211,252,0.28); border-left:3px solid #5DC1BF; border-radius:10px; cursor:pointer; display:flex; align-items:center; gap:0.6rem;">
@@ -615,6 +615,9 @@ window._pdfReady=true;
 </li>
 <li class="nav-item" onclick="openSection('s-tratamientos', this)">
 <div class="nav-item-content"><i class="fa-solid fa-list-check"></i> Plan Tratamiento</div>
+</li>
+<li class="nav-item" onclick="openSection('s-cobros', this)">
+<div class="nav-item-content"><i class="fa-solid fa-money-bill-wave"></i> Cobros</div>
 </li>
 <li class="nav-group">
 <div class="nav-item" onclick="toggleSubmenu(this)">
@@ -762,7 +765,7 @@ window._pdfReady=true;
 <button onclick="sfQuickGo('s-receta')" style="border:none; border-radius:10px; padding:0.55rem 0.9rem; font-weight:800; font-size:0.85rem; cursor:pointer; display:inline-flex; align-items:center; gap:0.4rem; white-space:nowrap; background:#7c3aed; color:white;" title="Emitir receta"><i class="fa-solid fa-prescription"></i> Receta</button>
 <button onclick="sfQuickGo('s-odontograma')" style="border:none; border-radius:10px; padding:0.55rem 0.9rem; font-weight:800; font-size:0.85rem; cursor:pointer; display:inline-flex; align-items:center; gap:0.4rem; white-space:nowrap; background:#0891b2; color:white;" title="Odontograma"><i class="fa-solid fa-teeth-open"></i> Odontograma</button>
 <button onclick="sfQuickGo('s-tratamientos')" style="border:none; border-radius:10px; padding:0.55rem 0.9rem; font-weight:800; font-size:0.85rem; cursor:pointer; display:inline-flex; align-items:center; gap:0.4rem; white-space:nowrap; background:#059669; color:white;" title="Plan de tratamiento"><i class="fa-solid fa-list-check"></i> Plan</button>
-<button onclick="sfQuickGo('s-perfil','listaAbonos')" style="border:none; border-radius:10px; padding:0.55rem 0.9rem; font-weight:800; font-size:0.85rem; cursor:pointer; display:inline-flex; align-items:center; gap:0.4rem; white-space:nowrap; background:#b45309; color:white;" title="Registrar abono o cobro"><i class="fa-solid fa-cash-register"></i> Cobro</button>
+<button onclick="sfQuickGo('s-cobros','listaAbonos')" style="border:none; border-radius:10px; padding:0.55rem 0.9rem; font-weight:800; font-size:0.85rem; cursor:pointer; display:inline-flex; align-items:center; gap:0.4rem; white-space:nowrap; background:#b45309; color:white;" title="Registrar abono o cobro"><i class="fa-solid fa-cash-register"></i> Cobro</button>
 </div>
 <div class="app-section active" id="s-inicio">
 <div style="background:linear-gradient(135deg, var(--primary), var(--secondary)); color:white; border-radius:14px; padding:1.2rem 1.5rem; margin-bottom:1.2rem; box-shadow:0 6px 16px rgba(31,91,158,0.22); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.8rem;">
@@ -1602,6 +1605,38 @@ Paciente con Alergias Médicas / Materiales
 </div>
 
 </div>
+<button class="btn btn-success" onclick="savePatient()" style="width:100%; margin-top:1.5rem; font-size:1.15rem; padding: 1.2rem; font-weight:800; box-shadow: 0 4px 10px rgba(16, 185, 129, 0.3); display:flex; align-items:center; justify-content:center; gap:0.6rem;"><i class="fa-solid fa-shield-heart"></i> GUARDAR PERFIL DEL PACIENTE <i class="fa-solid fa-circle-check"></i></button>
+</div>
+<div class="alert-box" id="pPendingTreats" style="background:linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); border:2px solid #3b82f6; border-left-width:6px; border-radius:12px; padding:1.2rem; margin-top:1rem; display:none; box-shadow:0 4px 6px -1px rgba(59,130,246,0.15);"></div>
+<div class="alert-box" id="divAlertBox">
+<div style="width:100%; display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
+<label id="lblAlertTitle" style="font-size:0.95rem; margin:0; font-weight:800; display:flex; align-items:center; gap:0.5rem;">
+<span style="background:#fef3c7; color:#854d0e; width:28px; height:28px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; font-size:0.8rem; border:1px solid #fde047;"><i class="fa-solid fa-thumbtack"></i></span>
+AVISO PRÓX. CITA (Recordatorio local):
+</label>
+</div>
+<input id="pAlert" onchange="savePatientAlert()" placeholder="Sin avisos ni pendientes registrados..." style="color: var(--text); background: white; border: 1px solid #fde047; padding: 0.6rem; border-radius: 6px; width: 100%; font-weight: 500;" type="text"/>
+<div style="border-top: 1px dashed rgba(0,0,0,0.1); padding-top: 1.2rem; margin-top: 1.2rem;">
+<label style="font-size:0.85rem; font-weight:800; color:var(--warning-text); display:block; margin-bottom:0.8rem;"><i class="fa-brands fa-whatsapp"></i> AGENDAR Y ENVIAR RECORDATORIO A ESTE PACIENTE:</label>
+<div style="display: flex; gap: 0.5rem; flex-wrap:wrap; align-items:center;">
+<button class="btn" onclick="pedirResena()" style="background:linear-gradient(135deg,#f59e0b,#d97706); color:white; font-size:0.95rem; padding:0.8rem; font-weight:800;" title="Enviar solicitud de reseña por WhatsApp"><i class="fa-solid fa-star"></i> Pedir reseña</button>
+<button class="btn" onclick="abrirAgenda()" style="background:var(--primary); font-size:0.95rem; padding:0.8rem;" title="Abrir Google Calendar"><i class="fa-regular fa-calendar-plus"></i> Abrir Calendario</button>
+<input class="input-field" id="waDate" onchange="if(db.curr){ db.pats[db.curr].nextAppt = this.value; saveDB(); renderAgendaList(); if(typeof renderInicio==='function') renderInicio(); }" style="flex:1; background: white; border-color:#fcd34d;" type="date"/>
+<input class="input-field" id="waTime" onchange="if(db.curr){ db.pats[db.curr].nextApptTime = this.value; saveDB(); renderAgendaList(); if(typeof renderInicio==='function') renderInicio(); }" style="width: 130px; background: white; border-color:#fcd34d;" type="time"/>
+<button class="btn btn-wa" onclick="sendApptWA()" style="flex-grow:1; font-size:1rem; padding:0.8rem;"><i class="fa-brands fa-whatsapp fa-lg"></i> Enviar Confirmación por WA</button>
+</div>
+</div>
+</div>
+</div>
+<div class="app-section" id="s-cobros">
+<div class="card" style="border-top-color: var(--secondary-dark);">
+<h3 style="color:var(--secondary-dark); font-size:1.15rem; border-bottom:2px solid #cffafe; padding-bottom:0.7rem; margin-bottom:1.2rem; display:flex; align-items:center; gap:0.7rem; flex-wrap:wrap;">
+    <span style="background:linear-gradient(135deg, var(--secondary), var(--secondary-dark)); color:white; width:36px; height:36px; border-radius:10px; display:inline-flex; align-items:center; justify-content:center; font-size:0.95rem;"><i class="fa-solid fa-money-bill-wave"></i></span>
+    Cobros y Pagos
+</h3>
+<div style="background:#eff6ff; border:1px dashed #bae6fd; color:#1e40af; padding:0.7rem 1rem; border-radius:8px; margin-bottom:1.2rem; font-size:0.8rem; line-height:1.5;">
+<i class="fa-solid fa-lock"></i> Sección confidencial: evita mostrar esta pantalla al paciente o asistente.
+</div>
 <!-- ABONOS Y DEUDAS (control de pagos del paciente) -->
 <h3 onclick="toggleAccordion('accAbonos', this)" style="color:var(--secondary-dark); font-size:1.15rem; border-bottom:2px solid #cffafe; padding-bottom:0.7rem; margin-bottom:1.2rem; margin-top:2rem; display:flex; align-items:center; gap:0.7rem; cursor:pointer; user-select:none;">
     <span style="background:linear-gradient(135deg, var(--secondary), var(--secondary-dark)); color:white; width:36px; height:36px; border-radius:10px; display:inline-flex; align-items:center; justify-content:center; font-size:0.95rem;"><i class="fa-solid fa-money-bill-wave"></i></span>
@@ -1666,27 +1701,6 @@ Paciente con Alergias Médicas / Materiales
 <textarea class="input-field" id="pNotaPago" oninput="triggerUnsavedWarning()" placeholder="Notas de pago (acuerdos, fechas, etc.)" style="min-height:50px; margin-top:0.8rem; font-size:0.85rem;"></textarea>
 </div>
 
-</div>
-<button class="btn btn-success" onclick="savePatient()" style="width:100%; margin-top:1.5rem; font-size:1.15rem; padding: 1.2rem; font-weight:800; box-shadow: 0 4px 10px rgba(16, 185, 129, 0.3); display:flex; align-items:center; justify-content:center; gap:0.6rem;"><i class="fa-solid fa-shield-heart"></i> GUARDAR PERFIL DEL PACIENTE <i class="fa-solid fa-circle-check"></i></button>
-</div>
-<div class="alert-box" id="pPendingTreats" style="background:linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); border:2px solid #3b82f6; border-left-width:6px; border-radius:12px; padding:1.2rem; margin-top:1rem; display:none; box-shadow:0 4px 6px -1px rgba(59,130,246,0.15);"></div>
-<div class="alert-box" id="divAlertBox">
-<div style="width:100%; display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
-<label id="lblAlertTitle" style="font-size:0.95rem; margin:0; font-weight:800; display:flex; align-items:center; gap:0.5rem;">
-<span style="background:#fef3c7; color:#854d0e; width:28px; height:28px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; font-size:0.8rem; border:1px solid #fde047;"><i class="fa-solid fa-thumbtack"></i></span>
-AVISO PRÓX. CITA (Recordatorio local):
-</label>
-</div>
-<input id="pAlert" onchange="savePatientAlert()" placeholder="Sin avisos ni pendientes registrados..." style="color: var(--text); background: white; border: 1px solid #fde047; padding: 0.6rem; border-radius: 6px; width: 100%; font-weight: 500;" type="text"/>
-<div style="border-top: 1px dashed rgba(0,0,0,0.1); padding-top: 1.2rem; margin-top: 1.2rem;">
-<label style="font-size:0.85rem; font-weight:800; color:var(--warning-text); display:block; margin-bottom:0.8rem;"><i class="fa-brands fa-whatsapp"></i> AGENDAR Y ENVIAR RECORDATORIO A ESTE PACIENTE:</label>
-<div style="display: flex; gap: 0.5rem; flex-wrap:wrap; align-items:center;">
-<button class="btn" onclick="pedirResena()" style="background:linear-gradient(135deg,#f59e0b,#d97706); color:white; font-size:0.95rem; padding:0.8rem; font-weight:800;" title="Enviar solicitud de reseña por WhatsApp"><i class="fa-solid fa-star"></i> Pedir reseña</button>
-<button class="btn" onclick="abrirAgenda()" style="background:var(--primary); font-size:0.95rem; padding:0.8rem;" title="Abrir Google Calendar"><i class="fa-regular fa-calendar-plus"></i> Abrir Calendario</button>
-<input class="input-field" id="waDate" onchange="if(db.curr){ db.pats[db.curr].nextAppt = this.value; saveDB(); renderAgendaList(); if(typeof renderInicio==='function') renderInicio(); }" style="flex:1; background: white; border-color:#fcd34d;" type="date"/>
-<input class="input-field" id="waTime" onchange="if(db.curr){ db.pats[db.curr].nextApptTime = this.value; saveDB(); renderAgendaList(); if(typeof renderInicio==='function') renderInicio(); }" style="width: 130px; background: white; border-color:#fcd34d;" type="time"/>
-<button class="btn btn-wa" onclick="sendApptWA()" style="flex-grow:1; font-size:1rem; padding:0.8rem;"><i class="fa-brands fa-whatsapp fa-lg"></i> Enviar Confirmación por WA</button>
-</div>
 </div>
 </div>
 </div>
@@ -1830,6 +1844,20 @@ AVISO PRÓX. CITA (Recordatorio local):
 <div class="input-group" style="margin:0; margin-top:0.6rem;"><label>Notas protésicas / mantenimiento</label><textarea id="implNotasProt" class="input-field" rows="2" placeholder="Pilar, tipo de corona, índices periimplantarios..." style="margin:0;"></textarea></div>
 </div>
 
+<div style="background:white; padding:1rem 1.2rem; border-radius:var(--radius-md); margin-bottom:1rem; border:1px dashed #cbd5e1;">
+<label style="display:flex; align-items:center; gap:0.6rem; cursor:pointer; font-weight:700; color:var(--text); font-size:0.9rem; margin-bottom:0.5rem;">
+<input id="implVitChk" onchange="document.getElementById('implVitBox').classList.toggle('hidden', !this.checked)" style="width:18px; height:18px; accent-color:#b45309;" type="checkbox"/>
+<i class="fa-solid fa-heart-pulse"></i> Signos vitales de esta visita
+</label>
+<div class="hidden" id="implVitBox" style="display:flex; gap:0.5rem; flex-wrap:wrap; align-items:center;">
+<input class="input-field" id="implVitFecha" type="date" style="flex:1; min-width:130px;"/>
+<input class="input-field" id="implVitTA" placeholder="T.A." type="text" style="flex:1; min-width:70px;"/>
+<input class="input-field" id="implVitFC" placeholder="F.C." type="number" style="flex:1; min-width:70px;"/>
+<input class="input-field" id="implVitTemp" placeholder="T(°C)" step="0.1" type="number" style="flex:1; min-width:70px;"/>
+<input class="input-field" id="implVitGluc" placeholder="Glucosa" type="number" style="flex:1; min-width:70px;"/>
+<button class="btn btn-outline" type="button" onclick="sfGuardarVitales('implVit','implante')" style="white-space:nowrap;"><i class="fa-solid fa-floppy-disk"></i> Guardar signos</button>
+</div>
+</div>
 <div style="display:flex; gap:0.5rem; margin-top:1.2rem; flex-wrap:wrap;">
 <button class="btn btn-success" onclick="implGuardar()" style="font-weight:700;"><i class="fa-solid fa-floppy-disk"></i> Guardar implante</button>
 <button class="btn btn-outline" onclick="implCancelar()">Cancelar</button>
@@ -2017,6 +2045,20 @@ AVISO PRÓX. CITA (Recordatorio local):
 
 <div class="input-group" style="margin:0;"><label>Notas / laboratorio</label><textarea id="protNotas" class="input-field" rows="2" placeholder="Laboratorio, indicaciones, línea de terminación, ajustes..." style="margin:0;"></textarea></div>
 
+<div style="background:white; padding:1rem 1.2rem; border-radius:var(--radius-md); margin-bottom:1rem; border:1px dashed #cbd5e1;">
+<label style="display:flex; align-items:center; gap:0.6rem; cursor:pointer; font-weight:700; color:var(--text); font-size:0.9rem; margin-bottom:0.5rem;">
+<input id="protVitChk" onchange="document.getElementById('protVitBox').classList.toggle('hidden', !this.checked)" style="width:18px; height:18px; accent-color:#d97706;" type="checkbox"/>
+<i class="fa-solid fa-heart-pulse"></i> Signos vitales de esta visita
+</label>
+<div class="hidden" id="protVitBox" style="display:flex; gap:0.5rem; flex-wrap:wrap; align-items:center;">
+<input class="input-field" id="protVitFecha" type="date" style="flex:1; min-width:130px;"/>
+<input class="input-field" id="protVitTA" placeholder="T.A." type="text" style="flex:1; min-width:70px;"/>
+<input class="input-field" id="protVitFC" placeholder="F.C." type="number" style="flex:1; min-width:70px;"/>
+<input class="input-field" id="protVitTemp" placeholder="T(°C)" step="0.1" type="number" style="flex:1; min-width:70px;"/>
+<input class="input-field" id="protVitGluc" placeholder="Glucosa" type="number" style="flex:1; min-width:70px;"/>
+<button class="btn btn-outline" type="button" onclick="sfGuardarVitales('protVit','prot')" style="white-space:nowrap;"><i class="fa-solid fa-floppy-disk"></i> Guardar signos</button>
+</div>
+</div>
 <div style="display:flex; gap:0.5rem; margin-top:1rem; flex-wrap:wrap;">
 <button class="btn btn-success" onclick="protGuardar()" style="font-weight:700;"><i class="fa-solid fa-floppy-disk"></i> Guardar caso</button>
 <button class="btn btn-outline" onclick="protCancelar()">Cancelar</button>
@@ -2098,6 +2140,20 @@ AVISO PRÓX. CITA (Recordatorio local):
 
 <div class="input-group" style="margin:0;"><label>Notas clínicas</label><textarea id="remNotas" class="input-field" rows="2" placeholder="Reborde, tolerancia, ajustes realizados, laboratorio..." style="margin:0;"></textarea></div>
 
+<div style="background:white; padding:1rem 1.2rem; border-radius:var(--radius-md); margin-bottom:1rem; border:1px dashed #cbd5e1;">
+<label style="display:flex; align-items:center; gap:0.6rem; cursor:pointer; font-weight:700; color:var(--text); font-size:0.9rem; margin-bottom:0.5rem;">
+<input id="remVitChk" onchange="document.getElementById('remVitBox').classList.toggle('hidden', !this.checked)" style="width:18px; height:18px; accent-color:#0e7490;" type="checkbox"/>
+<i class="fa-solid fa-heart-pulse"></i> Signos vitales de esta visita
+</label>
+<div class="hidden" id="remVitBox" style="display:flex; gap:0.5rem; flex-wrap:wrap; align-items:center;">
+<input class="input-field" id="remVitFecha" type="date" style="flex:1; min-width:130px;"/>
+<input class="input-field" id="remVitTA" placeholder="T.A." type="text" style="flex:1; min-width:70px;"/>
+<input class="input-field" id="remVitFC" placeholder="F.C." type="number" style="flex:1; min-width:70px;"/>
+<input class="input-field" id="remVitTemp" placeholder="T(°C)" step="0.1" type="number" style="flex:1; min-width:70px;"/>
+<input class="input-field" id="remVitGluc" placeholder="Glucosa" type="number" style="flex:1; min-width:70px;"/>
+<button class="btn btn-outline" type="button" onclick="sfGuardarVitales('remVit','protrem')" style="white-space:nowrap;"><i class="fa-solid fa-floppy-disk"></i> Guardar signos</button>
+</div>
+</div>
 <div style="display:flex; gap:0.5rem; margin-top:1rem; flex-wrap:wrap;">
 <button class="btn btn-success" onclick="remGuardar()" style="font-weight:700;"><i class="fa-solid fa-floppy-disk"></i> Guardar caso</button>
 <button class="btn btn-outline" onclick="remCancelar()">Cancelar</button>
@@ -2173,6 +2229,20 @@ AVISO PRÓX. CITA (Recordatorio local):
 <div class="input-group" style="margin:0; margin-top:0.6rem;"><label>Notas / observaciones</label><textarea id="endoNotas" class="input-field" rows="2" placeholder="Radiografías tomadas, incidencias, recomendación de corona posterior..." style="margin:0;"></textarea></div>
 </div>
 
+<div style="background:white; padding:1rem 1.2rem; border-radius:var(--radius-md); margin-bottom:1rem; border:1px dashed #cbd5e1;">
+<label style="display:flex; align-items:center; gap:0.6rem; cursor:pointer; font-weight:700; color:var(--text); font-size:0.9rem; margin-bottom:0.5rem;">
+<input id="endoVitChk" onchange="document.getElementById('endoVitBox').classList.toggle('hidden', !this.checked)" style="width:18px; height:18px; accent-color:#7c3aed;" type="checkbox"/>
+<i class="fa-solid fa-heart-pulse"></i> Signos vitales de esta visita
+</label>
+<div class="hidden" id="endoVitBox" style="display:flex; gap:0.5rem; flex-wrap:wrap; align-items:center;">
+<input class="input-field" id="endoVitFecha" type="date" style="flex:1; min-width:130px;"/>
+<input class="input-field" id="endoVitTA" placeholder="T.A." type="text" style="flex:1; min-width:70px;"/>
+<input class="input-field" id="endoVitFC" placeholder="F.C." type="number" style="flex:1; min-width:70px;"/>
+<input class="input-field" id="endoVitTemp" placeholder="T(°C)" step="0.1" type="number" style="flex:1; min-width:70px;"/>
+<input class="input-field" id="endoVitGluc" placeholder="Glucosa" type="number" style="flex:1; min-width:70px;"/>
+<button class="btn btn-outline" type="button" onclick="sfGuardarVitales('endoVit','endo')" style="white-space:nowrap;"><i class="fa-solid fa-floppy-disk"></i> Guardar signos</button>
+</div>
+</div>
 <div style="display:flex; gap:0.5rem; margin-top:0.4rem; flex-wrap:wrap;">
 <button class="btn btn-success" onclick="endoGuardar()" style="font-weight:700;"><i class="fa-solid fa-floppy-disk"></i> Guardar tratamiento</button>
 <button class="btn btn-outline" onclick="endoCancelar()">Cancelar</button>
@@ -2192,11 +2262,16 @@ AVISO PRÓX. CITA (Recordatorio local):
 <div class="input-group"><label><i class="fa-regular fa-calendar"></i> Fecha de Consulta</label><input class="input-field" id="nDateGen" style="font-weight:700;" type="date"/></div>
 <div class="grid-2">
 <div class="arch-box" style="margin-bottom:0; box-shadow:none;">
-<div class="arch-title"><i class="fa-solid fa-heart-pulse"></i> Signos Vitales (Opcional)</div>
-<div style="display:flex; gap:0.6rem; margin-bottom:0.2rem;">
-<input class="input-field" id="gTA" placeholder="T.A." title="Tensión Arterial" type="text"/>
-<input class="input-field" id="gFC" placeholder="F.C." title="Frecuencia Cardíaca" type="number"/>
-<input class="input-field" id="gTemp" placeholder="T(°C)" step="0.1" title="Temperatura" type="number"/>
+<div class="arch-title"><i class="fa-solid fa-heart-pulse"></i> Signos Vitales</div>
+<label style="display:flex; align-items:center; gap:0.5rem; font-size:0.85rem; cursor:pointer; font-weight:700; color:var(--text); margin-bottom:0.5rem;">
+<input id="gVitChk" onchange="document.getElementById('gVitBox').classList.toggle('hidden', !this.checked)" style="width:18px; height:18px; accent-color:var(--primary);" type="checkbox"/>
+Se tomaron signos vitales
+</label>
+<div class="hidden" id="gVitBox" style="display:flex; gap:0.5rem; flex-wrap:wrap; margin-bottom:0.2rem;">
+<input class="input-field" id="gTA" placeholder="T.A." title="Tensión Arterial" type="text" style="flex:1; min-width:70px;"/>
+<input class="input-field" id="gFC" placeholder="F.C." title="Frecuencia Cardíaca" type="number" style="flex:1; min-width:70px;"/>
+<input class="input-field" id="gTemp" placeholder="T(°C)" step="0.1" title="Temperatura" type="number" style="flex:1; min-width:70px;"/>
+<input class="input-field" id="gGluc" placeholder="Glucosa" title="Glucosa capilar (mg/dL)" type="number" style="flex:1; min-width:70px;"/>
 </div>
 </div>
 <div class="arch-box" style="margin-bottom:0; box-shadow:none;">
@@ -2252,7 +2327,7 @@ AVISO PRÓX. CITA (Recordatorio local):
 <div style="background:white; padding:1.2rem; border-radius:var(--radius-md); margin-bottom:1.5rem; border:1px solid #bae6fd; border-left: 5px solid #1f5b9e; box-shadow: var(--shadow-sm);">
 <label style="display:flex; align-items:center; gap:0.8rem; cursor:pointer; font-weight:800; color:var(--text); font-size:1rem; margin:0;">
 <input checked="" id="nCobroGen" style="width:24px; height:24px; accent-color:#1f5b9e;" type="checkbox"/>
-                            💰 Contabilizar Ingreso y Gasto en reporte financiero
+                            💰 Contabilizar Gasto/Insumos en reporte financiero <span style="font-weight:400; color:#64748b;">(el ingreso se registra en Abonos)</span>
                         </label>
 </div>
 <button class="btn btn-primary" onclick="saveEvolucionGen()" style="font-size:1.1rem; padding:1rem;"><i class="fa-solid fa-floppy-disk"></i> Guardar Evolución General</button>
@@ -2321,8 +2396,20 @@ AVISO PRÓX. CITA (Recordatorio local):
 </div>
 <div style="background:white; padding:1.2rem; border-radius:var(--radius-md); margin-bottom:1.5rem; border:1px solid #a7f3d0; border-left: 5px solid #059669; box-shadow: var(--shadow-sm);">
 <label style="display:flex; align-items:center; gap:0.8rem; cursor:pointer; font-weight:800; color:var(--text); font-size:1rem; margin:0;">
+<div style="background:white; padding:1rem 1.2rem; border-radius:var(--radius-md); margin-bottom:1rem; border:1px dashed #cbd5e1;">
+<label style="display:flex; align-items:center; gap:0.6rem; cursor:pointer; font-weight:700; color:var(--text); font-size:0.9rem; margin-bottom:0.5rem;">
+<input id="nVitChk" onchange="document.getElementById('nVitBox').classList.toggle('hidden', !this.checked)" style="width:18px; height:18px; accent-color:var(--success);" type="checkbox"/>
+<i class="fa-solid fa-heart-pulse"></i> Se tomaron signos vitales
+</label>
+<div class="hidden" id="nVitBox" style="display:flex; gap:0.5rem; flex-wrap:wrap;">
+<input class="input-field" id="nVitTA" placeholder="T.A." type="text" style="flex:1; min-width:70px;"/>
+<input class="input-field" id="nVitFC" placeholder="F.C." type="number" style="flex:1; min-width:70px;"/>
+<input class="input-field" id="nVitTemp" placeholder="T(°C)" step="0.1" type="number" style="flex:1; min-width:70px;"/>
+<input class="input-field" id="nVitGluc" placeholder="Glucosa" type="number" style="flex:1; min-width:70px;"/>
+</div>
+</div>
 <input checked="" id="nCobroOrto" style="width:24px; height:24px; accent-color:#059669;" type="checkbox"/>
-                            💰 Contabilizar Ingreso y Gasto en reporte financiero
+                            💰 Contabilizar Gasto/Insumos en reporte financiero <span style="font-weight:400; color:#64748b;">(el ingreso se registra en Abonos)</span>
                         </label>
 </div>
 <button class="btn btn-success" onclick="saveEvolucion()" style="font-size:1.1rem; padding:1rem; width:100%;"><i class="fa-solid fa-floppy-disk"></i> Guardar Nota de Ortodoncia</button>
@@ -2349,8 +2436,20 @@ AVISO PRÓX. CITA (Recordatorio local):
 </div>
 <div style="background:white; padding:1.2rem; border-radius:var(--radius-md); margin-bottom:1.5rem; border:1px solid #a7f3d0; border-left: 5px solid #059669; box-shadow: var(--shadow-sm);">
 <label style="display:flex; align-items:center; gap:0.8rem; cursor:pointer; font-weight:800; color:var(--text); font-size:1rem; margin:0;">
+<div style="background:white; padding:1rem 1.2rem; border-radius:var(--radius-md); margin-bottom:1rem; border:1px dashed #cbd5e1;">
+<label style="display:flex; align-items:center; gap:0.6rem; cursor:pointer; font-weight:700; color:var(--text); font-size:0.9rem; margin-bottom:0.5rem;">
+<input id="aVitChk" onchange="document.getElementById('aVitBox').classList.toggle('hidden', !this.checked)" style="width:18px; height:18px; accent-color:var(--success);" type="checkbox"/>
+<i class="fa-solid fa-heart-pulse"></i> Se tomaron signos vitales
+</label>
+<div class="hidden" id="aVitBox" style="display:flex; gap:0.5rem; flex-wrap:wrap;">
+<input class="input-field" id="aVitTA" placeholder="T.A." type="text" style="flex:1; min-width:70px;"/>
+<input class="input-field" id="aVitFC" placeholder="F.C." type="number" style="flex:1; min-width:70px;"/>
+<input class="input-field" id="aVitTemp" placeholder="T(°C)" step="0.1" type="number" style="flex:1; min-width:70px;"/>
+<input class="input-field" id="aVitGluc" placeholder="Glucosa" type="number" style="flex:1; min-width:70px;"/>
+</div>
+</div>
 <input checked="" id="nCobroAli" style="width:24px; height:24px; accent-color:#059669;" type="checkbox"/>
-                            💰 Contabilizar Ingreso en reporte de "Ortodoncia"
+                            💰 Contabilizar Gasto en reporte financiero <span style="font-weight:400; color:#64748b;">(el ingreso se registra en Abonos)</span>
                         </label>
 </div>
 <button class="btn" onclick="saveEvolucionAli()" style="background:#047857; color:white; font-size:1.1rem; padding:1rem; width:100%;"><i class="fa-solid fa-floppy-disk"></i> Guardar Nota de Alineadores</button>
@@ -3786,7 +3885,22 @@ No hay forma de recuperarlo: el cifrado es real y ni nosotros podemos abrirlo. G
         try {
             const nav = document.querySelector('#sidebar [onclick*="' + sec + '"]');
             openSection(sec, nav);
-            if(ancla) setTimeout(() => { const el = document.getElementById(ancla); if(el) el.scrollIntoView({ behavior:'smooth', block:'center' }); }, 150);
+            if(ancla) setTimeout(() => {
+                const el = document.getElementById(ancla);
+                if(!el) return;
+                // El bloque de cobros vive dentro de un acordeon cerrado
+                // (#accAbonos). scrollIntoView no hace NADA sobre un elemento
+                // oculto: por eso el boton "Cobro" no respondia. Se abren
+                // todos los contenedores cerrados que haya arriba del ancla.
+                let n = el.parentElement;
+                while(n && n !== document.body){
+                    if(n.style && n.style.display === 'none') n.style.display = 'block';
+                    if(n.classList && n.classList.contains('hidden')) n.classList.remove('hidden');
+                    n = n.parentElement;
+                }
+                try { if(typeof recalcSaldo === 'function') recalcSaldo(); } catch(e){}
+                el.scrollIntoView({ behavior:'smooth', block:'center' });
+            }, 150);
         } catch(e){ console.warn('quickgo', e); }
     }
     // Solo tiene sentido con un paciente abierto.
@@ -4987,11 +5101,18 @@ db = {
             (p.removibles || []).forEach(r => { if(!(r.etapas && r.etapas.instalacion && r.etapas.instalacion.done)) protActivas++; });
         });
         // Ingresos: suma de abonos por fecha (lo realmente cobrado)
+        // BUG: p.abonos guarda la fecha como "dd/mm/aaaa" (sfHoyMX/toLocaleDateString
+        // es-MX), pero aqui se comparaba contra ISO "aaaa-mm-dd": nunca coincidian
+        // y por eso Ingresos Hoy siempre marcaba $0. Se convierte antes de comparar.
         const _hoyISO = new Date().toISOString().split('T')[0];
         const _mesISO = _hoyISO.substring(0,7);
+        function _sfFechaISO(txt){
+            const m = String(txt||'').match(/^(\d{2})\/(\d{2})\/(\d{4})/);
+            return m ? (m[3]+'-'+m[2]+'-'+m[1]) : String(txt||'').substring(0,10);
+        }
         let ingHoy = 0, ingMes = 0;
         Object.values(db.pats || {}).forEach(p => { (p.abonos || []).forEach(a => {
-            const f = sfFechaISO(a);
+            const f = _sfFechaISO(a.fecha);
             const m = parseFloat(a.monto) || 0;
             if(f === _hoyISO) ingHoy += m;
             if(f.substring(0,7) === _mesISO) ingMes += m;
@@ -11422,17 +11543,6 @@ ${patientText}`;
     // ===== ABONOS Y DEUDAS =====
     // Fecha de hoy con el mismo formato que usa agregarAbono (dd/mm/aaaa).
     function sfHoyMX(){ return new Date().toLocaleDateString('es-MX', {day:'2-digit',month:'2-digit',year:'numeric'}); }
-    // Fecha comparable (aaaa-mm-dd). Los registros viejos traen "dd/mm/aaaa";
-    // los nuevos guardan fISO. Se acepta cualquiera de los dos.
-    function sfFechaISO(a){
-        if(!a) return '';
-        if(a.fISO) return a.fISO;
-        const t = String(a.fecha||'').trim();
-        const m = t.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
-        if(m) return m[3]+'-'+m[2]+'-'+m[1];
-        return t.substring(0,10);
-    }
-    window.sfFechaISO = sfFechaISO;
     function sfSuma(lista){ return (lista||[]).reduce((a,x)=>a + (parseFloat(x.monto)||0), 0); }
 
     // Cuenta completa del paciente en un solo lugar.
@@ -11496,7 +11606,7 @@ ${patientText}`;
         const concepto = $('pNuevoCargoConcepto') ? $('pNuevoCargoConcepto').value.trim() : '';
         const p = db.pats[db.curr];
         p.cargos = p.cargos || [];
-        p.cargos.push({ id:'cg_'+Date.now(), monto: monto, fecha: sfHoyMX(), fISO: new Date().toISOString().split('T')[0], concepto: concepto });
+        p.cargos.push({ id:'cg_'+Date.now(), monto: monto, fecha: sfHoyMX(), concepto: concepto });
         $('pNuevoCargo').value = '';
         if($('pNuevoCargoConcepto')) $('pNuevoCargoConcepto').value = '';
         saveDB();
@@ -11520,7 +11630,7 @@ ${patientText}`;
         const filas = [];
         Object.values(db.pats || {}).forEach(p => {
             (p.abonos || []).forEach(a => {
-                if(sfFechaISO(a) === new Date().toISOString().split('T')[0]) filas.push({ paciente: p.name || 'Sin nombre', monto: parseFloat(a.monto)||0, concepto: a.concepto || '' });
+                if(a.fecha === dia) filas.push({ paciente: p.name || 'Sin nombre', monto: parseFloat(a.monto)||0, concepto: a.concepto || '' });
             });
         });
         return { dia, filas, total: filas.reduce((t,f)=>t+f.monto, 0) };
@@ -11596,7 +11706,7 @@ ${patientText}`;
         p.abonos = p.abonos || [];
         const f = new Date().toLocaleDateString('es-MX', {day:'2-digit',month:'2-digit',year:'numeric'});
         const idAb = 'ab_'+Date.now();
-        p.abonos.push({ id:idAb, monto: monto, fecha: f, fISO: new Date().toISOString().split('T')[0], concepto: concepto });
+        p.abonos.push({ id:idAb, monto: monto, fecha: f, concepto: concepto });
         // Asiento en el libro de ingresos (fecha ISO, que es la que filtran
         // el panel de Inicio y los reportes). 'ref' permite deshacerlo.
         db.log = db.log || [];
@@ -11616,7 +11726,6 @@ ${patientText}`;
         if(!confirm("¿Quitar este abono?")) return;
         const quitado = p.abonos[i];
         p.abonos.splice(i,1);
-        // Quitar tambien su asiento de ingresos para no inflar el corte.
         try { if(quitado && quitado.id) db.log = (db.log||[]).filter(r => r.ref !== quitado.id); } catch(e){}
         saveDB();
         renderAbonos();
@@ -13778,13 +13887,47 @@ Reglas: español de México; terminología dental correcta; máximo 6 líneas; u
         p.notas.unshift({ id: Date.now() + Math.floor(Math.random()*10000), type: type, f: f || new Date().toISOString().split('T')[0], obs: obs });
     }
 
-    function renderTimeline() { if(!db.curr||!db.pats[db.curr].notas || db.pats[db.curr].notas.length===0) { if($('tlRender')) $('tlRender').innerHTML='<p style="text-align:center; color:#94a3b8; padding:2rem;">Sin notas.</p>'; return; } let h=''; db.pats[db.curr].notas.forEach(n=>{ let l=({gen:'Odontología',orto:'Ortodoncia',ali:'Alineadores',endo:'Endodoncia',prot:'Prótesis Fija',protrem:'Prótesis Removible'})[n.type]||'Nota'; let tlBg=({endo:'#ede9fe',prot:'#fef3c7',protrem:'#cffafe'})[n.type]||'#e2e8f0'; h+=`<div class="tl-item"><div class="tl-date">${n.f} <span class="tl-tag" style="background:${tlBg};">${l}</span> <button onclick="deleteNota(${n.id})" style="background:none;border:none;color:red;cursor:pointer;"><i class="fa-solid fa-trash-can"></i></button></div><div class="tl-card" style="white-space:pre-wrap;">${n.obs}</div></div>`; }); if($('tlRender')) $('tlRender').innerHTML=h; }
+    function renderTimeline() { if(!db.curr||!db.pats[db.curr].notas || db.pats[db.curr].notas.length===0) { if($('tlRender')) $('tlRender').innerHTML='<p style="text-align:center; color:#94a3b8; padding:2rem;">Sin notas.</p>'; return; } let h=''; db.pats[db.curr].notas.forEach(n=>{ let l=({gen:'Odontología',orto:'Ortodoncia',ali:'Alineadores',endo:'Endodoncia',prot:'Prótesis Fija',protrem:'Prótesis Removible',implante:'Implantología'})[n.type]||'Nota'; let tlBg=({endo:'#ede9fe',prot:'#fef3c7',protrem:'#cffafe'})[n.type]||'#e2e8f0'; h+=`<div class="tl-item"><div class="tl-date">${n.f} <span class="tl-tag" style="background:${tlBg};">${l}</span> <button onclick="deleteNota(${n.id})" style="background:none;border:none;color:red;cursor:pointer;"><i class="fa-solid fa-trash-can"></i></button></div><div class="tl-card" style="white-space:pre-wrap;">${n.obs}</div></div>`; }); if($('tlRender')) $('tlRender').innerHTML=h; }
     function deleteNota(id) { if(confirm("¿Eliminar permanentemente?")) { db.pats[db.curr].notas=db.pats[db.curr].notas.filter(n=>n.id!==id); saveDB(); renderTimeline(); } }
     function triggerAlertUpdate(fut) { if(fut) { $('pAlert').value=fut; db.pats[db.curr].alert=fut; db.pats[db.curr].alertDate=new Date().toISOString().split('T')[0]; setAlertLabel(db.pats[db.curr].alertDate); } }
 
-    function saveEvolucionGen() { if(!db.curr) return alert("Selecciona paciente."); const f=$('nDateGen').value; let mc=0, mLog=''; db.cfg.materials.forEach((m,i)=>{ if($(`cMat_${i}`)?.checked) { mc+=m.cost; mLog+=`\n[+ Insumo Extra: ${m.name}]`; } }); let obs=$('nObsGen').value+mLog; if($('gAnesChk').checked) obs=`[Anestesia: ${$('gAnesTipo').value} (${$('gAnesCart').value} cart.)]\n`+obs; if($('nCobroGen').checked) db.log.push({f:f, p:db.pats[db.curr].name, t:'gen', ing:db.fin.conGen, op:db.fin.desGen, inv:mc}); db.pats[db.curr].notas.unshift({id:Date.now(), type:'gen', f:f, obs:obs.trim(), fut:$('nFutGen').value}); triggerAlertUpdate($('nFutGen').value); saveDB(); renderTimeline(); actualizarContadorMes(); openSection('s-historial', document.querySelector('.nav-item[onclick*=\'s-historial\']')); }
-    function saveEvolucion() { if(!db.curr) return alert("Selecciona paciente."); const mS=document.querySelector('input[name="mSup"]:checked').value, cS=document.querySelector('input[name="cSup"]:checked').value, mI=document.querySelector('input[name="mInf"]:checked').value, cI=document.querySelector('input[name="cInf"]:checked').value; let cAr=0, cb=0, cl=`Arcos -> Sup: ${mS} ${cS}" | Inf: ${mI} ${cI}"\n`; if(mS!=='NA') { if(!db.inv['Sup'][mS]) db.inv['Sup'][mS]={}; db.inv['Sup'][mS][cS]=Math.max(0,(db.inv['Sup'][mS][cS]||0)-1); cAr+=getArchCost(mS); } if(mI!=='NA') { if(!db.inv['Inf'][mI]) db.inv['Inf'][mI]={}; db.inv['Inf'][mI][cI]=Math.max(0,(db.inv['Inf'][mI][cI]||0)-1); cAr+=getArchCost(mI); } if($('chkBktSup').checked) { cb+=db.cfg.brackets[$('selBktSup').value].cost; db.cfg.brackets[$('selBktSup').value].stock--; cl+=`[Bkt Sup colocados]\n`; } if($('chkBktInf').checked) { cb+=db.cfg.brackets[$('selBktInf').value].cost; db.cfg.brackets[$('selBktInf').value].stock--; cl+=`[Bkt Inf colocados]\n`; } if($('eSi').checked) cl+=`[Elásticos: ${document.querySelector('input[name="eVec"]:checked')?.value} ${$('eSize').value} ${$('eForce').value} en ${$('ePos').value}]\n`; if($('chkTuboRepo') && $('chkTuboRepo').checked) { const tk=$('selTuboRepo').value; if(tk && db.inv.tubesRepo && db.inv.tubesRepo[tk] > 0) { db.inv.tubesRepo[tk]=Math.max(0, db.inv.tubesRepo[tk]-1); const pz=tk.split('|'); cl+=`[Tubo repuesto: ${tuboLabel(pz[0],pz[1],pz[2],pz[3],pz[4])}]\n`; } } const f=$('nDate').value; if($('nCobroOrto').checked) db.log.push({f:f, p:db.pats[db.curr].name, t:'orto', ing:db.fin.conOrto, op:db.fin.desOrto, inv:cAr+cb}); db.pats[db.curr].notas.unshift({id:Date.now(), type:'orto', f:f, obs:cl+$('nObs').value, fut:$('nFut').value}); triggerAlertUpdate($('nFut').value); saveDB(); renderTimeline(); renderInvShop(); renderClinicaDyn(); actualizarContadorMes(); openSection('s-historial', document.querySelector('.nav-item[onclick*=\'s-historial\']')); }
-    function saveEvolucionAli() { if(!db.curr) return alert("Selecciona paciente."); const f=$('nDateAli').value; if($('nCobroAli').checked) db.log.push({f:f, p:db.pats[db.curr].name, t:'ali', ing:db.fin.conOrto, op:db.fin.desOrto, inv:0}); db.pats[db.curr].notas.unshift({id:Date.now(), type:'ali', f:f, obs:`[Fase: ${$('aEtapa').value} | Num: ${$('aNum').value}]\n`+$('aObs').value, fut:$('aFut').value}); triggerAlertUpdate($('aFut').value); saveDB(); renderTimeline(); actualizarContadorMes(); openSection('s-historial', document.querySelector('.nav-item[onclick*=\'s-historial\']')); }
+    // ===== SIGNOS VITALES (compartido por las 7 notas clinicas) =====
+    function sfLeerVitales(pfx) {
+        const ta = $(pfx+'TA') ? $(pfx+'TA').value.trim() : '';
+        const fc = $(pfx+'FC') ? $(pfx+'FC').value : '';
+        const temp = $(pfx+'Temp') ? $(pfx+'Temp').value : '';
+        const gluc = $(pfx+'Gluc') ? $(pfx+'Gluc').value : '';
+        const partes = [];
+        if(ta) partes.push('T.A. '+ta);
+        if(fc) partes.push('F.C. '+fc+' lpm');
+        if(temp) partes.push('Temp '+temp+'°C');
+        if(gluc) partes.push('Glucosa '+gluc+' mg/dL');
+        return { ta:ta, fc:fc, temp:temp, gluc:gluc, texto: partes.join(' · ') };
+    }
+    // Para endo/protesis/removible/implante: no tienen "nota por visita" propia
+    // (son expedientes por caso/fase), asi que los signos vitales se guardan
+    // como una nota independiente en la linea de tiempo del paciente.
+    function sfGuardarVitales(prefix, tipo) {
+        if(!db.curr) return alert('Selecciona un paciente.');
+        const chk = $(prefix+'Chk');
+        if(!chk || !chk.checked) return alert('Marca "Signos vitales de esta visita" primero.');
+        const vit = sfLeerVitales(prefix);
+        if(!vit.texto) return alert('Captura al menos un signo vital.');
+        const fEl = $(prefix+'Fecha');
+        const f = (fEl && fEl.value) ? fEl.value : new Date().toISOString().split('T')[0];
+        db.pats[db.curr].notas.unshift({ id: Date.now()+Math.floor(Math.random()*10000), type: tipo, f: f, obs: '[Signos Vitales] '+vit.texto, vitales: vit });
+        saveDB();
+        if(typeof renderTimeline === 'function') renderTimeline();
+        ['TA','FC','Temp','Gluc'].forEach(k=>{ const e=$(prefix+k); if(e) e.value=''; });
+        if(fEl) fEl.value='';
+        chk.checked = false;
+        const box = $(prefix+'Box'); if(box) box.classList.add('hidden');
+        if(typeof daniSpeak === 'function') daniSpeak('✅ Signos vitales guardados en el historial.', 3500, 'info'); else alert('Guardado.');
+    }
+
+    function saveEvolucionGen() { if(!db.curr) return alert("Selecciona paciente."); const f=$('nDateGen').value; let mc=0, mLog=''; db.cfg.materials.forEach((m,i)=>{ if($(`cMat_${i}`)?.checked) { mc+=m.cost; mLog+=`\n[+ Insumo Extra: ${m.name}]`; } }); let obs=$('nObsGen').value+mLog; if($('gAnesChk').checked) obs=`[Anestesia: ${$('gAnesTipo').value} (${$('gAnesCart').value} cart.)]\n`+obs; let vitGen=null; if($('gVitChk') && $('gVitChk').checked){ vitGen=sfLeerVitales('g'); if(vitGen.texto) obs='[Signos Vitales: '+vitGen.texto+']\n'+obs; } if($('nCobroGen').checked) db.log.push({f:f, p:db.pats[db.curr].name, t:'gen', ing:0, op:db.fin.desGen, inv:mc}); db.pats[db.curr].notas.unshift({id:Date.now(), type:'gen', f:f, obs:obs.trim(), fut:$('nFutGen').value, vitales:vitGen}); triggerAlertUpdate($('nFutGen').value); saveDB(); renderTimeline(); actualizarContadorMes(); openSection('s-historial', document.querySelector('.nav-item[onclick*=\'s-historial\']')); }
+    function saveEvolucion() { if(!db.curr) return alert("Selecciona paciente."); const mS=document.querySelector('input[name="mSup"]:checked').value, cS=document.querySelector('input[name="cSup"]:checked').value, mI=document.querySelector('input[name="mInf"]:checked').value, cI=document.querySelector('input[name="cInf"]:checked').value; let cAr=0, cb=0, cl=`Arcos -> Sup: ${mS} ${cS}" | Inf: ${mI} ${cI}"\n`; if(mS!=='NA') { if(!db.inv['Sup'][mS]) db.inv['Sup'][mS]={}; db.inv['Sup'][mS][cS]=Math.max(0,(db.inv['Sup'][mS][cS]||0)-1); cAr+=getArchCost(mS); } if(mI!=='NA') { if(!db.inv['Inf'][mI]) db.inv['Inf'][mI]={}; db.inv['Inf'][mI][cI]=Math.max(0,(db.inv['Inf'][mI][cI]||0)-1); cAr+=getArchCost(mI); } if($('chkBktSup').checked) { cb+=db.cfg.brackets[$('selBktSup').value].cost; db.cfg.brackets[$('selBktSup').value].stock--; cl+=`[Bkt Sup colocados]\n`; } if($('chkBktInf').checked) { cb+=db.cfg.brackets[$('selBktInf').value].cost; db.cfg.brackets[$('selBktInf').value].stock--; cl+=`[Bkt Inf colocados]\n`; } if($('eSi').checked) cl+=`[Elásticos: ${document.querySelector('input[name="eVec"]:checked')?.value} ${$('eSize').value} ${$('eForce').value} en ${$('ePos').value}]\n`; if($('chkTuboRepo') && $('chkTuboRepo').checked) { const tk=$('selTuboRepo').value; if(tk && db.inv.tubesRepo && db.inv.tubesRepo[tk] > 0) { db.inv.tubesRepo[tk]=Math.max(0, db.inv.tubesRepo[tk]-1); const pz=tk.split('|'); cl+=`[Tubo repuesto: ${tuboLabel(pz[0],pz[1],pz[2],pz[3],pz[4])}]\n`; } } const f=$('nDate').value; let vitOrto=null; if($('nVitChk') && $('nVitChk').checked){ vitOrto=sfLeerVitales('nVit'); if(vitOrto.texto) cl='[Signos Vitales: '+vitOrto.texto+']\n'+cl; } if($('nCobroOrto').checked) db.log.push({f:f, p:db.pats[db.curr].name, t:'orto', ing:0, op:db.fin.desOrto, inv:cAr+cb}); db.pats[db.curr].notas.unshift({id:Date.now(), type:'orto', f:f, obs:cl+$('nObs').value, fut:$('nFut').value, vitales:vitOrto}); triggerAlertUpdate($('nFut').value); saveDB(); renderTimeline(); renderInvShop(); renderClinicaDyn(); actualizarContadorMes(); openSection('s-historial', document.querySelector('.nav-item[onclick*=\'s-historial\']')); }
+    function saveEvolucionAli() { if(!db.curr) return alert("Selecciona paciente."); const f=$('nDateAli').value; let vitAli=null; let obsAli=`[Fase: ${$('aEtapa').value} | Num: ${$('aNum').value}]\n`+$('aObs').value; if($('aVitChk') && $('aVitChk').checked){ vitAli=sfLeerVitales('aVit'); if(vitAli.texto) obsAli='[Signos Vitales: '+vitAli.texto+']\n'+obsAli; } if($('nCobroAli').checked) db.log.push({f:f, p:db.pats[db.curr].name, t:'ali', ing:0, op:db.fin.desOrto, inv:0}); db.pats[db.curr].notas.unshift({id:Date.now(), type:'ali', f:f, obs:obsAli, fut:$('aFut').value, vitales:vitAli}); triggerAlertUpdate($('aFut').value); saveDB(); renderTimeline(); actualizarContadorMes(); openSection('s-historial', document.querySelector('.nav-item[onclick*=\'s-historial\']')); }
 
     // --- ALERGIAS Y ANESTESIA ---
     function toggleAllergies() { const h = $('pHasAl').checked; if($('alBox')) $('alBox').classList.toggle('hidden', !h); if(!h){$('pAlPen').checked=false;$('pAlAin').checked=false;$('pAlLat').checked=false;$('pAlSulfa').checked=false;$('pAlOther').value='';} checkLatexAlert(); }
@@ -14458,7 +14601,7 @@ Reglas: español de México; terminología dental correcta; máximo 6 líneas; u
 
         // Notas en orden cronológico (más antigua primero para lectura de expediente)
         const notasOrden = [...notas].reverse();
-        const tipoLabel = (t) => t==='gen'?'Odontología General':(t==='orto'?'Ortodoncia':(t==='ali'?'Alineadores':'Nota'));
+        const tipoLabel = (t) => ({gen:'Odontología General',orto:'Ortodoncia',ali:'Alineadores',endo:'Endodoncia',prot:'Prótesis Fija',protrem:'Prótesis Removible',implante:'Implantología'})[t] || 'Nota';
 
         const cuerpoNotas = [];
         notasOrden.forEach(n => {
