@@ -581,7 +581,7 @@ window._pdfReady=true;
         <h2 style="margin: 0 !important; font-size: 1.5rem !important; color: white !important;">SmileFlow</h2>
         <a href="https://www.dentilike.com.mx" target="_blank" style="color: #bae6fd; font-size: 0.75rem; text-decoration: none; font-weight: 600; cursor: pointer; transition: color 0.2s;" onmouseover="this.style.color='white'" onmouseout="this.style.color='#bae6fd'">www.dentilike.com.mx</a>
         <a href="mailto:soporte@dentilike.com.mx" style="color: #bae6fd; font-size: 0.75rem; text-decoration: none; font-weight: 600; cursor: pointer; transition: color 0.2s;" onmouseover="this.style.color='white'" onmouseout="this.style.color='#bae6fd'">soporte@dentilike.com.mx</a>
-<span style="color:#7dd3fc; font-size:0.62rem; opacity:0.8; margin-top:2px;">© 2026 Dentilike · Todos los derechos reservados · <b id="sfVersion">v95</b></span>
+<span style="color:#7dd3fc; font-size:0.62rem; opacity:0.8; margin-top:2px;">© 2026 Dentilike · Todos los derechos reservados · <b id="sfVersion">v96</b></span>
     </div></div>
 <!-- Doctor en sesion: informativo, lleva a Configuracion para cambiarlo -->
 <div id="sideDocBox" onclick="openSection('s-admin-id', document.querySelector('.nav-item[onclick*=&quot;s-admin-id&quot;]'))" title="Doctor en sesion. Toca para cambiarlo o editar el perfil." style="margin:0 12px 10px; padding:0.7rem 0.85rem; background:rgba(255,255,255,0.07); border:1px solid rgba(125,211,252,0.28); border-left:3px solid #5DC1BF; border-radius:10px; cursor:pointer; display:flex; align-items:center; gap:0.6rem;">
@@ -1532,6 +1532,15 @@ window._pdfReady=true;
 <div class="input-group" style="margin:0; flex:1;">
 <label><i class="fa-solid fa-cake-candles"></i> Edad</label>
 <input class="input-field" id="pAge" placeholder="--" readonly="" style="text-align:center;" type="text"/>
+</div>
+<div class="input-group" style="margin:0; flex:1;">
+<label><i class="fa-solid fa-venus-mars"></i> Sexo</label>
+<select class="input-field" id="pSexo" onchange="triggerUnsavedWarning()">
+<option value="">—</option>
+<option value="Femenino">Femenino</option>
+<option value="Masculino">Masculino</option>
+<option value="Otro">Otro</option>
+</select>
 </div>
 </div>
 </div>
@@ -10432,7 +10441,7 @@ function selectTooth(t, ev) {
                 { text:'Etapas', bold:true, fontSize:11, color:accent, margin:[0,8,0,5] },
                 { table:{ widths:['*','auto','auto'], body:[[ {text:'Etapa', bold:true, fontSize:9}, {text:'Estado', bold:true, fontSize:9}, {text:'Fecha', bold:true, fontSize:9} ], ...etapasBody] }, layout:'lightHorizontalLines' },
                 r.notas ? { text:'Notas: ' + r.notas, fontSize:9, margin:[0,10,0,0] } : {},
-                { text: (activeD.name ? activeD.name : '') + (activeD.ced ? '  ·  Céd. Prof. ' + activeD.ced : ''), fontSize:9, color:'#475569', alignment:'center', margin:[0,30,0,0] }
+                { text: (activeD.name ? activeD.name : '') + (activeD.ced1 ? '  ·  Céd. Prof. ' + activeD.ced1 : '') + (activeD.ced2 ? '  ·  Céd. Esp. ' + activeD.ced2 : ''), fontSize:9, color:'#475569', alignment:'center', margin:[0,30,0,0] }
             ]
         };
         try { pdfMake.createPdf(doc).open(); } catch(e){ alert('No se pudo generar el PDF.'); }
@@ -11149,7 +11158,7 @@ function selectTooth(t, ev) {
         if(cfg.cli) L.push(cfg.cli);
         L.push('');
         L.push('*Paciente:* ' + (p.name||'—'));
-        if(activeD.name) L.push('*Dr(a):* ' + activeD.name + (activeD.ced1?' · Céd. '+activeD.ced1:''));
+        if(activeD.name) L.push('*Dr(a):* ' + activeD.name + (activeD.ced1?' · Céd. Prof. '+activeD.ced1:'') + (activeD.ced2?' · Céd. Esp. '+activeD.ced2:''));
         L.push('');
         L.push('*Estudios solicitados:*');
         if(seleccionados.length) seleccionados.forEach(e=>L.push('• '+e));
@@ -11252,7 +11261,7 @@ function selectTooth(t, ev) {
         L.push('');
         L.push('Quedo atento(a) a los resultados. De antemano, muchas gracias por su apoyo y excelente servicio. 🙏');
         L.push('');
-        if(activeD.name) L.push(`*${activeD.name}*${activeD.ced1?('\nCéd. Prof. '+activeD.ced1):''}`);
+        if(activeD.name) L.push(`*${activeD.name}*${activeD.ced1?('\nCéd. Prof. '+activeD.ced1):''}${activeD.ced2?('\nCéd. Esp. '+activeD.ced2):''}`);
         if(cfg.cli) L.push(cfg.cli);
         if(cfg.contact) L.push('📞 '+cfg.contact);
         if(lab.partner) L.push('\n_GEO y DentiLike, unidos para tu salud dental._');
@@ -11303,7 +11312,7 @@ function selectTooth(t, ev) {
         }
         const linea = [];
         if(activeD && activeD.name) linea.push(activeD.name);
-        if(activeD && activeD.ced1) linea.push('Céd. Prof. '+activeD.ced1);
+        if(activeD && activeD.ced1) linea.push('Céd. Prof. '+activeD.ced1); if(activeD && activeD.ced2) linea.push('Céd. Esp. '+activeD.ced2);
         stack.push({ text: linea.join('  ·  ') || 'Firma del profesional', fontSize:8, bold:true, alignment:'center' });
         stack.push({ text:'Firma del profesional', fontSize:7, color:'#94a3b8', alignment:'center' });
         // Contacto del doctor de referencia (teléfono y correo)
@@ -11536,7 +11545,7 @@ ${patientText}`;
     // --- GESTIÓN DE PACIENTES ---
     function checkAge() { const a=$('pAge').value; if($('divGuardian')) $('divGuardian').classList.toggle('hidden', a===''||a>=18); }
     
-    function newPatient() { db.curr=null; saveDB(); $('pSelect').value=''; $('lblId').innerHTML='<i class="fa-solid fa-address-card"></i> Nuevo Px'; ['pName','pBirth','pAge','pGuardian','pPhone','pEmail','pAddress','pAddrCalle','pAddrCol','pAddrCiudad','pSum','pAlert','pBrackets'].forEach(id=>{if($(id))$(id).value='';}); ['pRetra','pFactReq','pHasAl','pAlPen','pAlAin','pAlLat','pAlSulfa'].forEach(id=>{if($(id))$(id).checked=false;}); if($('pAlOther')) $('pAlOther').value=''; if($('pCostoTotal'))$('pCostoTotal').value='';if($('pNotaPago'))$('pNotaPago').value=''; if($('listaAbonos'))$('listaAbonos').innerHTML=''; recalcSaldo(); clearMedHistory(); if($('pCakeIcon')) $('pCakeIcon').style.display='none'; autoLoadWaDate(); checkAge(); toggleAllergies(); loadTreats({}); renderOdonto(); renderTimeline(); setAlertLabel(null); if($('txtReceta')) $('txtReceta').value=''; if($('chkAntibiotico')) $('chkAntibiotico').checked=false; loadFacturacion({}); renderMedsList(); try{ sfQuickBar(); }catch(e){} try{ sfLimpiarImagenesPaciente(); sfRefrescarVistasPaciente(); }catch(e){} }
+    function newPatient() { db.curr=null; saveDB(); $('pSelect').value=''; $('lblId').innerHTML='<i class="fa-solid fa-address-card"></i> Nuevo Px'; ['pName','pBirth','pAge','pGuardian','pPhone','pEmail','pAddress','pAddrCalle','pAddrCol','pAddrCiudad','pSum','pAlert','pBrackets','pSexo'].forEach(id=>{if($(id))$(id).value='';}); ['pRetra','pFactReq','pHasAl','pAlPen','pAlAin','pAlLat','pAlSulfa'].forEach(id=>{if($(id))$(id).checked=false;}); if($('pAlOther')) $('pAlOther').value=''; if($('pCostoTotal'))$('pCostoTotal').value='';if($('pNotaPago'))$('pNotaPago').value=''; if($('listaAbonos'))$('listaAbonos').innerHTML=''; recalcSaldo(); clearMedHistory(); if($('pCakeIcon')) $('pCakeIcon').style.display='none'; autoLoadWaDate(); checkAge(); toggleAllergies(); loadTreats({}); renderOdonto(); renderTimeline(); setAlertLabel(null); if($('txtReceta')) $('txtReceta').value=''; if($('chkAntibiotico')) $('chkAntibiotico').checked=false; loadFacturacion({}); renderMedsList(); try{ sfQuickBar(); }catch(e){} try{ sfLimpiarImagenesPaciente(); sfRefrescarVistasPaciente(); }catch(e){} }
     
     function savePatientAlert() { if(!db.curr) return; db.pats[db.curr].alert=$('pAlert').value; db.pats[db.curr].alertDate=new Date().toISOString().split('T')[0]; saveDB(); setAlertLabel(db.pats[db.curr].alertDate); }
 
@@ -12933,7 +12942,7 @@ Reglas: español de México; terminología dental correcta; máximo 6 líneas; u
         L.push('');
         L.push('Quedo atento(a). ¡Muchas gracias por su apoyo y excelente trabajo! 🙏');
         L.push('');
-        if(activeD.name) L.push(`*${activeD.name}*${activeD.ced1?('\nCéd. Prof. '+activeD.ced1):''}`);
+        if(activeD.name) L.push(`*${activeD.name}*${activeD.ced1?('\nCéd. Prof. '+activeD.ced1):''}${activeD.ced2?('\nCéd. Esp. '+activeD.ced2):''}`);
         if(cfg.cli) L.push(cfg.cli);
         if(cfg.contact) L.push('📞 '+cfg.contact);
 
@@ -13251,7 +13260,7 @@ Reglas: español de México; terminología dental correcta; máximo 6 líneas; u
         pieCols.push({ width:'*', stack:[
             { canvas:[{type:'line',x1:0,y1:0,x2:180,y2:0,lineWidth:0.8,lineColor:'#0f172a'}] },
             { text: (activeD.name||'Firma del doctor(a)')+(activeD.spec?(' — '+activeD.spec):''), fontSize:8.5, bold:true, alignment:'center', margin:[0,3,0,0] },
-            activeD.ced1?{ text:'Céd. Prof. '+activeD.ced1, fontSize:7.5, color:'#64748b', alignment:'center' }:{}
+            (activeD.ced1 || activeD.ced2)?{ text:[activeD.ced1?('Céd. Prof. '+activeD.ced1):'', activeD.ced2?('Céd. Esp. '+activeD.ced2):''].filter(Boolean).join('  |  '), fontSize:7.5, color:'#64748b', alignment:'center' }:{}
         ]});
         pieCols.push({ width:'*', stack:[
             { canvas:[{type:'line',x1:0,y1:0,x2:180,y2:0,lineWidth:0.8,lineColor:'#0f172a'}] },
@@ -13433,9 +13442,9 @@ Reglas: español de México; terminología dental correcta; máximo 6 líneas; u
         if(typeof daniSpeak === 'function') daniSpeak('🧪 Paciente de Prueba creado con datos en todos los módulos: odontograma, alertas médicas, endodoncia, prótesis, Smile Plan, laboratorio dental y abonos. ¡Explóralos!', 9000, 'info');
     }
 
-    function savePatient() { const n=$('pName').value.trim(); if(!n) return alert("Falta Nombre."); const dId='Px-'+n; if(!db.curr){ db.curr='p_'+Date.now(); db.pats[db.curr]={id:db.curr,displayId:dId,notas:[],treats:{},alertDate:new Date().toISOString().split('T')[0],factReq:false,factData:{},odonto:{}}; }else db.pats[db.curr].displayId=dId; let p=db.pats[db.curr]; p.name=n;p.birth=sfBirthToISO($('pBirth').value);p.age=$('pAge').value;p.guardian=$('pGuardian').value;p.phone=$('pPhone').value;p.email=$('pEmail').value; sfSyncDireccion(); p.address=$('pAddress').value; p.addr={ calle:($('pAddrCalle')?$('pAddrCalle').value:''), col:($('pAddrCol')?$('pAddrCol').value:''), ciudad:($('pAddrCiudad')?$('pAddrCiudad').value:'') };p.sum=$('pSum').value;p.brackets=$('pBrackets').value;p.retra=$('pRetra').checked;p.factReq=$('pFactReq').checked;p.hasAl=$('pHasAl').checked;p.alPen=$('pAlPen').checked;p.alAin=$('pAlAin').checked;p.alLat=$('pAlLat').checked;p.alSulfa=$('pAlSulfa').checked;p.alOther=$('pAlOther').value; p.costoTotal=$('pCostoTotal')?$('pCostoTotal').value:'';p.notaPago=$('pNotaPago')?$('pNotaPago').value:''; saveMedHistory(p); saveTreats(p); saveDB(); renderPatSelect(); $('lblId').innerHTML=`<i class="fa-solid fa-address-card"></i> ${dId}`; renderPendingTreatsMain(p); renderMedsList(); renderAgendaList(); if(typeof daniSpeak === 'function') daniSpeak("💾 Px guardado."); }
+    function savePatient() { const n=$('pName').value.trim(); if(!n) return alert("Falta Nombre."); const dId='Px-'+n; if(!db.curr){ db.curr='p_'+Date.now(); db.pats[db.curr]={id:db.curr,displayId:dId,notas:[],treats:{},alertDate:new Date().toISOString().split('T')[0],factReq:false,factData:{},odonto:{}}; }else db.pats[db.curr].displayId=dId; let p=db.pats[db.curr]; p.name=n;p.birth=sfBirthToISO($('pBirth').value);p.age=$('pAge').value;p.guardian=$('pGuardian').value;p.phone=$('pPhone').value;p.email=$('pEmail').value; p.sex=$('pSexo')?$('pSexo').value:''; sfSyncDireccion(); p.address=$('pAddress').value; p.addr={ calle:($('pAddrCalle')?$('pAddrCalle').value:''), col:($('pAddrCol')?$('pAddrCol').value:''), ciudad:($('pAddrCiudad')?$('pAddrCiudad').value:'') };p.sum=$('pSum').value;p.brackets=$('pBrackets').value;p.retra=$('pRetra').checked;p.factReq=$('pFactReq').checked;p.hasAl=$('pHasAl').checked;p.alPen=$('pAlPen').checked;p.alAin=$('pAlAin').checked;p.alLat=$('pAlLat').checked;p.alSulfa=$('pAlSulfa').checked;p.alOther=$('pAlOther').value; p.costoTotal=$('pCostoTotal')?$('pCostoTotal').value:'';p.notaPago=$('pNotaPago')?$('pNotaPago').value:''; saveMedHistory(p); saveTreats(p); saveDB(); renderPatSelect(); $('lblId').innerHTML=`<i class="fa-solid fa-address-card"></i> ${dId}`; renderPendingTreatsMain(p); renderMedsList(); renderAgendaList(); if(typeof daniSpeak === 'function') daniSpeak("💾 Px guardado."); }
     
-    function loadPatient() { const v=$('pSelect').value; if(!v) return newPatient(); db.curr=v; saveDB(); try{ sfLimpiarImagenesPaciente(); }catch(e){} const p=db.pats[v]; $('lblId').innerHTML=`<i class="fa-solid fa-address-card"></i> ${p.displayId}`; $('pName').value=p.name||'';$('pBirth').value=sfISOToBirth(p.birth||'');try{sfBirthConfirm($('pBirth').value);}catch(e){}$('pGuardian').value=p.guardian||'';$('pPhone').value=p.phone||'';$('pEmail').value=p.email||''; sfCargarDireccion(p);$('pSum').value=p.sum||'';$('pAlert').value=p.alert||'';$('pBrackets').value=p.brackets||'';$('pRetra').checked=p.retra||false;$('pFactReq').checked=p.factReq||false;$('pHasAl').checked=p.hasAl||false;$('pAlPen').checked=p.alPen||false;$('pAlAin').checked=p.alAin||false;$('pAlLat').checked=p.alLat||false;$('pAlSulfa').checked=p.alSulfa||false;$('pAlOther').value=p.alOther||''; if($('pCostoTotal'))$('pCostoTotal').value=p.costoTotal||'';if($('pNotaPago'))$('pNotaPago').value=p.notaPago||''; renderAbonos(); loadMedHistory(p); calcPatientAge(); autoLoadWaDate(); toggleAllergies(); loadTreats(p); renderOdonto(); renderTimeline(); setAlertLabel(p.alertDate); if($('txtReceta'))$('txtReceta').value=''; if($('chkAntibiotico'))$('chkAntibiotico').checked=false; loadFacturacion(p); renderMedsList(); openSection('s-perfil', document.querySelector('.nav-item.active')); autoAbrirAbonosSiDeuda(); window._resenaSug=false; try{ checkResenaSugerencia(); }catch(e){} try{ sfQuickBar(); }catch(e){} try{ sfRefrescarVistasPaciente(); }catch(e){} }
+    function loadPatient() { const v=$('pSelect').value; if(!v) return newPatient(); db.curr=v; saveDB(); try{ sfLimpiarImagenesPaciente(); }catch(e){} const p=db.pats[v]; $('lblId').innerHTML=`<i class="fa-solid fa-address-card"></i> ${p.displayId}`; $('pName').value=p.name||'';$('pBirth').value=sfISOToBirth(p.birth||'');try{sfBirthConfirm($('pBirth').value);}catch(e){}$('pGuardian').value=p.guardian||'';$('pPhone').value=p.phone||'';$('pEmail').value=p.email||''; if($('pSexo')) $('pSexo').value=p.sex||''; sfCargarDireccion(p);$('pSum').value=p.sum||'';$('pAlert').value=p.alert||'';$('pBrackets').value=p.brackets||'';$('pRetra').checked=p.retra||false;$('pFactReq').checked=p.factReq||false;$('pHasAl').checked=p.hasAl||false;$('pAlPen').checked=p.alPen||false;$('pAlAin').checked=p.alAin||false;$('pAlLat').checked=p.alLat||false;$('pAlSulfa').checked=p.alSulfa||false;$('pAlOther').value=p.alOther||''; if($('pCostoTotal'))$('pCostoTotal').value=p.costoTotal||'';if($('pNotaPago'))$('pNotaPago').value=p.notaPago||''; renderAbonos(); loadMedHistory(p); calcPatientAge(); autoLoadWaDate(); toggleAllergies(); loadTreats(p); renderOdonto(); renderTimeline(); setAlertLabel(p.alertDate); if($('txtReceta'))$('txtReceta').value=''; if($('chkAntibiotico'))$('chkAntibiotico').checked=false; loadFacturacion(p); renderMedsList(); openSection('s-perfil', document.querySelector('.nav-item.active')); autoAbrirAbonosSiDeuda(); window._resenaSug=false; try{ checkResenaSugerencia(); }catch(e){} try{ sfQuickBar(); }catch(e){} try{ sfRefrescarVistasPaciente(); }catch(e){} }
 
     function autoAbrirAbonosSiDeuda() {
         try {
@@ -14634,7 +14643,7 @@ Reglas: español de México; terminología dental correcta; máximo 6 líneas; u
                 buildMedHistoryPdfBlock(p, accent),
                 { text:'NOTAS DE EVOLUCIÓN', fontSize:11, bold:true, color:accent, alignment:'center', margin:[0,0,0,8] },
                 ...cuerpoNotas,
-                activeD.name ? { text:'\nResponsable: '+activeD.name+(activeD.spec?' — '+activeD.spec:'')+(activeD.ced1?'  Céd. '+activeD.ced1:''), fontSize:7.5, color:'#64748b', margin:[0,10,0,0] } : {}
+                activeD.name ? { text:'\nResponsable: '+activeD.name+(activeD.spec?' — '+activeD.spec:'')+(activeD.ced1?'  ·  Céd. Prof. '+activeD.ced1:'')+(activeD.ced2?'  ·  Céd. Esp. '+activeD.ced2:''), fontSize:7.5, color:'#64748b', margin:[0,10,0,0] } : {}
             ],
             styles: pdfStyles()
         };
@@ -14735,7 +14744,7 @@ Reglas: español de México; terminología dental correcta; máximo 6 líneas; u
 
         // Sexo y fecha nacimiento si existen
         const sexo = p.sex || p.sexo || '';
-        const fnac = p.dob || p.fnac || '';
+        const fnac = p.birth ? (typeof sfISOToBirth==='function' ? sfISOToBirth(p.birth) : p.birth) : '';
 
         const content = [
             // Encabezado clínica
@@ -15436,6 +15445,7 @@ Reglas: español de México; terminología dental correcta; máximo 6 líneas; u
                     `👨‍⚕️ *${activeD.name || ''}*` +
                     (activeD.spec ? `\n${activeD.spec}` : '') +
                     (activeD.ced1 ? `\nCéd. Prof. ${activeD.ced1}` : '') +
+                    (activeD.ced2 ? `\nCéd. Esp. ${activeD.ced2}` : '') +
                     (cfg.contact ? `\n📞 ${cfg.contact}` : '');
 
         window.open(`https://wa.me/52${p.phone.replace(/\D/g,'')}?text=${encodeURIComponent(msg)}`, '_blank');
