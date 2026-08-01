@@ -581,7 +581,7 @@ window._pdfReady=true;
         <h2 style="margin: 0 !important; font-size: 1.5rem !important; color: white !important;">SmileFlow</h2>
         <a href="https://www.dentilike.com.mx" target="_blank" style="color: #bae6fd; font-size: 0.75rem; text-decoration: none; font-weight: 600; cursor: pointer; transition: color 0.2s;" onmouseover="this.style.color='white'" onmouseout="this.style.color='#bae6fd'">www.dentilike.com.mx</a>
         <a href="mailto:soporte@dentilike.com.mx" style="color: #bae6fd; font-size: 0.75rem; text-decoration: none; font-weight: 600; cursor: pointer; transition: color 0.2s;" onmouseover="this.style.color='white'" onmouseout="this.style.color='#bae6fd'">soporte@dentilike.com.mx</a>
-<span style="color:#7dd3fc; font-size:0.62rem; opacity:0.8; margin-top:2px;">© 2026 Dentilike · Todos los derechos reservados · <b id="sfVersion">v98</b></span>
+<span style="color:#7dd3fc; font-size:0.62rem; opacity:0.8; margin-top:2px;">© 2026 Dentilike · Todos los derechos reservados · <b id="sfVersion">v100</b></span>
     </div></div>
 <!-- Doctor en sesion: informativo, lleva a Configuracion para cambiarlo -->
 <div id="sideDocBox" onclick="openSection('s-admin-id', document.querySelector('.nav-item[onclick*=&quot;s-admin-id&quot;]'))" title="Doctor en sesion. Toca para cambiarlo o editar el perfil." style="margin:0 12px 10px; padding:0.7rem 0.85rem; background:rgba(255,255,255,0.07); border:1px solid rgba(125,211,252,0.28); border-left:3px solid #5DC1BF; border-radius:10px; cursor:pointer; display:flex; align-items:center; gap:0.6rem;">
@@ -713,6 +713,7 @@ window._pdfReady=true;
 <i class="fa-solid fa-magnifying-glass"></i>
 <input class="search-input" id="searchInput" onkeyup="filterPatients()" placeholder="Buscar paciente por nombre..." type="text"/>
 <select class="search-select" id="pSelect" onchange="loadPatient()"></select>
+<select class="search-select" id="filtroConsultorio" onchange="sfCambiarFiltroConsultorio(this.value)" style="max-width:150px;" title="Filtrar por consultorio"></select>
 </div>
 <button class="btn btn-warning" onclick="newPatient(); openSection('s-perfil', document.querySelector('.nav-item[onclick*=\'s-perfil\']'))" style="padding: 0.5rem 0.8rem;" title="Crear Nuevo Paciente"><i class="fa-solid fa-user-plus"></i></button>
 <button class="btn" onclick="irAgendaHoy()" style="padding: 0.5rem 0.9rem; background:#1f5b9e; color:white; white-space:nowrap;" title="Ver las citas de hoy"><i class="fa-solid fa-calendar-day"></i> <span class="agenda-btn-txt">Hoy</span></button>
@@ -1501,6 +1502,10 @@ window._pdfReady=true;
 <label><i class="fa-solid fa-calendar-day"></i> Selecciona un Día</label>
 <input class="input-field" id="agendaSearchDate" onchange="renderAgendaList()" style="font-weight:800;" type="date"/>
 </div>
+<div class="input-group">
+<label><i class="fa-solid fa-hospital"></i> Consultorio</label>
+<select class="input-select" id="filtroConsultorioAgenda" onchange="sfCambiarFiltroConsultorio(this.value)"></select>
+</div>
 <button class="btn btn-warning" onclick="document.getElementById('agendaSearchDate').valueAsDate = new Date(); renderAgendaList();" style="width:100%; color:white;"><i class="fa-solid fa-calendar-day"></i> Ver Citas de Hoy</button>
 </div>
 <div class="card" style="border-top-color: #f59e0b; margin-bottom:0; display:flex; flex-direction:column;">
@@ -1542,6 +1547,10 @@ window._pdfReady=true;
 <option value="Otro">Otro</option>
 </select>
 </div>
+</div>
+<div class="input-group" style="margin-top:1rem;">
+<label><i class="fa-solid fa-hospital"></i> Consultorio</label>
+<select class="input-select" id="pConsultorio"></select>
 </div>
 </div>
 <div class="grid-3" style="margin-bottom:1.5rem;">
@@ -3192,6 +3201,35 @@ Se tomaron signos vitales
 <div style="display:flex; gap:1rem; margin-top:1.5rem;">
 <button class="btn btn-outline" onclick="eliminarDoctorAdmin()" style="border-color:var(--danger); color:var(--danger-text);"><i class="fa-solid fa-trash-can"></i> Eliminar</button>
 <button class="btn btn-primary" onclick="guardarDoctorAdmin()" style="flex-grow:1; margin:0;"><i class="fa-solid fa-floppy-disk"></i> Guardar Perfil del Doctor</button>
+</div>
+</div>
+</div>
+<div class="card" style="border-top-color:#f59e0b;">
+<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem; border-bottom:2px solid #fde68a; padding-bottom:0.8rem; flex-wrap: wrap; gap: 1rem;">
+<h4 style="font-size:1.1rem; margin:0; color:#b45309;"><i class="fa-solid fa-hospital"></i> Consultorios / Sedes</h4>
+<button class="btn btn-success" onclick="crearNuevoConsultorio()" style="padding: 0.6rem 1rem;"><i class="fa-solid fa-plus"></i> Crear Nuevo Consultorio</button>
+</div>
+<div class="input-group">
+<div style="background:#fffbeb; border:1px solid #fde68a; border-left:4px solid #b45309; border-radius:10px; padding:0.9rem 1rem; margin-bottom:1rem;">
+<label style="display:block; font-weight:800; color:#92400e; font-size:0.85rem; margin-bottom:0.4rem;"><i class="fa-solid fa-location-dot"></i> Consultorio activo (donde estás trabajando ahora)</label>
+<select class="input-select" id="consSelect" onchange="changeConsultorioActivo()" style="font-weight:800; background:white; border-color:#fde68a; font-size:1.02rem;"></select>
+<p style="font-size:0.74rem; color:#92400e; margin:0.45rem 0 0 0; line-height:1.5;">Los pacientes nuevos que registres se asignan aquí automáticamente. También define qué dirección/teléfono sale en recetas y documentos de ese paciente.</p>
+</div>
+<label><i class="fa-solid fa-pen"></i> Selecciona el Consultorio a Editar</label>
+<select class="input-select" id="adminConsSelect" onchange="cargarConsultorioAdmin()" style="font-weight:800; background:#fffbeb; border-color:#fde68a; font-size:1.05rem;"></select>
+<p style="font-size:0.74rem; color:#64748b; margin:0.45rem 0 0 0;">Editar un consultorio no cambia el consultorio activo.</p>
+</div>
+<div id="consFormBox" style="background:#f8fafc; padding:1.5rem; border-radius:var(--radius-md); border:1px solid #cbd5e1; margin-top:1.5rem;">
+<input id="consId" type="hidden"/>
+<div class="grid-2">
+<div class="input-group"><label><i class="fa-solid fa-signature"></i> Nombre del Consultorio</label><input class="input-field" id="consNombre" placeholder="Ej. Consultorio Dra. Torres" style="font-weight:800;" type="text"/></div>
+<div class="input-group"><label><i class="fa-brands fa-whatsapp"></i> Teléfono / WhatsApp</label><input class="input-field" id="consTelefono" type="text"/></div>
+</div>
+<div class="input-group"><label><i class="fa-solid fa-location-dot"></i> Dirección</label><input class="input-field" id="consDireccion" type="text"/></div>
+<div class="input-group"><label><i class="fa-regular fa-envelope"></i> Correo Electrónico</label><input class="input-field" id="consEmail" type="email"/></div>
+<div style="display:flex; gap:1rem; margin-top:1rem;">
+<button class="btn btn-primary" onclick="guardarConsultorioAdmin()" style="flex:1; padding:1rem; font-weight:800;"><i class="fa-solid fa-floppy-disk"></i> Guardar Consultorio</button>
+<button class="btn" onclick="eliminarConsultorioAdmin()" style="background:#fee2e2; color:#b91c1c; padding:1rem 1.2rem;" title="Eliminar consultorio"><i class="fa-solid fa-trash"></i></button>
 </div>
 </div>
 </div>
@@ -4906,10 +4944,58 @@ db = {
         db.activeDoc = firstDocId;
     }
 
+
+    // Devuelve los datos de identidad (nombre/direccion/telefono/correo) que deben
+    // aparecer en documentos y mensajes para un paciente dado: los de SU consultorio
+    // asignado si los tiene, o los de la identidad global (db.cfg) si no.
+    function sfMigrarConsultoriosYDoctores() {
+        // Doctores: si el registro cargado de IndexedDB no trae ninguno (instalacion
+        // nueva), se crea uno vacio para editar. Antes esta migracion solo corria
+        // sobre el objeto "db" de arranque, que se descarta en cuanto termina de
+        // cargar la base real — por eso se mueve aqui, despues de await initDB().
+        if (!db.docs || Object.keys(db.docs).length === 0) {
+            db.docs = {}; const firstDocId = 'doc_' + Date.now();
+            db.docs[firstDocId] = { id: firstDocId, name: '', spec: '', ced1: '', ced2: '', uni1: '', uni2: '', phone: '', email: '' };
+            db.activeDoc = firstDocId;
+        }
+        // Consultorios: si no existen, se crea uno a partir de la identidad global
+        // actual (Nombre Comercial, Direccion, Telefono, Correo), y se asigna a
+        // todos los pacientes que aun no tengan consultorio.
+        if (!db.consultorios || Object.keys(db.consultorios).length === 0) {
+            db.consultorios = {}; const firstConsId = 'cons_' + Date.now();
+            db.consultorios[firstConsId] = {
+                id: firstConsId,
+                nombre: (db.cfg && db.cfg.cli) || 'Mi Consultorio',
+                direccion: (db.cfg && db.cfg.address) || '',
+                telefono: (db.cfg && db.cfg.contact) || '',
+                email: (db.cfg && db.cfg.email) || ''
+            };
+            db.consultorioActivo = firstConsId;
+            Object.values(db.pats || {}).forEach(p => { if (!p.consultorioId) p.consultorioId = firstConsId; });
+        }
+        if (!db.consultorioActivo || !db.consultorios[db.consultorioActivo]) {
+            db.consultorioActivo = Object.keys(db.consultorios)[0];
+        }
+    }
+
+    function sfClinicaActiva(p) {
+        const base = db.cfg || {};
+        const pat = p || ((db.curr && db.pats[db.curr]) ? db.pats[db.curr] : null);
+        const c = (pat && pat.consultorioId && db.consultorios && db.consultorios[pat.consultorioId]) ? db.consultorios[pat.consultorioId] : null;
+        if (!c) return base;
+        return Object.assign({}, base, {
+            cli: c.nombre || base.cli,
+            address: c.direccion || base.address,
+            contact: c.telefono || base.contact,
+            email: c.email || base.email
+        });
+    }
+
+
     // --- BUSCADOR Y AGENDA ---
     function renderPatSelect(f = '') { 
         $('pSelect').innerHTML = '<option value="">Selecciona paciente...</option>'; 
-        Object.values(db.pats).forEach(p => { if(p.name.toLowerCase().includes(f.toLowerCase()) || p.displayId.toLowerCase().includes(f.toLowerCase())) $('pSelect').innerHTML += `<option value="${p.id}">${p.name}</option>`; }); 
+        Object.values(db.pats).forEach(p => { const pasaConsultorio = !sfFiltroConsultorio || p.consultorioId === sfFiltroConsultorio; if(pasaConsultorio && (p.name.toLowerCase().includes(f.toLowerCase()) || p.displayId.toLowerCase().includes(f.toLowerCase()))) $('pSelect').innerHTML += `<option value="${p.id}">${p.name}</option>`; }); 
         if(db.curr && db.pats[db.curr] && !f) $('pSelect').value = db.curr; 
     }
     function filterPatients() { renderPatSelect($('searchInput').value); }
@@ -5239,7 +5325,7 @@ db = {
         const d = $('agendaSearchDate').value; if(!d) return; let h = '';
         const fmtH = t => { if(!t) return ''; let [hh,mm]=t.split(':'); let H=parseInt(hh), ap=H>=12?'PM':'AM'; H=H%12||12; return H+':'+mm+' '+ap; };
         const lista = [];
-        Object.values(db.pats).forEach(p => { if(p.nextAppt === d) lista.push(p); });
+        Object.values(db.pats).forEach(p => { if(p.nextAppt === d && (!sfFiltroConsultorio || p.consultorioId === sfFiltroConsultorio)) lista.push(p); });
         lista.sort((a,b)=>{ const ha=a.nextApptTime||'99', hb=b.nextApptTime||'99'; return ha.localeCompare(hb); });
         lista.forEach(p => {
                 h += `<div style="display:flex; justify-content:space-between; align-items:center; background:#f8fafc; padding:1.2rem; border:1px solid #e2e8f0; border-radius:8px; margin-bottom:0.8rem; box-shadow:var(--shadow-sm);">
@@ -5252,7 +5338,7 @@ db = {
     
     function abrirAgenda() { window.open(db.cfg.agenda || 'https://calendar.google.com', '_blank'); }
     function abrirAgendaNuevaCita() { window.open('https://calendar.google.com/calendar/r/eventedit', '_blank'); }
-    function openWaPatient(pid) { const p = db.pats[pid]; if(!p || !p.phone) return alert("Paciente sin teléfono."); window.open(`https://wa.me/52${p.phone.replace(/\D/g,'')}?text=${encodeURIComponent(`Hola ${p.name}, excelente día 👋. Te escribimos de ${db.cfg.cli} para confirmar tu cita programada.`)}`, '_blank'); }
+    function openWaPatient(pid) { const p = db.pats[pid]; if(!p || !p.phone) return alert("Paciente sin teléfono."); window.open(`https://wa.me/52${p.phone.replace(/\D/g,'')}?text=${encodeURIComponent(`Hola ${p.name}, excelente día 👋. Te escribimos de ${sfClinicaActiva(p).cli} para confirmar tu cita programada.`)}`, '_blank'); }
 
     // --- CUMPLEAÑOS Y EDAD AUTOMÁTICA ---
     // Fecha de nacimiento escribible: DD/MM/AAAA en pantalla, ISO (AAAA-MM-DD) al guardar.
@@ -7677,7 +7763,7 @@ db = {
         const en = endoRecoger();
         if(!en.diente) return alert('Indica al menos el diente antes de imprimir.');
         const p = db.pats[db.curr];
-        const cfg = db.cfg || {};
+        const cfg = sfClinicaActiva();
         const activeD = (db.docs && db.activeDoc && db.docs[db.activeDoc]) ? db.docs[db.activeDoc] : {};
         const accent = '#7c3aed';
         const d = new Date();
@@ -7733,8 +7819,7 @@ db = {
 
         const docParts = [];
         if(activeD.name) docParts.push(activeD.name + (activeD.spec? ' — '+activeD.spec : ''));
-        const ced=[]; if(activeD.ced1) ced.push('Céd. Prof. '+activeD.ced1); if(activeD.ced2) ced.push('Céd. Esp. '+activeD.ced2);
-        if(ced.length) docParts.push(ced.join('  |  '));
+        if(activeD.ced1) docParts.push('Céd. Prof. '+activeD.ced1); if(activeD.ced2) docParts.push('Céd. Esp. '+activeD.ced2);
         if(cfg.cofepris) docParts.push('COFEPRIS: '+cfg.cofepris);
         if(docParts.length) content.push({ text: docParts.join('\n'), fontSize:7.5, color:'#64748b', alignment:'center', margin:[0,20,0,0] });
 
@@ -10415,7 +10500,7 @@ function selectTooth(t, ev) {
         if(typeof ensurePdfMake === 'function' && !ensurePdfMake()) return;
         const r = remRecoger();
         const p = db.pats[db.curr];
-        const cfg = db.cfg || {};
+        const cfg = sfClinicaActiva();
         const activeD = (db.docs && db.activeDoc && db.docs[db.activeDoc]) ? db.docs[db.activeDoc] : {};
         const accent = '#0e7490';
         const d = new Date();
@@ -10446,7 +10531,7 @@ function selectTooth(t, ev) {
                 { text:'Etapas', bold:true, fontSize:11, color:accent, margin:[0,8,0,5] },
                 { table:{ widths:['*','auto','auto'], body:[[ {text:'Etapa', bold:true, fontSize:9}, {text:'Estado', bold:true, fontSize:9}, {text:'Fecha', bold:true, fontSize:9} ], ...etapasBody] }, layout:'lightHorizontalLines' },
                 r.notas ? { text:'Notas: ' + r.notas, fontSize:9, margin:[0,10,0,0] } : {},
-                { text: (activeD.name ? activeD.name : '') + (activeD.ced1 ? '  ·  Céd. Prof. ' + activeD.ced1 : '') + (activeD.ced2 ? '  ·  Céd. Esp. ' + activeD.ced2 : ''), fontSize:9, color:'#475569', alignment:'center', margin:[0,30,0,0] }
+                { text: (activeD.name ? activeD.name : '') + (activeD.ced1 ? '\nCéd. Prof. ' + activeD.ced1 : '') + (activeD.ced2 ? '\nCéd. Esp. ' + activeD.ced2 : ''), fontSize:9, color:'#475569', alignment:'center', margin:[0,30,0,0] }
             ]
         };
         try { pdfMake.createPdf(doc).open(); } catch(e){ alert('No se pudo generar el PDF.'); }
@@ -10645,7 +10730,7 @@ function selectTooth(t, ev) {
         const pr = protRecoger();
         if(!pr.piezas.length) return alert('Agrega al menos una pieza antes de imprimir.');
         const p = db.pats[db.curr];
-        const cfg = db.cfg || {};
+        const cfg = sfClinicaActiva();
         const activeD = (db.docs && db.activeDoc && db.docs[db.activeDoc]) ? db.docs[db.activeDoc] : {};
         const accent = '#b45309';
         const d = new Date();
@@ -10706,8 +10791,7 @@ function selectTooth(t, ev) {
 
         const docParts = [];
         if(activeD.name) docParts.push(activeD.name + (activeD.spec? ' — '+activeD.spec : ''));
-        const ced=[]; if(activeD.ced1) ced.push('Céd. Prof. '+activeD.ced1); if(activeD.ced2) ced.push('Céd. Esp. '+activeD.ced2);
-        if(ced.length) docParts.push(ced.join('  |  '));
+        if(activeD.ced1) docParts.push('Céd. Prof. '+activeD.ced1); if(activeD.ced2) docParts.push('Céd. Esp. '+activeD.ced2);
         if(cfg.cofepris) docParts.push('COFEPRIS: '+cfg.cofepris);
         if(docParts.length) content.push({ text: docParts.join('\n'), fontSize:7.5, color:'#64748b', alignment:'center', margin:[0,20,0,0] });
 
@@ -10878,7 +10962,7 @@ function selectTooth(t, ev) {
     //   IMPRESIÓN CON PDFMAKE (Hoja Clínica / Hoja Paciente)
     // ============================================================
     function getDoctorAndClinic() {
-        const cfg = db.cfg || {};
+        const cfg = sfClinicaActiva();
         const activeD = (db.docs && db.activeDoc && db.docs[db.activeDoc]) ? db.docs[db.activeDoc] : {};
         return { cfg, activeD };
     }
@@ -10929,10 +11013,8 @@ function selectTooth(t, ev) {
         const parts = [];
         if(activeD.name) parts.push({ text: activeD.name, bold:true, fontSize:9 });
         if(activeD.spec) parts.push({ text: activeD.spec, fontSize:8 });
-        const ced = [];
-        if(activeD.ced1) ced.push('Céd. Prof. ' + activeD.ced1);
-        if(activeD.ced2) ced.push('Céd. Esp. ' + activeD.ced2);
-        if(ced.length) parts.push({ text: ced.join('  |  '), fontSize:8 });
+        if(activeD.ced1) parts.push({ text: 'Céd. Prof. ' + activeD.ced1, fontSize:8 });
+        if(activeD.ced2) parts.push({ text: 'Céd. Esp. ' + activeD.ced2, fontSize:8 });
         if(cfg.cofepris) parts.push({ text: 'COFEPRIS: ' + cfg.cofepris, fontSize:7, color:'#64748b' });
         parts.push({ text: '\n\n_______________________________', fontSize:8, margin:[0,12,0,0] });
         parts.push({ text: 'Firma del profesional', fontSize:7, color:'#94a3b8' });
@@ -11103,7 +11185,7 @@ function selectTooth(t, ev) {
         if(!id || !db.labs[id]) return alert("Selecciona un laboratorio destino.");
         const lab = db.labs[id];
         const p = db.pats[db.curr];
-        const cfg = db.cfg || {};
+        const cfg = sfClinicaActiva();
         const activeD = (db.docs && db.activeDoc && db.docs[db.activeDoc]) ? db.docs[db.activeDoc] : {};
         const accent = '#1f5b9e';
         const seleccionados = Array.from(document.querySelectorAll('.labEstudioChk:checked')).map(c=>c.value);
@@ -11152,7 +11234,7 @@ function selectTooth(t, ev) {
         if(!id || !db.labs[id]) return alert("Selecciona un laboratorio destino.");
         const lab = db.labs[id];
         const p = db.pats[db.curr];
-        const cfg = db.cfg || {};
+        const cfg = sfClinicaActiva();
         const activeD = (db.docs && db.activeDoc && db.docs[db.activeDoc]) ? db.docs[db.activeDoc] : {};
         const seleccionados = Array.from(document.querySelectorAll('.labEstudioChk:checked')).map(c=>c.value);
         const notas = $('labNotas').value.trim();
@@ -11163,7 +11245,7 @@ function selectTooth(t, ev) {
         if(cfg.cli) L.push(cfg.cli);
         L.push('');
         L.push('*Paciente:* ' + (p.name||'—'));
-        if(activeD.name) L.push('*Dr(a):* ' + activeD.name + (activeD.ced1?' · Céd. Prof. '+activeD.ced1:'') + (activeD.ced2?' · Céd. Esp. '+activeD.ced2:''));
+        if(activeD.name) L.push('*Dr(a):* ' + activeD.name + (activeD.ced1?'\nCéd. Prof. '+activeD.ced1:'') + (activeD.ced2?'\nCéd. Esp. '+activeD.ced2:''));
         L.push('');
         L.push('*Estudios solicitados:*');
         if(seleccionados.length) seleccionados.forEach(e=>L.push('• '+e));
@@ -11193,7 +11275,7 @@ function selectTooth(t, ev) {
 
     function renderLabEmailDest() {
         const sel = $('labEmailDest'); if(!sel) return;
-        const cfg = db.cfg || {};
+        const cfg = sfClinicaActiva();
         const activeD = (db.docs && db.activeDoc && db.docs[db.activeDoc]) ? db.docs[db.activeDoc] : {};
         const prev = sel.value;
         const opts = [];
@@ -11223,7 +11305,7 @@ function selectTooth(t, ev) {
         if(!id || !db.labs[id]) return alert("Selecciona un laboratorio destino.");
         const lab = db.labs[id];
         const p = db.pats[db.curr];
-        const cfg = db.cfg || {};
+        const cfg = sfClinicaActiva();
         const activeD = (db.docs && db.activeDoc && db.docs[db.activeDoc]) ? db.docs[db.activeDoc] : {};
         const seleccionados = Array.from(document.querySelectorAll('.labEstudioChk:checked')).map(c=>c.value);
         const notas = $('labNotas') ? $('labNotas').value.trim() : '';
@@ -11315,10 +11397,9 @@ function selectTooth(t, ev) {
         } else {
             stack.push({ text:'_______________________________', fontSize:8, alignment:'center', margin:[0,22,0,0] });
         }
-        const linea = [];
-        if(activeD && activeD.name) linea.push(activeD.name);
-        if(activeD && activeD.ced1) linea.push('Céd. Prof. '+activeD.ced1); if(activeD && activeD.ced2) linea.push('Céd. Esp. '+activeD.ced2);
-        stack.push({ text: linea.join('  ·  ') || 'Firma del profesional', fontSize:8, bold:true, alignment:'center' });
+        stack.push({ text: (activeD && activeD.name) ? activeD.name : 'Firma del profesional', fontSize:8, bold:true, alignment:'center' });
+        if(activeD && activeD.ced1) stack.push({ text:'Céd. Prof. '+activeD.ced1, fontSize:7.5, alignment:'center' });
+        if(activeD && activeD.ced2) stack.push({ text:'Céd. Esp. '+activeD.ced2, fontSize:7.5, alignment:'center' });
         stack.push({ text:'Firma del profesional', fontSize:7, color:'#94a3b8', alignment:'center' });
         // Contacto del doctor de referencia (teléfono y correo)
         const contacto = [];
@@ -11550,7 +11631,7 @@ ${patientText}`;
     // --- GESTIÓN DE PACIENTES ---
     function checkAge() { const a=$('pAge').value; if($('divGuardian')) $('divGuardian').classList.toggle('hidden', a===''||a>=18); }
     
-    function newPatient() { db.curr=null; saveDB(); $('pSelect').value=''; $('lblId').innerHTML='<i class="fa-solid fa-address-card"></i> Nuevo Px'; ['pName','pBirth','pAge','pGuardian','pPhone','pEmail','pAddress','pAddrCalle','pAddrCol','pAddrCiudad','pSum','pAlert','pBrackets','pSexo'].forEach(id=>{if($(id))$(id).value='';}); ['pRetra','pFactReq','pHasAl','pAlPen','pAlAin','pAlLat','pAlSulfa'].forEach(id=>{if($(id))$(id).checked=false;}); if($('pAlOther')) $('pAlOther').value=''; if($('pCostoTotal'))$('pCostoTotal').value='';if($('pNotaPago'))$('pNotaPago').value=''; if($('listaAbonos'))$('listaAbonos').innerHTML=''; recalcSaldo(); clearMedHistory(); if($('pCakeIcon')) $('pCakeIcon').style.display='none'; autoLoadWaDate(); checkAge(); toggleAllergies(); loadTreats({}); renderOdonto(); renderTimeline(); setAlertLabel(null); if($('txtReceta')) $('txtReceta').value=''; if($('chkAntibiotico')) $('chkAntibiotico').checked=false; loadFacturacion({}); renderMedsList(); try{ sfQuickBar(); }catch(e){} try{ sfLimpiarImagenesPaciente(); sfRefrescarVistasPaciente(); }catch(e){} }
+    function newPatient() { db.curr=null; saveDB(); $('pSelect').value=''; $('lblId').innerHTML='<i class="fa-solid fa-address-card"></i> Nuevo Px'; ['pName','pBirth','pAge','pGuardian','pPhone','pEmail','pAddress','pAddrCalle','pAddrCol','pAddrCiudad','pSum','pAlert','pBrackets','pSexo'].forEach(id=>{if($(id))$(id).value='';}); if($('pConsultorio')) $('pConsultorio').value=db.consultorioActivo||''; ['pRetra','pFactReq','pHasAl','pAlPen','pAlAin','pAlLat','pAlSulfa'].forEach(id=>{if($(id))$(id).checked=false;}); if($('pAlOther')) $('pAlOther').value=''; if($('pCostoTotal'))$('pCostoTotal').value='';if($('pNotaPago'))$('pNotaPago').value=''; if($('listaAbonos'))$('listaAbonos').innerHTML=''; recalcSaldo(); clearMedHistory(); if($('pCakeIcon')) $('pCakeIcon').style.display='none'; autoLoadWaDate(); checkAge(); toggleAllergies(); loadTreats({}); renderOdonto(); renderTimeline(); setAlertLabel(null); if($('txtReceta')) $('txtReceta').value=''; if($('chkAntibiotico')) $('chkAntibiotico').checked=false; loadFacturacion({}); renderMedsList(); try{ sfQuickBar(); }catch(e){} try{ sfLimpiarImagenesPaciente(); sfRefrescarVistasPaciente(); }catch(e){} }
     
     function savePatientAlert() { if(!db.curr) return; db.pats[db.curr].alert=$('pAlert').value; db.pats[db.curr].alertDate=new Date().toISOString().split('T')[0]; saveDB(); setAlertLabel(db.pats[db.curr].alertDate); }
 
@@ -11766,7 +11847,7 @@ ${patientText}`;
         const p = db.pats[db.curr];
         const a = (p.abonos || [])[i];
         if(!a) return;
-        const cfg = db.cfg || {};
+        const cfg = sfClinicaActiva();
         const activeD = (db.docs && db.activeDoc && db.docs[db.activeDoc]) ? db.docs[db.activeDoc] : {};
         const accent = '#059669';
         const monto = parseFloat(a.monto) || 0;
@@ -11849,7 +11930,7 @@ ${patientText}`;
         const a = (p.abonos || [])[i];
         if(!a) return;
         if(!p.phone) return alert("El paciente no tiene teléfono registrado.");
-        const cfg = db.cfg || {};
+        const cfg = sfClinicaActiva();
         const activeD = (db.docs && db.activeDoc && db.docs[db.activeDoc]) ? db.docs[db.activeDoc] : {};
         const monto = parseFloat(a.monto) || 0;
         const total = parseFloat(p.costoTotal) || 0;
@@ -12299,7 +12380,7 @@ ${patientText}`;
         if(!p.phone) return alert('El paciente no tiene teléfono registrado.');
         if(!spTrats.some(t=>t.costo)) return alert('Agrega al menos un tratamiento con costo.');
         const c = spCalc();
-        const cfg = db.cfg||{};
+        const cfg = sfClinicaActiva();
         const activeD = (db.docs&&db.activeDoc&&db.docs[db.activeDoc])?db.docs[db.activeDoc]:{};
         let m = `*Smile Plan by Dentilike* 🦷✨\n\n`;
         m += `¡Hola *${p.name||''}*! Aquí tu plan personalizado:\n\n`;
@@ -12329,7 +12410,7 @@ ${patientText}`;
         if(!spTrats.some(t=>t.costo)) return alert('Agrega al menos un tratamiento con costo.');
         const c = spCalc();
         const p = db.pats[db.curr];
-        const cfg = db.cfg||{};
+        const cfg = sfClinicaActiva();
         const activeD = (db.docs&&db.activeDoc&&db.docs[db.activeDoc])?db.docs[db.activeDoc]:{};
         const azul = '#1f5b9e';
         const ds = new Date().toLocaleDateString('es-MX',{day:'2-digit',month:'2-digit',year:'numeric'});
@@ -12414,7 +12495,7 @@ ${patientText}`;
         if(!spTrats.some(t=>t.costo)) return alert('Agrega al menos un tratamiento con costo.');
         const c = spCalc();
         const p = db.curr?db.pats[db.curr]:null;
-        const cfg = db.cfg||{};
+        const cfg = sfClinicaActiva();
         const azul = '#1f5b9e';
         let minPlazo=spPlazos()[0], minMensual=Infinity;
         spPlazos().forEach(P=>{ if(c.planes[P].mensual<minMensual){ minMensual=c.planes[P].mensual; minPlazo=P; } });
@@ -12924,7 +13005,7 @@ Reglas: español de México; terminología dental correcta; máximo 6 líneas; u
         let wa = (lab.wa||'').replace(/\D/g,'');
         if(!wa){ const m=(lab.tel||'').replace(/\D/g,''); if(m.length>=10) wa=m.slice(0,10); }
         if(!wa) return alert('Este laboratorio no tiene WhatsApp registrado. Edítalo y agrega el número.');
-        const cfg = db.cfg||{};
+        const cfg = sfClinicaActiva();
         const activeD = (db.docs&&db.activeDoc&&db.docs[db.activeDoc])?db.docs[db.activeDoc]:{};
         const t = LABD_TIPOS[o.categoria]||{campos:[],label:''};
         const hora = new Date().getHours();
@@ -13192,7 +13273,7 @@ Reglas: español de México; terminología dental correcta; máximo 6 líneas; u
         if(!o.subtipo) return alert('Elige el tipo de trabajo antes de imprimir.');
         if(!o.labId) return alert('Selecciona el laboratorio destino antes de imprimir.');
         const lab = db.labsDentales[o.labId]||{};
-        const cfg = db.cfg||{};
+        const cfg = sfClinicaActiva();
         const activeD = (db.docs&&db.activeDoc&&db.docs[db.activeDoc])?db.docs[db.activeDoc]:{};
         const t = LABD_TIPOS[o.categoria]||{campos:[],label:''};
         const accent = '#1f5b9e';
@@ -13265,7 +13346,7 @@ Reglas: español de México; terminología dental correcta; máximo 6 líneas; u
         pieCols.push({ width:'*', stack:[
             { canvas:[{type:'line',x1:0,y1:0,x2:180,y2:0,lineWidth:0.8,lineColor:'#0f172a'}] },
             { text: (activeD.name||'Firma del doctor(a)')+(activeD.spec?(' — '+activeD.spec):''), fontSize:8.5, bold:true, alignment:'center', margin:[0,3,0,0] },
-            (activeD.ced1 || activeD.ced2)?{ text:[activeD.ced1?('Céd. Prof. '+activeD.ced1):'', activeD.ced2?('Céd. Esp. '+activeD.ced2):''].filter(Boolean).join('  |  '), fontSize:7.5, color:'#64748b', alignment:'center' }:{}
+            (activeD.ced1 || activeD.ced2)?{ text:[activeD.ced1?('Céd. Prof. '+activeD.ced1):'', activeD.ced2?('Céd. Esp. '+activeD.ced2):''].filter(Boolean).join('\n'), fontSize:7.5, color:'#64748b', alignment:'center' }:{}
         ]});
         pieCols.push({ width:'*', stack:[
             { canvas:[{type:'line',x1:0,y1:0,x2:180,y2:0,lineWidth:0.8,lineColor:'#0f172a'}] },
@@ -13282,7 +13363,7 @@ Reglas: español de México; terminología dental correcta; máximo 6 líneas; u
         if(!db.curr) return alert('Selecciona un paciente primero.');
         const p = db.pats[db.curr];
         if(!p.phone) return alert('El paciente no tiene teléfono registrado.');
-        const cfg = db.cfg || {};
+        const cfg = sfClinicaActiva();
         const g = (cfg.resGoogle||'').trim();
         const d = (cfg.resDoctoralia||'').trim();
         if(!g && !d) return alert('Configura al menos una liga de reseña en Sistema → Ligas para pedir reseñas.');
@@ -13447,9 +13528,9 @@ Reglas: español de México; terminología dental correcta; máximo 6 líneas; u
         if(typeof daniSpeak === 'function') daniSpeak('🧪 Paciente de Prueba creado con datos en todos los módulos: odontograma, alertas médicas, endodoncia, prótesis, Smile Plan, laboratorio dental y abonos. ¡Explóralos!', 9000, 'info');
     }
 
-    function savePatient() { const n=$('pName').value.trim(); if(!n) return alert("Falta Nombre."); const dId='Px-'+n; if(!db.curr){ db.curr='p_'+Date.now(); db.pats[db.curr]={id:db.curr,displayId:dId,notas:[],treats:{},alertDate:new Date().toISOString().split('T')[0],factReq:false,factData:{},odonto:{}}; }else db.pats[db.curr].displayId=dId; let p=db.pats[db.curr]; p.name=n;p.birth=sfBirthToISO($('pBirth').value);p.age=$('pAge').value;p.guardian=$('pGuardian').value;p.phone=$('pPhone').value;p.email=$('pEmail').value; p.sex=$('pSexo')?$('pSexo').value:''; sfSyncDireccion(); p.address=$('pAddress').value; p.addr={ calle:($('pAddrCalle')?$('pAddrCalle').value:''), col:($('pAddrCol')?$('pAddrCol').value:''), ciudad:($('pAddrCiudad')?$('pAddrCiudad').value:'') };p.sum=$('pSum').value;p.brackets=$('pBrackets').value;p.retra=$('pRetra').checked;p.factReq=$('pFactReq').checked;p.hasAl=$('pHasAl').checked;p.alPen=$('pAlPen').checked;p.alAin=$('pAlAin').checked;p.alLat=$('pAlLat').checked;p.alSulfa=$('pAlSulfa').checked;p.alOther=$('pAlOther').value; p.costoTotal=$('pCostoTotal')?$('pCostoTotal').value:'';p.notaPago=$('pNotaPago')?$('pNotaPago').value:''; saveMedHistory(p); saveTreats(p); saveDB(); renderPatSelect(); $('lblId').innerHTML=`<i class="fa-solid fa-address-card"></i> ${dId}`; renderPendingTreatsMain(p); renderMedsList(); renderAgendaList(); if(typeof daniSpeak === 'function') daniSpeak("💾 Px guardado."); try{ sfQuickBar(); }catch(e){} }
+    function savePatient() { const n=$('pName').value.trim(); if(!n) return alert("Falta Nombre."); const dId='Px-'+n; if(!db.curr){ db.curr='p_'+Date.now(); db.pats[db.curr]={id:db.curr,displayId:dId,notas:[],treats:{},alertDate:new Date().toISOString().split('T')[0],factReq:false,factData:{},odonto:{}}; }else db.pats[db.curr].displayId=dId; let p=db.pats[db.curr]; p.name=n;p.birth=sfBirthToISO($('pBirth').value);p.age=$('pAge').value;p.guardian=$('pGuardian').value;p.phone=$('pPhone').value;p.email=$('pEmail').value; p.sex=$('pSexo')?$('pSexo').value:''; p.consultorioId=$('pConsultorio')?($('pConsultorio').value||db.consultorioActivo):db.consultorioActivo; sfSyncDireccion(); p.address=$('pAddress').value; p.addr={ calle:($('pAddrCalle')?$('pAddrCalle').value:''), col:($('pAddrCol')?$('pAddrCol').value:''), ciudad:($('pAddrCiudad')?$('pAddrCiudad').value:'') };p.sum=$('pSum').value;p.brackets=$('pBrackets').value;p.retra=$('pRetra').checked;p.factReq=$('pFactReq').checked;p.hasAl=$('pHasAl').checked;p.alPen=$('pAlPen').checked;p.alAin=$('pAlAin').checked;p.alLat=$('pAlLat').checked;p.alSulfa=$('pAlSulfa').checked;p.alOther=$('pAlOther').value; p.costoTotal=$('pCostoTotal')?$('pCostoTotal').value:'';p.notaPago=$('pNotaPago')?$('pNotaPago').value:''; saveMedHistory(p); saveTreats(p); saveDB(); renderPatSelect(); $('lblId').innerHTML=`<i class="fa-solid fa-address-card"></i> ${dId}`; renderPendingTreatsMain(p); renderMedsList(); renderAgendaList(); if(typeof daniSpeak === 'function') daniSpeak("💾 Px guardado."); try{ sfQuickBar(); }catch(e){} }
     
-    function loadPatient() { const v=$('pSelect').value; if(!v) return newPatient(); db.curr=v; saveDB(); try{ sfLimpiarImagenesPaciente(); }catch(e){} const p=db.pats[v]; $('lblId').innerHTML=`<i class="fa-solid fa-address-card"></i> ${p.displayId}`; $('pName').value=p.name||'';$('pBirth').value=sfISOToBirth(p.birth||'');try{sfBirthConfirm($('pBirth').value);}catch(e){}$('pGuardian').value=p.guardian||'';$('pPhone').value=p.phone||'';$('pEmail').value=p.email||''; if($('pSexo')) $('pSexo').value=p.sex||''; sfCargarDireccion(p);$('pSum').value=p.sum||'';$('pAlert').value=p.alert||'';$('pBrackets').value=p.brackets||'';$('pRetra').checked=p.retra||false;$('pFactReq').checked=p.factReq||false;$('pHasAl').checked=p.hasAl||false;$('pAlPen').checked=p.alPen||false;$('pAlAin').checked=p.alAin||false;$('pAlLat').checked=p.alLat||false;$('pAlSulfa').checked=p.alSulfa||false;$('pAlOther').value=p.alOther||''; if($('pCostoTotal'))$('pCostoTotal').value=p.costoTotal||'';if($('pNotaPago'))$('pNotaPago').value=p.notaPago||''; renderAbonos(); loadMedHistory(p); calcPatientAge(); autoLoadWaDate(); toggleAllergies(); loadTreats(p); renderOdonto(); renderTimeline(); setAlertLabel(p.alertDate); if($('txtReceta'))$('txtReceta').value=''; if($('chkAntibiotico'))$('chkAntibiotico').checked=false; loadFacturacion(p); renderMedsList(); openSection('s-perfil', document.querySelector('.nav-item.active')); autoAbrirAbonosSiDeuda(); window._resenaSug=false; try{ checkResenaSugerencia(); }catch(e){} try{ sfQuickBar(); }catch(e){} try{ sfRefrescarVistasPaciente(); }catch(e){} }
+    function loadPatient() { const v=$('pSelect').value; if(!v) return newPatient(); db.curr=v; saveDB(); try{ sfLimpiarImagenesPaciente(); }catch(e){} const p=db.pats[v]; $('lblId').innerHTML=`<i class="fa-solid fa-address-card"></i> ${p.displayId}`; $('pName').value=p.name||'';$('pBirth').value=sfISOToBirth(p.birth||'');try{sfBirthConfirm($('pBirth').value);}catch(e){}$('pGuardian').value=p.guardian||'';$('pPhone').value=p.phone||'';$('pEmail').value=p.email||''; if($('pSexo')) $('pSexo').value=p.sex||''; if($('pConsultorio')) $('pConsultorio').value=p.consultorioId||db.consultorioActivo||''; sfCargarDireccion(p);$('pSum').value=p.sum||'';$('pAlert').value=p.alert||'';$('pBrackets').value=p.brackets||'';$('pRetra').checked=p.retra||false;$('pFactReq').checked=p.factReq||false;$('pHasAl').checked=p.hasAl||false;$('pAlPen').checked=p.alPen||false;$('pAlAin').checked=p.alAin||false;$('pAlLat').checked=p.alLat||false;$('pAlSulfa').checked=p.alSulfa||false;$('pAlOther').value=p.alOther||''; if($('pCostoTotal'))$('pCostoTotal').value=p.costoTotal||'';if($('pNotaPago'))$('pNotaPago').value=p.notaPago||''; renderAbonos(); loadMedHistory(p); calcPatientAge(); autoLoadWaDate(); toggleAllergies(); loadTreats(p); renderOdonto(); renderTimeline(); setAlertLabel(p.alertDate); if($('txtReceta'))$('txtReceta').value=''; if($('chkAntibiotico'))$('chkAntibiotico').checked=false; loadFacturacion(p); renderMedsList(); openSection('s-perfil', document.querySelector('.nav-item.active')); autoAbrirAbonosSiDeuda(); window._resenaSug=false; try{ checkResenaSugerencia(); }catch(e){} try{ sfQuickBar(); }catch(e){} try{ sfRefrescarVistasPaciente(); }catch(e){} }
 
     function autoAbrirAbonosSiDeuda() {
         try {
@@ -13541,6 +13622,57 @@ Reglas: español de México; terminología dental correcta; máximo 6 líneas; u
         } catch(err) { sfErrImagen(err); }
     }
     function eliminarDoctorAdmin() { let i=$('dId').value; if(i==='new'||Object.keys(db.docs).length<=1) return; delete db.docs[i]; if(db.activeDoc===i) db.activeDoc=Object.keys(db.docs)[0]; saveDB(); renderDocSelects(); }
+
+    // ===== CONSULTORIOS / SEDES =====
+    let sfFiltroConsultorio = '';
+    function sfCambiarFiltroConsultorio(v){
+        sfFiltroConsultorio = v;
+        ['filtroConsultorio','filtroConsultorioAgenda'].forEach(id => { const e=$(id); if(e && e.value !== v) e.value = v; });
+        filterPatients();
+        if($('agendaSearchDate') && $('agendaSearchDate').value) renderAgendaList();
+    }
+    function renderConsultorioFiltro(){
+        const opts = '<option value="">Todos los consultorios</option>' + Object.values(db.consultorios||{}).map(c=>`<option value="${c.id}">${c.nombre}</option>`).join('');
+        ['filtroConsultorio','filtroConsultorioAgenda'].forEach(id => { const e=$(id); if(e){ e.innerHTML = opts; e.value = sfFiltroConsultorio; } });
+    }
+    function renderConsultorioSelects(){
+        let h=''; Object.values(db.consultorios||{}).forEach(c=>{ h += `<option value="${c.id}">${c.nombre}</option>`; });
+        if($('consSelect')) $('consSelect').innerHTML = h;
+        if($('adminConsSelect')) $('adminConsSelect').innerHTML = h;
+        if($('pConsultorio')) $('pConsultorio').innerHTML = h;
+        if(db.consultorioActivo && $('consSelect')) $('consSelect').value = db.consultorioActivo;
+        if($('adminConsSelect')){ $('adminConsSelect').value = db.consultorioActivo || Object.keys(db.consultorios||{})[0]; cargarConsultorioAdmin(); }
+        try { renderConsultorioFiltro(); } catch(e){}
+    }
+    function changeConsultorioActivo(){ db.consultorioActivo = $('consSelect').value; saveDB(); }
+    function crearNuevoConsultorio(){ $('consId').value='new'; ['consNombre','consTelefono','consDireccion','consEmail'].forEach(id=>{ if($(id)) $(id).value=''; }); }
+    function cargarConsultorioAdmin(){
+        let v = $('adminConsSelect').value; if(!v || !db.consultorios[v]) return;
+        let c = db.consultorios[v];
+        $('consId').value = c.id;
+        $('consNombre').value = c.nombre || '';
+        $('consTelefono').value = c.telefono || '';
+        $('consDireccion').value = c.direccion || '';
+        $('consEmail').value = c.email || '';
+    }
+    function guardarConsultorioAdmin(){
+        let i = $('consId').value; if(i === 'new' || !i) i = 'cons_' + Date.now();
+        if(!$('consNombre').value.trim()) return alert('Ponle un nombre al consultorio.');
+        db.consultorios[i] = { id:i, nombre:$('consNombre').value.trim(), telefono:$('consTelefono').value, direccion:$('consDireccion').value, email:$('consEmail').value };
+        if(!db.consultorioActivo) db.consultorioActivo = i;
+        saveDB(); renderConsultorioSelects(); alert('Consultorio guardado.');
+    }
+    function eliminarConsultorioAdmin(){
+        let i = $('consId').value;
+        if(i === 'new' || Object.keys(db.consultorios).length <= 1) return alert('Debe existir al menos un consultorio.');
+        if(!confirm('¿Eliminar este consultorio? Los pacientes asignados a él pasarán al primero de la lista.')) return;
+        delete db.consultorios[i];
+        const restante = Object.keys(db.consultorios)[0];
+        if(db.consultorioActivo === i) db.consultorioActivo = restante;
+        Object.values(db.pats||{}).forEach(p => { if(p.consultorioId === i) p.consultorioId = restante; });
+        saveDB(); renderConsultorioSelects();
+    }
+
 
     function renderAdminDyn() { let bH=''; db.cfg.brackets.forEach((b,i)=>{ bH+=`<div style="display:flex; justify-content:space-between; border-bottom:1px solid #e2e8f0; padding:0.6rem 0;"><span>${b.type} | ${b.brand} (Stock: ${b.stock})</span><span>$${b.cost.toFixed(2)} <button onclick="delBkt(${i})" style="color:var(--danger-text); background:none; border:none; cursor:pointer;"><i class="fa-solid fa-trash-can"></i></button></span></div>`; }); if($('renderAdminBrackets')) $('renderAdminBrackets').innerHTML = bH||'Sin brackets.'; let mH=''; db.cfg.materials.forEach((m,i)=>{ mH+=`<div style="display:flex; justify-content:space-between; border-bottom:1px solid #e2e8f0; padding:0.6rem 0;"><span>${m.name}</span><span>$${m.cost.toFixed(2)} <button onclick="delMat(${i})" style="color:var(--danger-text); background:none; border:none; cursor:pointer;"><i class="fa-solid fa-trash-can"></i></button></span></div>`; }); if($('renderAdminMats')) $('renderAdminMats').innerHTML = mH||'Sin insumos.'; }
     function updBktStock(i, q) { db.cfg.brackets[i].stock = Math.max(0, db.cfg.brackets[i].stock+q); saveDB(); renderAdminDyn(); renderClinicaDyn(); }
@@ -14724,7 +14856,7 @@ Reglas: español de México; terminología dental correcta; máximo 6 líneas; u
         const notas = p.notas || [];
         if(notas.length === 0) return alert("Este paciente no tiene notas de evolución registradas.");
 
-        const cfg = db.cfg || {};
+        const cfg = sfClinicaActiva();
         const activeD = (db.docs && db.activeDoc && db.docs[db.activeDoc]) ? db.docs[db.activeDoc] : {};
         const accent = '#1f5b9e';
 
@@ -14774,7 +14906,7 @@ Reglas: español de México; terminología dental correcta; máximo 6 líneas; u
                 buildMedHistoryPdfBlock(p, accent),
                 { text:'NOTAS DE EVOLUCIÓN', fontSize:11, bold:true, color:accent, alignment:'center', margin:[0,0,0,8] },
                 ...cuerpoNotas,
-                activeD.name ? { text:'\nResponsable: '+activeD.name+(activeD.spec?' — '+activeD.spec:'')+(activeD.ced1?'  ·  Céd. Prof. '+activeD.ced1:'')+(activeD.ced2?'  ·  Céd. Esp. '+activeD.ced2:''), fontSize:7.5, color:'#64748b', margin:[0,10,0,0] } : {}
+                activeD.name ? { text:'\nResponsable: '+activeD.name+(activeD.spec?' — '+activeD.spec:'')+(activeD.ced1?'\nCéd. Prof. '+activeD.ced1:'')+(activeD.ced2?'\nCéd. Esp. '+activeD.ced2:''), fontSize:7.5, color:'#64748b', margin:[0,10,0,0] } : {}
             ],
             styles: pdfStyles()
         };
@@ -14843,7 +14975,7 @@ Reglas: español de México; terminología dental correcta; máximo 6 líneas; u
         if(!ensurePdfMake()) return;
         const p = db.pats[db.curr];
         const m = p.med || {};
-        const cfg = db.cfg || {};
+        const cfg = sfClinicaActiva();
         const activeD = (db.docs && db.activeDoc && db.docs[db.activeDoc]) ? db.docs[db.activeDoc] : {};
         const accent = '#1f5b9e';
         const d = new Date();
@@ -14948,7 +15080,7 @@ Reglas: español de México; terminología dental correcta; máximo 6 líneas; u
         if(!db.curr) return alert("Selecciona o guarda un paciente primero.");
         if(!ensurePdfMake()) return;
         const p = db.pats[db.curr];
-        const cfg = db.cfg || {};
+        const cfg = sfClinicaActiva();
         const activeD = (db.docs && db.activeDoc && db.docs[db.activeDoc]) ? db.docs[db.activeDoc] : {};
         const rxText = ($('txtReceta').value || '').trim();
         if(!rxText) return alert("La receta está vacía.");
@@ -14972,7 +15104,7 @@ Reglas: español de México; terminología dental correcta; máximo 6 líneas; u
                             { text: (cfg.cli || 'Consultorio Dental').toUpperCase(), bold:true, fontSize:13, color:accent, characterSpacing:1 },
                             activeD.name ? { text: activeD.name, fontSize:9.5, bold:true, margin:[0,1,0,0] } : {},
                             activeD.spec ? { text: activeD.spec, fontSize:8, italics:true, color:'#475569' } : {},
-                            (activeD.ced1 || activeD.ced2) ? { text: [activeD.ced1?'Céd. Prof. '+activeD.ced1:'', activeD.ced2?'   ·   Céd. Esp. '+activeD.ced2:''].join(''), fontSize:7, color:'#64748b', margin:[0,1,0,0] } : {},
+                            (activeD.ced1 || activeD.ced2) ? { text: [activeD.ced1?'Céd. Prof. '+activeD.ced1:'', activeD.ced2?'Céd. Esp. '+activeD.ced2:''].filter(Boolean).join('\n'), fontSize:7, color:'#64748b', margin:[0,1,0,0] } : {},
                             cfg.cofepris ? { text: 'Reg. COFEPRIS: '+cfg.cofepris, fontSize:7, color:'#64748b' } : {}
                         ], width:'*'
                     },
@@ -15109,7 +15241,7 @@ Reglas: español de México; terminología dental correcta; máximo 6 líneas; u
                 'Autorizo el retratamiento bajo estas condiciones, habiendo comprendido sus alcances y limitaciones.'
             ]},
             aviso_priv: { titulo:'AVISO DE PRIVACIDAD', parrafos:[
-                `${db.cfg.cli || 'Esta clínica dental'}, responsable del tratamiento de sus datos personales, hace de su conocimiento el presente Aviso de Privacidad conforme a la Ley Federal de Protección de Datos Personales en Posesión de los Particulares.`,
+                `${sfClinicaActiva().cli || 'Esta clínica dental'}, responsable del tratamiento de sus datos personales, hace de su conocimiento el presente Aviso de Privacidad conforme a la Ley Federal de Protección de Datos Personales en Posesión de los Particulares.`,
                 'Los datos personales y datos sensibles de salud que usted proporcione serán utilizados con la finalidad de: brindar atención odontológica, integrar y resguardar su expediente clínico, dar seguimiento a su tratamiento, agendar citas, emitir comprobantes y mantener comunicación con usted.',
                 'Sus datos no serán transferidos a terceros sin su consentimiento, salvo las excepciones previstas por la ley. El expediente clínico se conserva conforme a la normatividad sanitaria aplicable (NOM-004).',
                 'Usted puede ejercer sus derechos de Acceso, Rectificación, Cancelación u Oposición (ARCO) y revocar su consentimiento presentando solicitud en nuestras instalaciones o a través de nuestros datos de contacto.',
@@ -15205,7 +15337,7 @@ Reglas: español de México; terminología dental correcta; máximo 6 líneas; u
 
         const tpl = getLegalTemplates()[firmaTipoActual];
         const p = db.pats[db.curr];
-        const cfg = db.cfg || {};
+        const cfg = sfClinicaActiva();
         const activeD = (db.docs && db.activeDoc && db.docs[db.activeDoc]) ? db.docs[db.activeDoc] : {};
         const menor = esMenorDeEdad();
         const tutor = menor && $('firmaTutor') ? ($('firmaTutor').value||'').trim() : '';
@@ -15286,8 +15418,7 @@ Reglas: español de México; terminología dental correcta; máximo 6 líneas; u
         // Datos del profesional al pie
         const docParts = [];
         if(activeD.name) docParts.push(activeD.name + (activeD.spec? ' — '+activeD.spec : ''));
-        const ced=[]; if(activeD.ced1) ced.push('Céd. Prof. '+activeD.ced1); if(activeD.ced2) ced.push('Céd. Esp. '+activeD.ced2);
-        if(ced.length) docParts.push(ced.join('  |  '));
+        if(activeD.ced1) docParts.push('Céd. Prof. '+activeD.ced1); if(activeD.ced2) docParts.push('Céd. Esp. '+activeD.ced2);
         if(cfg.cofepris) docParts.push('COFEPRIS: '+cfg.cofepris);
         if(docParts.length) content.push({ text: docParts.join('\n'), fontSize:7.5, color:'#64748b', alignment:'center', margin:[0,16,0,0] });
 
@@ -15496,7 +15627,7 @@ Reglas: español de México; terminología dental correcta; máximo 6 líneas; u
                     <b>Atiende:</b> ${nombreDoc}
                     ${specDoc ? `<br><b>Especialidad:</b> ${specDoc}` : ''}
                     ${ced1Doc ? `<br><b>Cédula Profesional:</b> ${ced1Doc}` : ''}
-                    ${ced2Doc ? ` &nbsp;|&nbsp; <b>Cédula Especialidad:</b> ${ced2Doc}` : ''}
+                    ${ced2Doc ? `<br><b>Cédula Especialidad:</b> ${ced2Doc}` : ''}
                     ${activeD.phone ? `<br><b>Tel. directo:</b> ${activeD.phone}` : ''}
                     ${activeD.email ? ` &nbsp;|&nbsp; <b>Correo:</b> ${activeD.email}` : ''}
                 </div>
@@ -15559,7 +15690,7 @@ Reglas: español de México; terminología dental correcta; máximo 6 líneas; u
         if(!p) return alert("Selecciona un paciente primero para enviar por WhatsApp.");
         if(!p.phone) return alert("El paciente no tiene teléfono registrado.");
 
-        const cfg = db.cfg || {};
+        const cfg = sfClinicaActiva();
         const activeD = (db.docs && db.activeDoc && db.docs[db.activeDoc]) ? db.docs[db.activeDoc] : { name:'' };
 
         // Texto plano para WhatsApp (sin HTML)
@@ -17062,7 +17193,7 @@ Reglas: español de México; terminología dental correcta; máximo 6 líneas; u
         setV('cCli', db.cfg.cli||''); setV('cSlogan', db.cfg.slogan||''); setV('cDrive', db.cfg.drive||''); setV('cAgenda', db.cfg.agenda||''); setV('cAddress', db.cfg.address||''); setV('cContact', db.cfg.contact||''); setV('cEmail', db.cfg.email||''); setV('cCofepris', db.cfg.cofepris||''); setV('cGeminiKey', localStorage.getItem('sf_gemini_key') || ''); setC('cDaniEn', db.cfg.daniEn); setV('cContName', db.cfg.contName||''); setV('cContPhone', db.cfg.contPhone||''); setV('cContEmail', db.cfg.contEmail||'');
         setV('cResGoogle', db.cfg.resGoogle||''); setV('cResDoctoralia', db.cfg.resDoctoralia||'');
         if($('hLogo')) $('hLogo').style.display='block'; /* Sidebar SIEMPRE muestra el logo de Dentilike (de fabrica); db.cfg.logo se usa solo en recetas/PDF */
-        if($('astNameLabel')) $('astNameLabel').innerHTML = '<i class="fa-solid fa-robot"></i> Dr. Mikes Molares'; try{renderAdminDyn();}catch(e){} try{renderClinicaDyn();}catch(e){} try{renderDocSelects();}catch(e){} try{renderPatSelect();}catch(e){} try{buildForms();}catch(e){} try{renderAdminMeds();}catch(e){} try{loadFin();}catch(e){}
+        if($('astNameLabel')) $('astNameLabel').innerHTML = '<i class="fa-solid fa-robot"></i> Dr. Mikes Molares'; try{renderAdminDyn();}catch(e){} try{renderClinicaDyn();}catch(e){} try{renderDocSelects();}catch(e){} try{renderConsultorioSelects();}catch(e){} try{renderPatSelect();}catch(e){} try{buildForms();}catch(e){} try{renderAdminMeds();}catch(e){} try{loadFin();}catch(e){}
     }
     function uploadAstPhoto(e) { /* Avatar fijo (Dr. Mikes Molares) - no editable */ }
     async function uploadLogo(e) {
@@ -17295,7 +17426,7 @@ function saveDB() {
     function copiarRutaLocal(r) { if(!r) return; navigator.clipboard.writeText(r).then(()=>alert("Ruta local copiada al portapapeles.")); }
     function autoLoadWaDate() { const p = db.curr ? db.pats[db.curr] : null; if(p && p.nextAppt){ $('waDate').value = p.nextAppt; $('waTime').value = p.nextApptTime || "16:00"; return; } let d = new Date(); d.setDate(d.getDate() + 30); $('waDate').value = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; $('waTime').value = "16:00"; }
     function setAlertLabel(d) { const t = new Date().toISOString().split('T')[0], l = $('lblAlertTitle'); if (!d || d === t) { l.innerHTML = "<i class='fa-solid fa-thumbtack'></i> AVISO PRÓX. CITA:"; l.style.color = "var(--warning-text)"; $('pAlert').style.color = "var(--text)"; $('pAlert').style.borderColor = "#fde047"; } else { l.innerHTML = "<i class='fa-solid fa-triangle-exclamation'></i> AVISO PARA HOY:"; l.style.color = "var(--danger-text)"; $('pAlert').style.color = "var(--danger-text)"; $('pAlert').style.borderColor = "#fca5a5"; } }
-    function sendApptWA() { if(!db.curr) return; let p = db.pats[db.curr]; if(!p.phone) return; let d=$('waDate').value, t=$('waTime').value; if(!d||!t) return; p.nextAppt = d; p.nextApptTime = t; saveDB(); renderAgendaList(); let dp=d.split('-'), do_ = new Date(dp[0],dp[1]-1,dp[2]), dStr = do_.toLocaleDateString('es-ES',{weekday:'long',year:'numeric',month:'long',day:'numeric'}); let tp=t.split(':'), h=parseInt(tp[0]), am=h>=12?'PM':'AM'; h=h%12; h=h?h:12; let tStr=h+':'+tp[1]+' '+am; let m = `✨ ¡Hola *${p.name}*!\n\nSu próxima cita en *${db.cfg.cli}* ha sido confirmada.\n\n📅 *Día:* ${dStr}\n⏰ *Hora:* ${tStr}\n👨‍⚕️ *Especialista:* ${db.docs[db.activeDoc]?.name}\n\n🙏 ¡Nos vemos pronto!`; window.open(`https://wa.me/52${p.phone.replace(/\D/g,'')}?text=${encodeURIComponent(m)}`, '_blank'); }
+    function sendApptWA() { if(!db.curr) return; let p = db.pats[db.curr]; if(!p.phone) return; let d=$('waDate').value, t=$('waTime').value; if(!d||!t) return; p.nextAppt = d; p.nextApptTime = t; saveDB(); renderAgendaList(); let dp=d.split('-'), do_ = new Date(dp[0],dp[1]-1,dp[2]), dStr = do_.toLocaleDateString('es-ES',{weekday:'long',year:'numeric',month:'long',day:'numeric'}); let tp=t.split(':'), h=parseInt(tp[0]), am=h>=12?'PM':'AM'; h=h%12; h=h?h:12; let tStr=h+':'+tp[1]+' '+am; let m = `✨ ¡Hola *${p.name}*!\n\nSu próxima cita en *${sfClinicaActiva(p).cli}* ha sido confirmada.\n\n📅 *Día:* ${dStr}\n⏰ *Hora:* ${tStr}\n👨‍⚕️ *Especialista:* ${db.docs[db.activeDoc]?.name}\n\n🙏 ¡Nos vemos pronto!`; window.open(`https://wa.me/52${p.phone.replace(/\D/g,'')}?text=${encodeURIComponent(m)}`, '_blank'); }
 
     // --- NUEVAS FUNCIONES VISUALES ---
     
@@ -17348,6 +17479,7 @@ function saveDB() {
     // ----------------------------------------------
     
     await initDB(); 
+        try { sfMigrarConsultoriosYDoctores(); } catch(e) { console.error('Error migracion consultorios/doctores', e); }
         try { sfChequeoNavegador(); } catch(e) {}
         try { sfOnboardingCheck(); } catch(e) {}
         // Reacomodo de controles desactivado: la barra se queda como estaba.
