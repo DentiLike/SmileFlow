@@ -581,7 +581,7 @@ window._pdfReady=true;
         <h2 style="margin: 0 !important; font-size: 1.5rem !important; color: white !important;">SmileFlow</h2>
         <a href="https://www.dentilike.com.mx" target="_blank" style="color: #bae6fd; font-size: 0.75rem; text-decoration: none; font-weight: 600; cursor: pointer; transition: color 0.2s;" onmouseover="this.style.color='white'" onmouseout="this.style.color='#bae6fd'">www.dentilike.com.mx</a>
         <a href="mailto:soporte@dentilike.com.mx" style="color: #bae6fd; font-size: 0.75rem; text-decoration: none; font-weight: 600; cursor: pointer; transition: color 0.2s;" onmouseover="this.style.color='white'" onmouseout="this.style.color='#bae6fd'">soporte@dentilike.com.mx</a>
-<span style="color:#7dd3fc; font-size:0.62rem; opacity:0.8; margin-top:2px;">© 2026 Dentilike · Todos los derechos reservados · <b id="sfVersion">v100</b></span>
+<span style="color:#7dd3fc; font-size:0.62rem; opacity:0.8; margin-top:2px;">© 2026 Dentilike · Todos los derechos reservados · <b id="sfVersion">v101</b></span>
     </div></div>
 <!-- Doctor en sesion: informativo, lleva a Configuracion para cambiarlo -->
 <div id="sideDocBox" onclick="openSection('s-admin-id', document.querySelector('.nav-item[onclick*=&quot;s-admin-id&quot;]'))" title="Doctor en sesion. Toca para cambiarlo o editar el perfil." style="margin:0 12px 10px; padding:0.7rem 0.85rem; background:rgba(255,255,255,0.07); border:1px solid rgba(125,211,252,0.28); border-left:3px solid #5DC1BF; border-radius:10px; cursor:pointer; display:flex; align-items:center; gap:0.6rem;">
@@ -3127,6 +3127,11 @@ Se tomaron signos vitales
 <div class="input-group" style="margin-top:0.5rem; background:#f8fafc; padding:1rem; border-radius:var(--radius-md); border:1px dashed #cbd5e1;">
 <label><i class="fa-regular fa-image"></i> Logo del Consultorio (Transparente recomendado para Marca de Agua)</label>
 <input accept="image/*" class="input-field" id="cLogo" onchange="uploadLogo(event)" style="padding:0.4rem; background:white;" type="file"/>
+<div id="cLogoPreviewBox" style="display:none; align-items:center; gap:0.8rem; margin-top:0.7rem; background:white; border:1px solid #cbd5e1; border-radius:8px; padding:0.6rem;">
+<img alt="Logo actual" id="cLogoPreview" src="" style="max-height:60px; max-width:120px; border-radius:4px;"/>
+<span style="font-size:0.8rem; color:#059669; font-weight:700;"><i class="fa-solid fa-circle-check"></i> Logo guardado</span>
+<button class="btn" onclick="quitarLogo()" style="margin-left:auto; background:#fee2e2; color:#b91c1c; padding:0.4rem 0.7rem; font-size:0.78rem;" type="button"><i class="fa-solid fa-trash"></i> Quitar</button>
+</div>
 <div style="margin-top:0.4rem; font-size:0.78rem; color:#64748b;"><i class="fa-solid fa-circle-info"></i> Este logo aparece en tus recetas y documentos PDF. La barra lateral siempre muestra el logo de Dentilike.</div>
 </div>
 
@@ -17193,12 +17198,17 @@ Reglas: español de México; terminología dental correcta; máximo 6 líneas; u
         setV('cCli', db.cfg.cli||''); setV('cSlogan', db.cfg.slogan||''); setV('cDrive', db.cfg.drive||''); setV('cAgenda', db.cfg.agenda||''); setV('cAddress', db.cfg.address||''); setV('cContact', db.cfg.contact||''); setV('cEmail', db.cfg.email||''); setV('cCofepris', db.cfg.cofepris||''); setV('cGeminiKey', localStorage.getItem('sf_gemini_key') || ''); setC('cDaniEn', db.cfg.daniEn); setV('cContName', db.cfg.contName||''); setV('cContPhone', db.cfg.contPhone||''); setV('cContEmail', db.cfg.contEmail||'');
         setV('cResGoogle', db.cfg.resGoogle||''); setV('cResDoctoralia', db.cfg.resDoctoralia||'');
         if($('hLogo')) $('hLogo').style.display='block'; /* Sidebar SIEMPRE muestra el logo de Dentilike (de fabrica); db.cfg.logo se usa solo en recetas/PDF */
+        if($('cLogoPreviewBox')) { if(db.cfg.logo){ $('cLogoPreviewBox').style.display='flex'; if($('cLogoPreview')) $('cLogoPreview').src = db.cfg.logo; } else { $('cLogoPreviewBox').style.display='none'; } }
         if($('astNameLabel')) $('astNameLabel').innerHTML = '<i class="fa-solid fa-robot"></i> Dr. Mikes Molares'; try{renderAdminDyn();}catch(e){} try{renderClinicaDyn();}catch(e){} try{renderDocSelects();}catch(e){} try{renderConsultorioSelects();}catch(e){} try{renderPatSelect();}catch(e){} try{buildForms();}catch(e){} try{renderAdminMeds();}catch(e){} try{loadFin();}catch(e){}
     }
     function uploadAstPhoto(e) { /* Avatar fijo (Dr. Mikes Molares) - no editable */ }
+    function quitarLogo(){
+        if(!confirm('¿Quitar el logo? Ya no aparecerá en recetas ni documentos.')) return;
+        db.cfg.logo = ''; saveDB(); loadConfigUI();
+    }
     async function uploadLogo(e) {
         const f = e.target.files[0]; e.target.value=''; if(!f) return;
-        try { db.cfg.logo = await sfLeerImagen(f, 600, 0.9); saveDB(); loadConfigUI(); }
+        try { db.cfg.logo = await sfLeerImagen(f, 600, 0.9); saveDB(); loadConfigUI(); if(typeof daniSpeak==='function') daniSpeak('✅ Logo guardado. Ya sale en tus recetas y documentos.', 4000, 'info'); }
         catch(err) { sfErrImagen(err); }
     }
     function aplicarVisibilidadDani() {
