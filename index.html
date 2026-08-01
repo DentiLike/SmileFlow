@@ -581,7 +581,7 @@ window._pdfReady=true;
         <h2 style="margin: 0 !important; font-size: 1.5rem !important; color: white !important;">SmileFlow</h2>
         <a href="https://www.dentilike.com.mx" target="_blank" style="color: #bae6fd; font-size: 0.75rem; text-decoration: none; font-weight: 600; cursor: pointer; transition: color 0.2s;" onmouseover="this.style.color='white'" onmouseout="this.style.color='#bae6fd'">www.dentilike.com.mx</a>
         <a href="mailto:soporte@dentilike.com.mx" style="color: #bae6fd; font-size: 0.75rem; text-decoration: none; font-weight: 600; cursor: pointer; transition: color 0.2s;" onmouseover="this.style.color='white'" onmouseout="this.style.color='#bae6fd'">soporte@dentilike.com.mx</a>
-<span style="color:#7dd3fc; font-size:0.62rem; opacity:0.8; margin-top:2px;">© 2026 Dentilike · Todos los derechos reservados · <b id="sfVersion">v96</b></span>
+<span style="color:#7dd3fc; font-size:0.62rem; opacity:0.8; margin-top:2px;">© 2026 Dentilike · Todos los derechos reservados · <b id="sfVersion">v98</b></span>
     </div></div>
 <!-- Doctor en sesion: informativo, lleva a Configuracion para cambiarlo -->
 <div id="sideDocBox" onclick="openSection('s-admin-id', document.querySelector('.nav-item[onclick*=&quot;s-admin-id&quot;]'))" title="Doctor en sesion. Toca para cambiarlo o editar el perfil." style="margin:0 12px 10px; padding:0.7rem 0.85rem; background:rgba(255,255,255,0.07); border:1px solid rgba(125,211,252,0.28); border-left:3px solid #5DC1BF; border-radius:10px; cursor:pointer; display:flex; align-items:center; gap:0.6rem;">
@@ -3066,6 +3066,11 @@ Se tomaron signos vitales
 <div class="card" style="background:#f5f3ff; border-color:#ddd6fe; border-top-width: 1px;">
 <h4 style="color:#6d28d9; margin-bottom:1rem; font-size:1.1rem; border-bottom:1px dashed #c4b5fd; padding-bottom:0.6rem;"><i class="fa-solid fa-building-columns"></i> Datos Fiscales del Paciente (Constancia de Situación Fiscal)</h4>
 <p style="font-size:0.9rem; color:#64748b; margin-bottom:1.5rem;">Llena estos datos una sola vez. Se quedarán guardados en el perfil de este paciente para todas sus futuras facturas.</p>
+<div style="background:#ede9fe; border:1px dashed #c4b5fd; border-radius:10px; padding:1rem; margin-bottom:1.2rem;">
+<label style="font-weight:800; color:#6d28d9; font-size:0.9rem; display:flex; align-items:center; gap:0.5rem; margin-bottom:0.6rem;"><i class="fa-solid fa-file-arrow-up"></i> Cargar Constancia de Situación Fiscal (PDF) — llena RFC, Nombre, C.P. y Régimen solos</label>
+<input accept="application/pdf" class="input-field" id="facCifPdf" onchange="sfLeerConstanciaPDF(event)" style="padding:0.4rem; background:white;" type="file"/>
+<div id="facCifEstado" style="margin-top:0.5rem; font-size:0.82rem;"></div>
+</div>
 <div class="grid-2">
 <div class="input-group"><label><i class="fa-solid fa-id-card"></i> RFC</label><input class="input-field" id="facRFC" style="text-transform:uppercase; font-weight:800;" type="text"/></div>
 <div class="input-group"><label><i class="fa-solid fa-user"></i> Nombre Completo o Razón Social</label><input class="input-field" id="facNom" type="text"/></div>
@@ -13442,7 +13447,7 @@ Reglas: español de México; terminología dental correcta; máximo 6 líneas; u
         if(typeof daniSpeak === 'function') daniSpeak('🧪 Paciente de Prueba creado con datos en todos los módulos: odontograma, alertas médicas, endodoncia, prótesis, Smile Plan, laboratorio dental y abonos. ¡Explóralos!', 9000, 'info');
     }
 
-    function savePatient() { const n=$('pName').value.trim(); if(!n) return alert("Falta Nombre."); const dId='Px-'+n; if(!db.curr){ db.curr='p_'+Date.now(); db.pats[db.curr]={id:db.curr,displayId:dId,notas:[],treats:{},alertDate:new Date().toISOString().split('T')[0],factReq:false,factData:{},odonto:{}}; }else db.pats[db.curr].displayId=dId; let p=db.pats[db.curr]; p.name=n;p.birth=sfBirthToISO($('pBirth').value);p.age=$('pAge').value;p.guardian=$('pGuardian').value;p.phone=$('pPhone').value;p.email=$('pEmail').value; p.sex=$('pSexo')?$('pSexo').value:''; sfSyncDireccion(); p.address=$('pAddress').value; p.addr={ calle:($('pAddrCalle')?$('pAddrCalle').value:''), col:($('pAddrCol')?$('pAddrCol').value:''), ciudad:($('pAddrCiudad')?$('pAddrCiudad').value:'') };p.sum=$('pSum').value;p.brackets=$('pBrackets').value;p.retra=$('pRetra').checked;p.factReq=$('pFactReq').checked;p.hasAl=$('pHasAl').checked;p.alPen=$('pAlPen').checked;p.alAin=$('pAlAin').checked;p.alLat=$('pAlLat').checked;p.alSulfa=$('pAlSulfa').checked;p.alOther=$('pAlOther').value; p.costoTotal=$('pCostoTotal')?$('pCostoTotal').value:'';p.notaPago=$('pNotaPago')?$('pNotaPago').value:''; saveMedHistory(p); saveTreats(p); saveDB(); renderPatSelect(); $('lblId').innerHTML=`<i class="fa-solid fa-address-card"></i> ${dId}`; renderPendingTreatsMain(p); renderMedsList(); renderAgendaList(); if(typeof daniSpeak === 'function') daniSpeak("💾 Px guardado."); }
+    function savePatient() { const n=$('pName').value.trim(); if(!n) return alert("Falta Nombre."); const dId='Px-'+n; if(!db.curr){ db.curr='p_'+Date.now(); db.pats[db.curr]={id:db.curr,displayId:dId,notas:[],treats:{},alertDate:new Date().toISOString().split('T')[0],factReq:false,factData:{},odonto:{}}; }else db.pats[db.curr].displayId=dId; let p=db.pats[db.curr]; p.name=n;p.birth=sfBirthToISO($('pBirth').value);p.age=$('pAge').value;p.guardian=$('pGuardian').value;p.phone=$('pPhone').value;p.email=$('pEmail').value; p.sex=$('pSexo')?$('pSexo').value:''; sfSyncDireccion(); p.address=$('pAddress').value; p.addr={ calle:($('pAddrCalle')?$('pAddrCalle').value:''), col:($('pAddrCol')?$('pAddrCol').value:''), ciudad:($('pAddrCiudad')?$('pAddrCiudad').value:'') };p.sum=$('pSum').value;p.brackets=$('pBrackets').value;p.retra=$('pRetra').checked;p.factReq=$('pFactReq').checked;p.hasAl=$('pHasAl').checked;p.alPen=$('pAlPen').checked;p.alAin=$('pAlAin').checked;p.alLat=$('pAlLat').checked;p.alSulfa=$('pAlSulfa').checked;p.alOther=$('pAlOther').value; p.costoTotal=$('pCostoTotal')?$('pCostoTotal').value:'';p.notaPago=$('pNotaPago')?$('pNotaPago').value:''; saveMedHistory(p); saveTreats(p); saveDB(); renderPatSelect(); $('lblId').innerHTML=`<i class="fa-solid fa-address-card"></i> ${dId}`; renderPendingTreatsMain(p); renderMedsList(); renderAgendaList(); if(typeof daniSpeak === 'function') daniSpeak("💾 Px guardado."); try{ sfQuickBar(); }catch(e){} }
     
     function loadPatient() { const v=$('pSelect').value; if(!v) return newPatient(); db.curr=v; saveDB(); try{ sfLimpiarImagenesPaciente(); }catch(e){} const p=db.pats[v]; $('lblId').innerHTML=`<i class="fa-solid fa-address-card"></i> ${p.displayId}`; $('pName').value=p.name||'';$('pBirth').value=sfISOToBirth(p.birth||'');try{sfBirthConfirm($('pBirth').value);}catch(e){}$('pGuardian').value=p.guardian||'';$('pPhone').value=p.phone||'';$('pEmail').value=p.email||''; if($('pSexo')) $('pSexo').value=p.sex||''; sfCargarDireccion(p);$('pSum').value=p.sum||'';$('pAlert').value=p.alert||'';$('pBrackets').value=p.brackets||'';$('pRetra').checked=p.retra||false;$('pFactReq').checked=p.factReq||false;$('pHasAl').checked=p.hasAl||false;$('pAlPen').checked=p.alPen||false;$('pAlAin').checked=p.alAin||false;$('pAlLat').checked=p.alLat||false;$('pAlSulfa').checked=p.alSulfa||false;$('pAlOther').value=p.alOther||''; if($('pCostoTotal'))$('pCostoTotal').value=p.costoTotal||'';if($('pNotaPago'))$('pNotaPago').value=p.notaPago||''; renderAbonos(); loadMedHistory(p); calcPatientAge(); autoLoadWaDate(); toggleAllergies(); loadTreats(p); renderOdonto(); renderTimeline(); setAlertLabel(p.alertDate); if($('txtReceta'))$('txtReceta').value=''; if($('chkAntibiotico'))$('chkAntibiotico').checked=false; loadFacturacion(p); renderMedsList(); openSection('s-perfil', document.querySelector('.nav-item.active')); autoAbrirAbonosSiDeuda(); window._resenaSug=false; try{ checkResenaSugerencia(); }catch(e){} try{ sfQuickBar(); }catch(e){} try{ sfRefrescarVistasPaciente(); }catch(e){} }
 
@@ -13886,8 +13891,134 @@ Reglas: español de México; terminología dental correcta; máximo 6 líneas; u
     }
 
     function loadFacturacion(p) { let f=p.factData||{}; $('facRFC').value=f.rfc||''; $('facNom').value=f.nom||''; $('facReg').value=f.reg||''; $('facCP').value=f.cp||''; $('facUso').value=f.uso||''; $('facEmail').value=f.email||''; }
+    // ===== Lectura automatica de la Constancia de Situacion Fiscal (SAT) =====
+    // Carga pdf.js bajo demanda (solo cuando se usa este boton) para no engordar
+    // el archivo principal. Requiere internet la primera vez; el navegador
+    // cachea la libreria despues de eso (igual que Font Awesome / Google Fonts).
+    let _sfPdfJsListo = false;
+    function sfCargarPdfJsLib(){
+        return new Promise((resolve, reject) => {
+            if (window.pdfjsLib) { _sfPdfJsListo = true; return resolve(); }
+            const s = document.createElement('script');
+            s.src = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
+            s.onload = () => {
+                try {
+                    window.pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+                    _sfPdfJsListo = true;
+                    resolve();
+                } catch(e){ reject(e); }
+            };
+            s.onerror = () => reject(new Error('No se pudo cargar el lector de PDF (revisa tu conexión a internet).'));
+            document.head.appendChild(s);
+        });
+    }
+
+    // Extrae los campos de una Constancia de Situacion Fiscal (SAT) ya convertida
+    // a un arreglo plano de textos (como los devuelve pdf.js con getTextContent).
+    function sfParsearConstanciaSAT(items){
+        const toks = items.map(s => (s||'').trim());
+        const idxOf = (label) => toks.findIndex(t => t === label);
+        const esEtiquetaConocida = (t) => /^[A-ZÁÉÍÓÚÑ][\wÁÉÍÓÚÑáéíóúñ ()]*:$/.test(t) || t === 'Datos del domicilio registrado' || t.startsWith('Actividades Económicas') || t.startsWith('Regímenes');
+        const valorDespuesDe = (label) => {
+            const i = idxOf(label);
+            if (i === -1) return '';
+            for (let k = i+1; k < toks.length && k < i+6; k++) {
+                const t = toks[k];
+                if (!t) continue;
+                if (esEtiquetaConocida(t)) return '';
+                return t;
+            }
+            return '';
+        };
+        const rfc = valorDespuesDe('RFC:');
+        const curp = valorDespuesDe('CURP:');
+        const nombres = valorDespuesDe('Nombre (s):');
+        const apPat = valorDespuesDe('Primer Apellido:');
+        const apMat = valorDespuesDe('Segundo Apellido:');
+        // Personas morales (empresas): no hay CURP/Apellidos, sino Razon Social directa.
+        // No se pudo probar contra un ejemplo real de persona moral; si no reconoce el
+        // formato, se avisa y se pide llenar a mano.
+        const razonSocial = valorDespuesDe('Denominación o Razón Social:') || valorDespuesDe('Denominación/Razón Social:') || valorDespuesDe('Razón Social:');
+        const cp = valorDespuesDe('Código Postal:');
+        let nombre = '';
+        if (curp && (nombres || apPat)) nombre = [nombres, apPat, apMat].filter(Boolean).join(' ');
+        else if (razonSocial) nombre = razonSocial;
+        // Regimen: dentro de la tabla "Regimenes:" (puede haber mas de uno; se toma el primero)
+        let regimen = '';
+        const iReg = toks.findIndex(t => t.startsWith('Regímenes'));
+        if (iReg !== -1) {
+            for (let k = iReg+1; k < toks.length; k++) {
+                const t = toks[k];
+                if (!t) continue;
+                if (t.startsWith('Sus datos personales')) break;
+                if (/^\d{2}\/\d{2}\/\d{4}$/.test(t)) continue;
+                if (t === 'Régimen' || t === 'Fecha Inicio' || t === 'Fecha Fin') continue;
+                regimen = t;
+                break;
+            }
+        }
+        return { rfc, curp, nombre, cp, regimen };
+    }
+
+    async function sfLeerConstanciaPDF(evt){
+        const file = evt.target.files && evt.target.files[0];
+        const el = $('facCifEstado');
+        if (!file) return;
+        if (el) el.innerHTML = '<span style="color:#6d28d9;"><i class="fa-solid fa-spinner fa-spin"></i> Leyendo PDF...</span>';
+        try {
+            await sfCargarPdfJsLib();
+            const buf = await file.arrayBuffer();
+            const doc = await window.pdfjsLib.getDocument({ data: buf }).promise;
+            let items = [];
+            for (let i=1; i<=doc.numPages; i++) {
+                const page = await doc.getPage(i);
+                const content = await page.getTextContent();
+                content.items.forEach(it => items.push(it.str));
+            }
+            const datos = sfParsearConstanciaSAT(items);
+            const rfcValido = /^[A-ZÑ&]{3,4}\d{6}[A-Z0-9]{3}$/.test(datos.rfc || '');
+            if (!rfcValido) {
+                if (el) el.innerHTML = '<span style="color:#dc2626;"><i class="fa-solid fa-triangle-exclamation"></i> No se reconoció el formato de este PDF. Llena los datos a mano.</span>';
+                return;
+            }
+            if ($('facRFC')) $('facRFC').value = datos.rfc;
+            if ($('facNom') && datos.nombre) $('facNom').value = datos.nombre;
+            if ($('facCP') && datos.cp) $('facCP').value = datos.cp;
+            let avisoRegimen = '';
+            if (datos.regimen) {
+                const sel = $('facReg');
+                const texto = datos.regimen.toLowerCase();
+                let match = Array.from(sel.options).find(o => {
+                    const v = o.value.toLowerCase();
+                    if (texto.includes('sueldos') && v.includes('sueldos')) return true;
+                    if (texto.includes('resico') && v.includes('resico')) return true;
+                    if ((texto.includes('actividad empresarial') || texto.includes('actividades empresariales')) && v.includes('empresariales')) return true;
+                    if (texto.includes('sin obligaciones') && v.includes('sin obligaciones')) return true;
+                    return false;
+                });
+                if (match) { sel.value = match.value; }
+                else {
+                    const yaExiste = Array.from(sel.options).some(o => o.value === datos.regimen);
+                    if (!yaExiste) {
+                        const op = document.createElement('option');
+                        op.value = datos.regimen; op.textContent = datos.regimen + ' (verificar clave SAT)';
+                        sel.appendChild(op);
+                    }
+                    sel.value = datos.regimen;
+                    avisoRegimen = ' Verifica el régimen (no estaba en la lista, se agregó tal cual — confirma la clave SAT).';
+                }
+            }
+            if (el) el.innerHTML = '<span style="color:#059669;"><i class="fa-solid fa-circle-check"></i> Datos leídos de la constancia. Verifica y da clic en Guardar.' + avisoRegimen + '</span>';
+        } catch (e) {
+            console.warn('Error leyendo constancia SAT', e);
+            if (el) el.innerHTML = '<span style="color:#dc2626;"><i class="fa-solid fa-triangle-exclamation"></i> No se pudo leer el PDF. Llena los datos a mano.</span>';
+        } finally {
+            evt.target.value = '';
+        }
+    }
+
     function saveFactDatos() { if(!db.curr) return; db.pats[db.curr].factData = {rfc:$('facRFC').value, nom:$('facNom').value, reg:$('facReg').value, cp:$('facCP').value, uso:$('facUso').value, email:$('facEmail').value}; saveDB(); daniSpeak("💾 Datos fiscales guardados."); }
-    function sendFactContador(m) { if(!db.curr || !db.cfg.contPhone) return alert("Falta paciente o datos del contador."); let f=db.pats[db.curr].factData||{}; let msg=`Solicitud de Factura.\nPaciente: ${f.nom}\nRFC: ${f.rfc}\nMonto: $${$('facMonto').value}\nConcepto: ${$('facConcepto').value}`; if(m==='wa') window.open(`https://wa.me/52${db.cfg.contPhone.replace(/\D/g,'')}?text=${encodeURIComponent(msg)}`); else window.open(`mailto:${db.cfg.contEmail}?subject=Factura&body=${encodeURIComponent(msg)}`); }
+    function sendFactContador(m) { if(!db.curr || !db.cfg.contPhone) return alert("Falta paciente o datos del contador."); let f=db.pats[db.curr].factData||{}; let msg=`Solicitud de Factura.\nPaciente: ${f.nom}\nRFC: ${f.rfc}\nRégimen Fiscal: ${f.reg}\nCódigo Postal: ${f.cp}\nUso de CFDI: ${f.uso}\nMonto: $${$('facMonto').value}\nConcepto: ${$('facConcepto').value}`; if(m==='wa') window.open(`https://wa.me/52${db.cfg.contPhone.replace(/\D/g,'')}?text=${encodeURIComponent(msg)}`); else window.open(`mailto:${db.cfg.contEmail}?subject=Factura&body=${encodeURIComponent(msg)}`); }
 
     function pushHist(type, f, obs) {
         if(!db.curr) return;
