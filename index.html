@@ -581,7 +581,7 @@ window._pdfReady=true;
         <h2 style="margin: 0 !important; font-size: 1.5rem !important; color: white !important;">SmileFlow</h2>
         <a href="https://www.dentilike.com.mx" target="_blank" style="color: #bae6fd; font-size: 0.75rem; text-decoration: none; font-weight: 600; cursor: pointer; transition: color 0.2s;" onmouseover="this.style.color='white'" onmouseout="this.style.color='#bae6fd'">www.dentilike.com.mx</a>
         <a href="mailto:soporte@dentilike.com.mx" style="color: #bae6fd; font-size: 0.75rem; text-decoration: none; font-weight: 600; cursor: pointer; transition: color 0.2s;" onmouseover="this.style.color='white'" onmouseout="this.style.color='#bae6fd'">soporte@dentilike.com.mx</a>
-<span style="color:#7dd3fc; font-size:0.62rem; opacity:0.8; margin-top:2px;">© 2026 Dentilike · Todos los derechos reservados · <b id="sfVersion">v103</b></span>
+<span style="color:#7dd3fc; font-size:0.62rem; opacity:0.8; margin-top:2px;">© 2026 Dentilike · Todos los derechos reservados · <b id="sfVersion">v107</b></span>
     </div></div>
 <!-- Doctor en sesion: informativo, lleva a Configuracion para cambiarlo -->
 <div id="sideDocBox" onclick="openSection('s-admin-id', document.querySelector('.nav-item[onclick*=&quot;s-admin-id&quot;]'))" title="Doctor en sesion. Toca para cambiarlo o editar el perfil." style="margin:0 12px 10px; padding:0.7rem 0.85rem; background:rgba(255,255,255,0.07); border:1px solid rgba(125,211,252,0.28); border-left:3px solid #5DC1BF; border-radius:10px; cursor:pointer; display:flex; align-items:center; gap:0.6rem;">
@@ -1399,6 +1399,112 @@ window._pdfReady=true;
 </div>
 </div>
 
+<!-- Valoracion Ortodoncica -->
+<div style="background:#eef2ff; border:1px solid #c7d2fe; border-radius:10px; padding:1.2rem; margin-bottom:1.2rem;">
+<label style="display:flex; align-items:center; gap:0.6rem; cursor:pointer; font-size:0.95rem; font-weight:800; color:#4338ca; margin-bottom:0.3rem;">
+<input id="ortoEvalActivo" onchange="document.getElementById('ortoEvalBox').classList.toggle('hidden', !this.checked); triggerUnsavedWarning();" style="width:20px; height:20px; accent-color:#4338ca;" type="checkbox"/>
+<i class="fa-solid fa-tooth"></i> Valoración Ortodóncica
+</label>
+<div class="hidden" id="ortoEvalBox" style="margin-top:1rem;">
+
+<div style="font-size:0.82rem; font-weight:800; color:#4338ca; margin-bottom:0.5rem;">Perfil facial</div>
+<div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:0.6rem 1rem; margin-bottom:1.1rem;">
+<label class="med-chk"><input id="ortoPerfilConvexo" type="checkbox" onchange="sfOrtoExclusivo(this.id); triggerUnsavedWarning();"/> Convexo</label>
+<label class="med-chk"><input id="ortoPerfilRecto" type="checkbox" onchange="sfOrtoExclusivo(this.id); triggerUnsavedWarning();"/> Recto</label>
+<label class="med-chk"><input id="ortoPerfilConcavo" type="checkbox" onchange="sfOrtoExclusivo(this.id); triggerUnsavedWarning();"/> Cóncavo</label>
+</div>
+
+<div class="grid-2" style="gap:1rem; margin-bottom:1.1rem;">
+<div>
+<div style="font-size:0.82rem; font-weight:800; color:#4338ca; margin-bottom:0.5rem;">Clase molar — Derecha</div>
+<div style="display:flex; flex-direction:column; gap:0.4rem;">
+<label class="med-chk"><input id="ortoMolarDer1" type="checkbox" onchange="sfOrtoExclusivo(this.id); triggerUnsavedWarning();"/> Clase I</label>
+<label class="med-chk"><input id="ortoMolarDer2" type="checkbox" onchange="sfOrtoExclusivo(this.id); triggerUnsavedWarning();"/> Clase II</label>
+<label class="med-chk"><input id="ortoMolarDer3" type="checkbox" onchange="sfOrtoExclusivo(this.id); triggerUnsavedWarning();"/> Clase III</label>
+</div>
+</div>
+<div>
+<div style="font-size:0.82rem; font-weight:800; color:#4338ca; margin-bottom:0.5rem;">Clase molar — Izquierda</div>
+<div style="display:flex; flex-direction:column; gap:0.4rem;">
+<label class="med-chk"><input id="ortoMolarIzq1" type="checkbox" onchange="sfOrtoExclusivo(this.id); triggerUnsavedWarning();"/> Clase I</label>
+<label class="med-chk"><input id="ortoMolarIzq2" type="checkbox" onchange="sfOrtoExclusivo(this.id); triggerUnsavedWarning();"/> Clase II</label>
+<label class="med-chk"><input id="ortoMolarIzq3" type="checkbox" onchange="sfOrtoExclusivo(this.id); triggerUnsavedWarning();"/> Clase III</label>
+</div>
+</div>
+</div>
+
+<div class="grid-2" style="gap:1rem; margin-bottom:1.1rem;">
+<div>
+<div style="font-size:0.82rem; font-weight:800; color:#4338ca; margin-bottom:0.5rem;">Clase canina — Derecha</div>
+<div style="display:flex; flex-direction:column; gap:0.4rem;">
+<label class="med-chk"><input id="ortoCaninaDer1" type="checkbox" onchange="sfOrtoExclusivo(this.id); triggerUnsavedWarning();"/> Clase I</label>
+<label class="med-chk"><input id="ortoCaninaDer2" type="checkbox" onchange="sfOrtoExclusivo(this.id); triggerUnsavedWarning();"/> Clase II</label>
+<label class="med-chk"><input id="ortoCaninaDer3" type="checkbox" onchange="sfOrtoExclusivo(this.id); triggerUnsavedWarning();"/> Clase III</label>
+</div>
+</div>
+<div>
+<div style="font-size:0.82rem; font-weight:800; color:#4338ca; margin-bottom:0.5rem;">Clase canina — Izquierda</div>
+<div style="display:flex; flex-direction:column; gap:0.4rem;">
+<label class="med-chk"><input id="ortoCaninaIzq1" type="checkbox" onchange="sfOrtoExclusivo(this.id); triggerUnsavedWarning();"/> Clase I</label>
+<label class="med-chk"><input id="ortoCaninaIzq2" type="checkbox" onchange="sfOrtoExclusivo(this.id); triggerUnsavedWarning();"/> Clase II</label>
+<label class="med-chk"><input id="ortoCaninaIzq3" type="checkbox" onchange="sfOrtoExclusivo(this.id); triggerUnsavedWarning();"/> Clase III</label>
+</div>
+</div>
+</div>
+
+<div style="font-size:0.82rem; font-weight:800; color:#4338ca; margin-bottom:0.5rem;">Tipo de mordida <span style="font-weight:400; color:#64748b;">(puedes marcar varias)</span></div>
+<div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(190px,1fr)); gap:0.6rem 1rem; margin-bottom:1.1rem;">
+<label class="med-chk"><input id="ortoMordAbierta" type="checkbox" onchange="triggerUnsavedWarning(); triggerUnsavedWarning();"/> Abierta</label>
+<label class="med-chk"><input id="ortoMordProfunda" type="checkbox" onchange="triggerUnsavedWarning(); triggerUnsavedWarning();"/> Profunda</label>
+<label class="med-chk"><input id="ortoMordCruzAnt" type="checkbox" onchange="triggerUnsavedWarning(); triggerUnsavedWarning();"/> Cruzada anterior</label>
+<label class="med-chk"><input id="ortoMordCruzPostDer" type="checkbox" onchange="triggerUnsavedWarning(); triggerUnsavedWarning();"/> Cruzada posterior derecha</label>
+<label class="med-chk"><input id="ortoMordCruzPostIzq" type="checkbox" onchange="triggerUnsavedWarning(); triggerUnsavedWarning();"/> Cruzada posterior izquierda</label>
+<label class="med-chk"><input id="ortoMordBordeBorde" type="checkbox" onchange="triggerUnsavedWarning(); triggerUnsavedWarning();"/> Borde a borde</label>
+<label class="med-chk"><input id="ortoMordTijera" type="checkbox" onchange="triggerUnsavedWarning(); triggerUnsavedWarning();"/> En tijera</label>
+</div>
+
+<div class="grid-2" style="gap:1rem; margin-bottom:1.1rem;">
+<div>
+<div style="font-size:0.82rem; font-weight:800; color:#4338ca; margin-bottom:0.5rem;">Apiñamiento — Superior</div>
+<div style="display:flex; flex-direction:column; gap:0.4rem;">
+<label class="med-chk"><input id="ortoApinSup1" type="checkbox" onchange="sfOrtoExclusivo(this.id); triggerUnsavedWarning();"/> Leve</label>
+<label class="med-chk"><input id="ortoApinSup2" type="checkbox" onchange="sfOrtoExclusivo(this.id); triggerUnsavedWarning();"/> Moderado</label>
+<label class="med-chk"><input id="ortoApinSup3" type="checkbox" onchange="sfOrtoExclusivo(this.id); triggerUnsavedWarning();"/> Severo</label>
+</div>
+</div>
+<div>
+<div style="font-size:0.82rem; font-weight:800; color:#4338ca; margin-bottom:0.5rem;">Apiñamiento — Inferior</div>
+<div style="display:flex; flex-direction:column; gap:0.4rem;">
+<label class="med-chk"><input id="ortoApinInf1" type="checkbox" onchange="sfOrtoExclusivo(this.id); triggerUnsavedWarning();"/> Leve</label>
+<label class="med-chk"><input id="ortoApinInf2" type="checkbox" onchange="sfOrtoExclusivo(this.id); triggerUnsavedWarning();"/> Moderado</label>
+<label class="med-chk"><input id="ortoApinInf3" type="checkbox" onchange="sfOrtoExclusivo(this.id); triggerUnsavedWarning();"/> Severo</label>
+</div>
+</div>
+</div>
+
+<div class="grid-2" style="gap:1rem;">
+<div>
+<div style="font-size:0.82rem; font-weight:800; color:#4338ca; margin-bottom:0.5rem;">Diastemas — Superior</div>
+<div style="display:flex; flex-direction:column; gap:0.4rem;">
+<label class="med-chk"><input id="ortoDiastSup1" type="checkbox" onchange="sfOrtoExclusivo(this.id); triggerUnsavedWarning();"/> Leve</label>
+<label class="med-chk"><input id="ortoDiastSup2" type="checkbox" onchange="sfOrtoExclusivo(this.id); triggerUnsavedWarning();"/> Moderado</label>
+<label class="med-chk"><input id="ortoDiastSup3" type="checkbox" onchange="sfOrtoExclusivo(this.id); triggerUnsavedWarning();"/> Severo</label>
+</div>
+</div>
+<div>
+<div style="font-size:0.82rem; font-weight:800; color:#4338ca; margin-bottom:0.5rem;">Diastemas — Inferior</div>
+<div style="display:flex; flex-direction:column; gap:0.4rem;">
+<label class="med-chk"><input id="ortoDiastInf1" type="checkbox" onchange="sfOrtoExclusivo(this.id); triggerUnsavedWarning();"/> Leve</label>
+<label class="med-chk"><input id="ortoDiastInf2" type="checkbox" onchange="sfOrtoExclusivo(this.id); triggerUnsavedWarning();"/> Moderado</label>
+<label class="med-chk"><input id="ortoDiastInf3" type="checkbox" onchange="sfOrtoExclusivo(this.id); triggerUnsavedWarning();"/> Severo</label>
+</div>
+</div>
+</div>
+
+<div style="font-size:0.74rem; color:#4338ca; margin-top:1rem; background:white; border-radius:8px; padding:0.6rem 0.8rem;"><i class="fa-solid fa-circle-info"></i> Esto se integra automáticamente al texto de Diagnóstico (junto con el odontograma) — se genera solo en el Odontograma, y lo puedes editar ahí a mano si quieres.</div>
+</div>
+</div>
+
 <!-- Higiene bucal -->
 <div style="background:#f0fdfa; border:1px solid #99f6e4; border-radius:10px; padding:1.2rem; margin-bottom:1.2rem;">
 <label style="font-size:0.95rem; font-weight:800; color:#0e7490; display:block; margin-bottom:0.9rem;"><i class="fa-solid fa-toothbrush"></i> Higiene bucal</label>
@@ -1666,7 +1772,7 @@ AVISO PRÓX. CITA (Recordatorio local):
 <div class="grid-2" style="gap:0.7rem; margin-bottom:1rem;">
 <div class="input-group" style="margin:0;">
 <label style="font-size:0.82rem;"><i class="fa-solid fa-sack-dollar"></i> Costo total del tratamiento ($)</label>
-<input class="input-field" id="pCostoTotal" type="number" oninput="recalcSaldo(); triggerUnsavedWarning()" onchange="sfAvisarBajaPlan()" placeholder="0" style="padding:0.5rem;"/>
+<input class="input-field" id="pCostoTotal" type="number" oninput="recalcSaldo(); triggerUnsavedWarning()" onchange="sfAvisarBajaPlan(); sfGuardarCostoTotal();" placeholder="0" style="padding:0.5rem;"/>
 </div>
 <div class="input-group" style="margin:0;">
 <label style="font-size:0.82rem;"><i class="fa-solid fa-circle-plus"></i> Registrar nuevo abono</label>
@@ -10269,6 +10375,8 @@ function selectTooth(t, ev) {
     function genDxDetail() {
         const f = collectFindings();
         const partes = [];
+        const ortoTxt = genOrtoTexto();
+        if(ortoTxt) partes.push(ortoTxt);
 
         if(f.Caries.length) {
             const desc = f.Caries.map(c => {
@@ -11840,6 +11948,14 @@ ${patientText}`;
 
     // Si se baja el costo del plan por debajo de lo ya cobrado, avisar:
     // ese es justo el movimiento que dejaba el saldo en negativo.
+    // Guarda el costo total al momento (igual que los abonos), para que el
+    // tablero de Inicio y "Con adeudo" siempre coincidan con lo que se ve
+    // en la ficha del paciente sin depender del boton "Guardar" general.
+    function sfGuardarCostoTotal(){
+        if(!db.curr) return;
+        db.pats[db.curr].costoTotal = $('pCostoTotal').value;
+        saveDB();
+    }
     function sfAvisarBajaPlan(){
         try {
             const c = sfCuenta();
@@ -14441,6 +14557,88 @@ Reglas: español de México; terminología dental correcta; máximo 6 líneas; u
         cont.innerHTML = html ? ('<div style="font-size:0.78rem; color:#a16207; font-weight:700; margin-bottom:0.2rem;"><i class="fa-solid fa-hand-pointer"></i> ¿Qué familiar? (toca para marcar)</div>' + html) : '';
     }
 
+    // ===== VALORACION ORTODONCICA =====
+    const ORTO_GRUPOS = {
+        perfil:    ['ortoPerfilConvexo','ortoPerfilRecto','ortoPerfilConcavo'],
+        molarDer:  ['ortoMolarDer1','ortoMolarDer2','ortoMolarDer3'],
+        molarIzq:  ['ortoMolarIzq1','ortoMolarIzq2','ortoMolarIzq3'],
+        caninaDer: ['ortoCaninaDer1','ortoCaninaDer2','ortoCaninaDer3'],
+        caninaIzq: ['ortoCaninaIzq1','ortoCaninaIzq2','ortoCaninaIzq3'],
+        apinSup:   ['ortoApinSup1','ortoApinSup2','ortoApinSup3'],
+        apinInf:   ['ortoApinInf1','ortoApinInf2','ortoApinInf3'],
+        diastSup:  ['ortoDiastSup1','ortoDiastSup2','ortoDiastSup3'],
+        diastInf:  ['ortoDiastInf1','ortoDiastInf2','ortoDiastInf3']
+    };
+    const ORTO_MORDIDA_IDS = ['ortoMordAbierta','ortoMordProfunda','ortoMordCruzAnt','ortoMordCruzPostDer','ortoMordCruzPostIzq','ortoMordBordeBorde','ortoMordTijera'];
+    const ORTO_ALL_IDS = ['ortoEvalActivo'].concat(Object.values(ORTO_GRUPOS).flat(), ORTO_MORDIDA_IDS);
+
+    // Estos grupos son de una sola opcion (perfil, clase molar/canina por lado,
+    // severidad de apiñamiento/diastemas): al marcar uno se desmarcan sus
+    // compañeros de grupo, igual que un radio button pero con checkboxes.
+    function sfOrtoExclusivo(clickedId){
+        for(const g in ORTO_GRUPOS){
+            const ids = ORTO_GRUPOS[g];
+            if(ids.includes(clickedId)){
+                ids.forEach(id => { if(id !== clickedId && $(id)) $(id).checked = false; });
+                break;
+            }
+        }
+    }
+
+    // Arma el parrafo de diagnostico a partir de la valoracion ortodoncica
+    // guardada del paciente. Se usa dentro de genDxDetail() para que salga
+    // junto con los hallazgos del odontograma.
+    function genOrtoTexto(){
+        if(!db.curr) return '';
+        const p = db.pats[db.curr];
+        const o = (p.med && p.med.orto) || {};
+        if(!o.ortoEvalActivo) return '';
+        const partes = [];
+
+        if(o.ortoPerfilConvexo) partes.push('Perfil facial convexo.');
+        else if(o.ortoPerfilRecto) partes.push('Perfil facial recto.');
+        else if(o.ortoPerfilConcavo) partes.push('Perfil facial cóncavo.');
+
+        const clase = (o1,o2,o3) => o1?'I':o2?'II':o3?'III':'';
+        const cMolarDer = clase(o.ortoMolarDer1,o.ortoMolarDer2,o.ortoMolarDer3);
+        const cMolarIzq = clase(o.ortoMolarIzq1,o.ortoMolarIzq2,o.ortoMolarIzq3);
+        if(cMolarDer || cMolarIzq){
+            if(cMolarDer && cMolarIzq && cMolarDer===cMolarIzq) partes.push(`Clase molar ${cMolarDer} bilateral.`);
+            else partes.push(`Clase molar: derecha ${cMolarDer||'—'}, izquierda ${cMolarIzq||'—'}.`);
+        }
+        const cCaninaDer = clase(o.ortoCaninaDer1,o.ortoCaninaDer2,o.ortoCaninaDer3);
+        const cCaninaIzq = clase(o.ortoCaninaIzq1,o.ortoCaninaIzq2,o.ortoCaninaIzq3);
+        if(cCaninaDer || cCaninaIzq){
+            if(cCaninaDer && cCaninaIzq && cCaninaDer===cCaninaIzq) partes.push(`Clase canina ${cCaninaDer} bilateral.`);
+            else partes.push(`Clase canina: derecha ${cCaninaDer||'—'}, izquierda ${cCaninaIzq||'—'}.`);
+        }
+
+        const mordidas = [];
+        if(o.ortoMordAbierta) mordidas.push('mordida abierta');
+        if(o.ortoMordProfunda) mordidas.push('mordida profunda');
+        if(o.ortoMordCruzAnt) mordidas.push('mordida cruzada anterior');
+        if(o.ortoMordCruzPostDer) mordidas.push('mordida cruzada posterior derecha');
+        if(o.ortoMordCruzPostIzq) mordidas.push('mordida cruzada posterior izquierda');
+        if(o.ortoMordBordeBorde) mordidas.push('mordida borde a borde');
+        if(o.ortoMordTijera) mordidas.push('mordida en tijera');
+        if(mordidas.length) partes.push('Se observa ' + mordidas.join(', ') + '.');
+
+        const sev = (o1,o2,o3) => o1?'leve':o2?'moderado':o3?'severo':'';
+        const apinSup = sev(o.ortoApinSup1,o.ortoApinSup2,o.ortoApinSup3);
+        const apinInf = sev(o.ortoApinInf1,o.ortoApinInf2,o.ortoApinInf3);
+        if(apinSup || apinInf){
+            if(apinSup && apinInf && apinSup===apinInf) partes.push(`Apiñamiento ${apinSup} en ambas arcadas.`);
+            else partes.push('Apiñamiento' + (apinSup?` ${apinSup} en arcada superior`:'') + (apinSup&&apinInf?' y':'') + (apinInf?` ${apinInf} en arcada inferior`:'') + '.');
+        }
+        const diastSup = sev(o.ortoDiastSup1,o.ortoDiastSup2,o.ortoDiastSup3);
+        const diastInf = sev(o.ortoDiastInf1,o.ortoDiastInf2,o.ortoDiastInf3);
+        if(diastSup || diastInf){
+            if(diastSup && diastInf && diastSup===diastInf) partes.push(`Diastemas ${diastSup} en ambas arcadas.`);
+            else partes.push('Diastemas' + (diastSup?` ${diastSup} en arcada superior`:'') + (diastSup&&diastInf?' y':'') + (diastInf?` ${diastInf} en arcada inferior`:'') + '.');
+        }
+        return partes.join(' ');
+    }
+
     function saveMedHistory(p) {
         p.med = p.med || {};
         MED_DISEASE_IDS.forEach(id => { if($(id)) p.med[id] = $(id).checked; });
@@ -14457,6 +14655,8 @@ Reglas: español de México; terminología dental correcta; máximo 6 líneas; u
         p.med.hbCepillado = $('hbCepillado') ? $('hbCepillado').value : '';
         p.med.hbHilo = $('hbHilo') ? $('hbHilo').value : '';
         p.med.hbOtros = $('hbOtros') ? $('hbOtros').value : '';
+        p.med.orto = p.med.orto || {};
+        ORTO_ALL_IDS.forEach(id => { if($(id)) p.med.orto[id] = $(id).checked; });
     }
     function loadMedHistory(p) {
         const m = p.med || {};
@@ -14475,6 +14675,9 @@ Reglas: español de México; terminología dental correcta; máximo 6 líneas; u
         if($('hbCepillado')) $('hbCepillado').value = m.hbCepillado || '';
         if($('hbHilo')) $('hbHilo').value = m.hbHilo || '';
         if($('hbOtros')) $('hbOtros').value = m.hbOtros || '';
+        const mo = m.orto || {};
+        ORTO_ALL_IDS.forEach(id => { if($(id)) $(id).checked = !!mo[id]; });
+        if($('ortoEvalBox')) $('ortoEvalBox').classList.toggle('hidden', !mo.ortoEvalActivo);
         renderPatientMeds();
         checkMedAlerts();
     }
@@ -14489,6 +14692,8 @@ Reglas: español de México; terminología dental correcta; máximo 6 líneas; u
         hfWhoState = {}; try { hfRenderWho(); } catch(e){}
         if($('hbCepillado')) $('hbCepillado').value = '';
         if($('hbOtros')) $('hbOtros').value = '';
+        ORTO_ALL_IDS.forEach(id => { if($(id)) $(id).checked = false; });
+        if($('ortoEvalBox')) $('ortoEvalBox').classList.add('hidden');
         if($('rxSearch')) $('rxSearch').value = '';
         if($('rxSearchResults')) $('rxSearchResults').innerHTML = '';
         renderPatientMeds();
@@ -15124,12 +15329,24 @@ Reglas: español de México; terminología dental correcta; máximo 6 líneas; u
 
             // 5. Antecedentes personales no patológicos
             { table:{ widths:['*'], body:[[ sectionTitle('5. ANTECEDENTES PERSONALES NO PATOLÓGICOS (HÁBITOS)') ]] }, layout:'noBorders', margin:[0,0,0,4] },
-            { text: fmtList(habitos), fontSize:9, margin:[2,0,2,12] },
+            { text: fmtList(habitos), fontSize:9, margin:[2,0,2,(m.orto && m.orto.ortoEvalActivo) ? 10 : 12] },
+
+            // 6. Valoración ortodóncica (solo si se activó; ahorra espacio si no aplica)
+            ...((m.orto && m.orto.ortoEvalActivo) ? [
+                { table:{ widths:['*'], body:[[ sectionTitle('6. VALORACIÓN ORTODÓNCICA') ]] }, layout:'noBorders', margin:[0,0,0,4] },
+                { text: genOrtoTexto() || 'Sin hallazgos especificados.', fontSize:9, margin:[2,0,2,12], lineHeight:1.3 }
+            ] : []),
 
             // Declaración y firmas
             { text:'Declaro que la información proporcionada es verídica y completa a mi leal saber y entender, y autorizo la atención odontológica correspondiente.', fontSize:8, italics:true, color:'#475569', margin:[0,4,0,20], alignment:'justify' },
             { columns:[
-                { stack:[ firmaPaciente ? { image: firmaPaciente, width:150, alignment:'center', margin:[0,0,0,2] } : { text:'', margin:[0,20,0,0] }, { canvas:[{type:'line',x1:0,y1:0,x2:200,y2:0,lineWidth:0.8,lineColor:'#0f172a'}] }, { text:'Firma del paciente o tutor', fontSize:8, color:'#94a3b8', margin:[0,3,0,0] } ], width:'*' },
+                { stack:[
+                    firmaPaciente ? { image: firmaPaciente, width:150, alignment:'center', margin:[0,0,0,2] } : { text:'', margin:[0,20,0,0] },
+                    { canvas:[{type:'line',x1:0,y1:0,x2:200,y2:0,lineWidth:0.8,lineColor:'#0f172a'}] },
+                    { text: (esMenorDeEdad() && p.guardian) ? p.guardian : (p.name || ''), fontSize:8, bold:true, margin:[0,3,0,0] },
+                    (esMenorDeEdad() && p.guardian) ? { text:'Tutor(a) de '+(p.name||''), fontSize:7, color:'#64748b' } : {},
+                    { text:'Firma del paciente o tutor', fontSize:7, color:'#94a3b8', margin:[0,1,0,0] }
+                ], width:'*' },
                 { text:'', width:30 },
                 firmaDoctorPdf(activeD)
             ] }
