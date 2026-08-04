@@ -581,7 +581,7 @@ window._pdfReady=true;
         <h2 style="margin: 0 !important; font-size: 1.5rem !important; color: white !important;">SmileFlow</h2>
         <a href="https://www.dentilike.com.mx" target="_blank" style="color: #bae6fd; font-size: 0.75rem; text-decoration: none; font-weight: 600; cursor: pointer; transition: color 0.2s;" onmouseover="this.style.color='white'" onmouseout="this.style.color='#bae6fd'">www.dentilike.com.mx</a>
         <a href="mailto:soporte@dentilike.com.mx" style="color: #bae6fd; font-size: 0.75rem; text-decoration: none; font-weight: 600; cursor: pointer; transition: color 0.2s;" onmouseover="this.style.color='white'" onmouseout="this.style.color='#bae6fd'">soporte@dentilike.com.mx</a>
-<span style="color:#7dd3fc; font-size:0.62rem; opacity:0.8; margin-top:2px;">© 2026 Dentilike · Todos los derechos reservados · <b id="sfVersion">v107</b></span>
+<span style="color:#7dd3fc; font-size:0.62rem; opacity:0.8; margin-top:2px;">© 2026 Dentilike · Todos los derechos reservados · <b id="sfVersion">v109</b></span>
     </div></div>
 <!-- Doctor en sesion: informativo, lleva a Configuracion para cambiarlo -->
 <div id="sideDocBox" onclick="openSection('s-admin-id', document.querySelector('.nav-item[onclick*=&quot;s-admin-id&quot;]'))" title="Doctor en sesion. Toca para cambiarlo o editar el perfil." style="margin:0 12px 10px; padding:0.7rem 0.85rem; background:rgba(255,255,255,0.07); border:1px solid rgba(125,211,252,0.28); border-left:3px solid #5DC1BF; border-radius:10px; cursor:pointer; display:flex; align-items:center; gap:0.6rem;">
@@ -1402,10 +1402,10 @@ window._pdfReady=true;
 <!-- Valoracion Ortodoncica -->
 <div style="background:#eef2ff; border:1px solid #c7d2fe; border-radius:10px; padding:1.2rem; margin-bottom:1.2rem;">
 <label style="display:flex; align-items:center; gap:0.6rem; cursor:pointer; font-size:0.95rem; font-weight:800; color:#4338ca; margin-bottom:0.3rem;">
-<input id="ortoEvalActivo" onchange="document.getElementById('ortoEvalBox').classList.toggle('hidden', !this.checked); triggerUnsavedWarning();" style="width:20px; height:20px; accent-color:#4338ca;" type="checkbox"/>
+<input id="ortoEvalActivo" onchange="document.getElementById('ortoEvalBox').classList.toggle('hidden', !this.checked); triggerUnsavedWarning(); sfGuardarOrtoAuto();" style="width:20px; height:20px; accent-color:#4338ca;" type="checkbox"/>
 <i class="fa-solid fa-tooth"></i> Valoración Ortodóncica
 </label>
-<div class="hidden" id="ortoEvalBox" style="margin-top:1rem;">
+<div class="hidden" id="ortoEvalBox" onchange="sfGuardarOrtoAuto()" style="margin-top:1rem;">
 
 <div style="font-size:0.82rem; font-weight:800; color:#4338ca; margin-bottom:0.5rem;">Perfil facial</div>
 <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:0.6rem 1rem; margin-bottom:1.1rem;">
@@ -1781,8 +1781,13 @@ AVISO PRÓX. CITA (Recordatorio local):
 <input class="input-field" id="pNuevoAbono" type="number" placeholder="Monto $" style="padding:0.5rem;"/>
 <button class="btn btn-success" type="button" onclick="agregarAbono()" style="padding:0.5rem 0.9rem; white-space:nowrap;"><i class="fa-solid fa-plus"></i></button>
 </div>
+<label style="display:flex; align-items:center; gap:0.4rem; font-size:0.78rem; color:#0f766e; margin-top:0.5rem; cursor:pointer;">
+<input id="pAbonoPideFactura" style="width:16px; height:16px; accent-color:#0f766e;" type="checkbox"/>
+🧾 Pidió factura
+</label>
 </div>
 </div>
+<div class="hidden" id="fbAvisoFacturaCobros" style="background:#fff7ed; border:1px solid #fdba74; border-left:4px solid #ea580c; border-radius:8px; padding:0.7rem 1rem; margin-bottom:1rem; font-size:0.82rem; color:#9a3412;"></div>
 
 <!-- Resumen visual saldo -->
 <div style="display:flex; gap:0.6rem; flex-wrap:wrap; margin-bottom:1rem;">
@@ -3192,6 +3197,7 @@ Se tomaron signos vitales
 </div>
 <div class="app-section" id="s-facturacion">
 <h3 style="color:#8b5cf6; font-size:1.3rem; margin-bottom:1.5rem; font-weight:800; display:flex; align-items:center; gap:0.7rem;"><span style="background:linear-gradient(135deg, #8b5cf6, #6d28d9); color:white; width:36px; height:36px; border-radius:10px; display:inline-flex; align-items:center; justify-content:center; font-size:0.95rem; box-shadow:0 4px 8px rgba(139,92,246,0.3);"><i class="fa-solid fa-file-invoice-dollar"></i></span> Solicitud de Facturación</h3>
+<div class="hidden" id="fbAvisoFacturaFact" style="background:#fff7ed; border:1px solid #fdba74; border-left:4px solid #ea580c; border-radius:8px; padding:0.7rem 1rem; margin-bottom:1.2rem; font-size:0.85rem; color:#9a3412;"></div>
 <div class="card" style="background:#f5f3ff; border-color:#ddd6fe; border-top-width: 1px;">
 <h4 style="color:#6d28d9; margin-bottom:1rem; font-size:1.1rem; border-bottom:1px dashed #c4b5fd; padding-bottom:0.6rem;"><i class="fa-solid fa-building-columns"></i> Datos Fiscales del Paciente (Constancia de Situación Fiscal)</h4>
 <p style="font-size:0.9rem; color:#64748b; margin-bottom:1.5rem;">Llena estos datos una sola vez. Se quedarán guardados en el perfil de este paciente para todas sus futuras facturas.</p>
@@ -11928,6 +11934,18 @@ ${patientText}`;
         window.open('https://wa.me/?text=' + encodeURIComponent(t), '_blank');
     }
 
+    // Recordatorio de factura pendiente: se muestra en Cobros y en Facturacion
+    // hasta que se llenen los datos fiscales del paciente.
+    function sfRenderAvisoFactura(){
+        const p = db.curr ? db.pats[db.curr] : null;
+        const pendiente = !!(p && p.facturaPendiente);
+        const msg = p ? `🧾 <b>${p.name||'Este paciente'}</b> pidió factura y aún no tiene datos fiscales guardados.` : '';
+        const bc = $('fbAvisoFacturaCobros');
+        if(bc){ bc.classList.toggle('hidden', !pendiente); if(pendiente) bc.innerHTML = msg + ' <a href="javascript:void(0)" onclick="sfQuickGo(\'s-facturacion\',\'facRFC\')" style="color:#c2410c; font-weight:800; text-decoration:underline;">Ir a Facturación</a>'; }
+        const bf = $('fbAvisoFacturaFact');
+        if(bf){ bf.classList.toggle('hidden', !pendiente); if(pendiente) bf.innerHTML = msg + ' Llena sus datos abajo para quitar este aviso.'; }
+    }
+
     function renderAbonos() {
         const cont = $('listaAbonos');
         if(!cont) return;
@@ -11944,6 +11962,7 @@ ${patientText}`;
                 </span>
             </div>`).join('');
         recalcSaldo();
+        sfRenderAvisoFactura();
     }
 
     // Si se baja el costo del plan por debajo de lo ya cobrado, avisar:
@@ -11988,6 +12007,22 @@ ${patientText}`;
         saveDB();
         renderAbonos();
         if(typeof daniSpeak === 'function') daniSpeak(`💰 Abono de $${monto.toLocaleString('es-MX')} registrado.`, 4000, 'info');
+        if($('pAbonoPideFactura') && $('pAbonoPideFactura').checked) {
+            $('pAbonoPideFactura').checked = false;
+            const tieneFiscales = p.factData && p.factData.rfc;
+            if(!tieneFiscales) {
+                if(confirm('🧾 Este paciente pidió factura y no tiene datos fiscales guardados.\n\n¿Quieres agregarlos ahora?\n\nAceptar = ir a Facturación ahora\nCancelar = que te lo recuerde después')) {
+                    p.facturaPendiente = false;
+                    saveDB();
+                    sfQuickGo('s-facturacion', 'facRFC');
+                } else {
+                    p.facturaPendiente = true;
+                    saveDB();
+                    sfRenderAvisoFactura();
+                    if(typeof daniSpeak === 'function') daniSpeak('📌 Anotado — te lo recuerdo la próxima vez que entres a Cobros o Facturación.', 4500, 'info');
+                }
+            }
+        }
     }
 
     function quitarAbono(i) {
@@ -14206,7 +14241,7 @@ Reglas: español de México; terminología dental correcta; máximo 6 líneas; u
         $('pPendingTreats').style.display = 'block';
     }
 
-    function loadFacturacion(p) { let f=p.factData||{}; $('facRFC').value=f.rfc||''; $('facNom').value=f.nom||''; $('facReg').value=f.reg||''; $('facCP').value=f.cp||''; $('facUso').value=f.uso||''; $('facEmail').value=f.email||''; }
+    function loadFacturacion(p) { let f=p.factData||{}; $('facRFC').value=f.rfc||''; $('facNom').value=f.nom||''; $('facReg').value=f.reg||''; $('facCP').value=f.cp||''; $('facUso').value=f.uso||''; $('facEmail').value=f.email||''; sfRenderAvisoFactura(); }
     // ===== Lectura automatica de la Constancia de Situacion Fiscal (SAT) =====
     // Carga pdf.js bajo demanda (solo cuando se usa este boton) para no engordar
     // el archivo principal. Requiere internet la primera vez; el navegador
@@ -14333,7 +14368,7 @@ Reglas: español de México; terminología dental correcta; máximo 6 líneas; u
         }
     }
 
-    function saveFactDatos() { if(!db.curr) return; db.pats[db.curr].factData = {rfc:$('facRFC').value, nom:$('facNom').value, reg:$('facReg').value, cp:$('facCP').value, uso:$('facUso').value, email:$('facEmail').value}; saveDB(); daniSpeak("💾 Datos fiscales guardados."); }
+    function saveFactDatos() { if(!db.curr) return; const p = db.pats[db.curr]; p.factData = {rfc:$('facRFC').value, nom:$('facNom').value, reg:$('facReg').value, cp:$('facCP').value, uso:$('facUso').value, email:$('facEmail').value}; if(p.factData.rfc) p.facturaPendiente = false; saveDB(); sfRenderAvisoFactura(); daniSpeak("💾 Datos fiscales guardados."); }
     function sendFactContador(m) { if(!db.curr || !db.cfg.contPhone) return alert("Falta paciente o datos del contador."); let f=db.pats[db.curr].factData||{}; let msg=`Solicitud de Factura.\nPaciente: ${f.nom}\nRFC: ${f.rfc}\nRégimen Fiscal: ${f.reg}\nCódigo Postal: ${f.cp}\nUso de CFDI: ${f.uso}\nMonto: $${$('facMonto').value}\nConcepto: ${$('facConcepto').value}`; if(m==='wa') window.open(`https://wa.me/52${db.cfg.contPhone.replace(/\D/g,'')}?text=${encodeURIComponent(msg)}`); else window.open(`mailto:${db.cfg.contEmail}?subject=Factura&body=${encodeURIComponent(msg)}`); }
 
     function pushHist(type, f, obs) {
@@ -14575,6 +14610,17 @@ Reglas: español de México; terminología dental correcta; máximo 6 líneas; u
     // Estos grupos son de una sola opcion (perfil, clase molar/canina por lado,
     // severidad de apiñamiento/diastemas): al marcar uno se desmarcan sus
     // compañeros de grupo, igual que un radio button pero con checkboxes.
+    // Guarda la valoracion ortodoncica al momento de cualquier cambio, para que
+    // no dependa de dar clic en "Guardar" antes de imprimir (mismo problema que
+    // ya se corrigio para Costo Total).
+    function sfGuardarOrtoAuto(){
+        if(!db.curr) return;
+        const p = db.pats[db.curr];
+        p.med = p.med || {};
+        p.med.orto = p.med.orto || {};
+        ORTO_ALL_IDS.forEach(id => { if($(id)) p.med.orto[id] = $(id).checked; });
+        saveDB();
+    }
     function sfOrtoExclusivo(clickedId){
         for(const g in ORTO_GRUPOS){
             const ids = ORTO_GRUPOS[g];
