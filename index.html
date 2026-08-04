@@ -581,7 +581,7 @@ window._pdfReady=true;
         <h2 style="margin: 0 !important; font-size: 1.5rem !important; color: white !important;">SmileFlow</h2>
         <a href="https://www.dentilike.com.mx" target="_blank" style="color: #bae6fd; font-size: 0.75rem; text-decoration: none; font-weight: 600; cursor: pointer; transition: color 0.2s;" onmouseover="this.style.color='white'" onmouseout="this.style.color='#bae6fd'">www.dentilike.com.mx</a>
         <a href="mailto:soporte@dentilike.com.mx" style="color: #bae6fd; font-size: 0.75rem; text-decoration: none; font-weight: 600; cursor: pointer; transition: color 0.2s;" onmouseover="this.style.color='white'" onmouseout="this.style.color='#bae6fd'">soporte@dentilike.com.mx</a>
-<span style="color:#7dd3fc; font-size:0.62rem; opacity:0.8; margin-top:2px;">© 2026 Dentilike · Todos los derechos reservados · <b id="sfVersion">v109</b></span>
+<span style="color:#7dd3fc; font-size:0.62rem; opacity:0.8; margin-top:2px;">© 2026 Dentilike · Todos los derechos reservados · <b id="sfVersion">v110</b></span>
     </div></div>
 <!-- Doctor en sesion: informativo, lleva a Configuracion para cambiarlo -->
 <div id="sideDocBox" onclick="openSection('s-admin-id', document.querySelector('.nav-item[onclick*=&quot;s-admin-id&quot;]'))" title="Doctor en sesion. Toca para cambiarlo o editar el perfil." style="margin:0 12px 10px; padding:0.7rem 0.85rem; background:rgba(255,255,255,0.07); border:1px solid rgba(125,211,252,0.28); border-left:3px solid #5DC1BF; border-radius:10px; cursor:pointer; display:flex; align-items:center; gap:0.6rem;">
@@ -14369,7 +14369,17 @@ Reglas: español de México; terminología dental correcta; máximo 6 líneas; u
     }
 
     function saveFactDatos() { if(!db.curr) return; const p = db.pats[db.curr]; p.factData = {rfc:$('facRFC').value, nom:$('facNom').value, reg:$('facReg').value, cp:$('facCP').value, uso:$('facUso').value, email:$('facEmail').value}; if(p.factData.rfc) p.facturaPendiente = false; saveDB(); sfRenderAvisoFactura(); daniSpeak("💾 Datos fiscales guardados."); }
-    function sendFactContador(m) { if(!db.curr || !db.cfg.contPhone) return alert("Falta paciente o datos del contador."); let f=db.pats[db.curr].factData||{}; let msg=`Solicitud de Factura.\nPaciente: ${f.nom}\nRFC: ${f.rfc}\nRégimen Fiscal: ${f.reg}\nCódigo Postal: ${f.cp}\nUso de CFDI: ${f.uso}\nMonto: $${$('facMonto').value}\nConcepto: ${$('facConcepto').value}`; if(m==='wa') window.open(`https://wa.me/52${db.cfg.contPhone.replace(/\D/g,'')}?text=${encodeURIComponent(msg)}`); else window.open(`mailto:${db.cfg.contEmail}?subject=Factura&body=${encodeURIComponent(msg)}`); }
+    function sendFactContador(m) {
+        if(!db.curr || !db.cfg.contPhone) return alert("Falta paciente o datos del contador.");
+        const p = db.pats[db.curr];
+        let f = p.factData || {};
+        if(!f.rfc) {
+            return alert('⚠️ Este paciente no tiene datos fiscales guardados.\n\nLlena RFC, Nombre, Régimen, etc. en "Datos Fiscales del Paciente" (sección Facturación) y dale clic a Guardar — luego intenta enviar la solicitud otra vez.');
+        }
+        let msg=`Solicitud de Factura.\nPaciente: ${f.nom}\nRFC: ${f.rfc}\nRégimen Fiscal: ${f.reg}\nCódigo Postal: ${f.cp}\nUso de CFDI: ${f.uso}\nMonto: $${$('facMonto').value}\nConcepto: ${$('facConcepto').value}`;
+        if(m==='wa') window.open(`https://wa.me/52${db.cfg.contPhone.replace(/\D/g,'')}?text=${encodeURIComponent(msg)}`);
+        else window.open(`mailto:${db.cfg.contEmail}?subject=Factura&body=${encodeURIComponent(msg)}`);
+    }
 
     function pushHist(type, f, obs) {
         if(!db.curr) return;
