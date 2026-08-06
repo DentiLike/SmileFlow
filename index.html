@@ -581,7 +581,7 @@ window._pdfReady=true;
         <h2 style="margin: 0 !important; font-size: 1.5rem !important; color: white !important;">SmileFlow</h2>
         <a href="https://www.dentilike.com.mx" target="_blank" style="color: #bae6fd; font-size: 0.75rem; text-decoration: none; font-weight: 600; cursor: pointer; transition: color 0.2s;" onmouseover="this.style.color='white'" onmouseout="this.style.color='#bae6fd'">www.dentilike.com.mx</a>
         <a href="mailto:soporte@dentilike.com.mx" style="color: #bae6fd; font-size: 0.75rem; text-decoration: none; font-weight: 600; cursor: pointer; transition: color 0.2s;" onmouseover="this.style.color='white'" onmouseout="this.style.color='#bae6fd'">soporte@dentilike.com.mx</a>
-<span style="color:#7dd3fc; font-size:0.62rem; opacity:0.8; margin-top:2px;">© 2026 Dentilike · Todos los derechos reservados · <b id="sfVersion">v110</b></span>
+<span style="color:#7dd3fc; font-size:0.62rem; opacity:0.8; margin-top:2px;">© 2026 Dentilike · Todos los derechos reservados · <b id="sfVersion">v114</b></span>
     </div></div>
 <!-- Doctor en sesion: informativo, lleva a Configuracion para cambiarlo -->
 <div id="sideDocBox" onclick="openSection('s-admin-id', document.querySelector('.nav-item[onclick*=&quot;s-admin-id&quot;]'))" title="Doctor en sesion. Toca para cambiarlo o editar el perfil." style="margin:0 12px 10px; padding:0.7rem 0.85rem; background:rgba(255,255,255,0.07); border:1px solid rgba(125,211,252,0.28); border-left:3px solid #5DC1BF; border-radius:10px; cursor:pointer; display:flex; align-items:center; gap:0.6rem;">
@@ -1788,6 +1788,15 @@ AVISO PRÓX. CITA (Recordatorio local):
 </div>
 </div>
 <div class="hidden" id="fbAvisoFacturaCobros" style="background:#fff7ed; border:1px solid #fdba74; border-left:4px solid #ea580c; border-radius:8px; padding:0.7rem 1rem; margin-bottom:1rem; font-size:0.82rem; color:#9a3412;"></div>
+<div style="background:#fffbeb; border:1px solid #fde68a; border-radius:10px; padding:1.2rem; margin-bottom:1rem;">
+<label style="font-size:0.85rem; font-weight:800; color:#92400e; display:flex; align-items:center; gap:0.4rem; margin-bottom:0.6rem;"><i class="fa-solid fa-tooth"></i> Tratamiento realizado hoy <span style="font-weight:400; font-size:0.74rem; color:#a16207;">(aparte del plan — se cobra y liquida al momento)</span></label>
+<input class="input-field" id="txConcepto" placeholder="Tratamiento (ej. Resinas, extracción, urgencia)" style="padding:0.5rem; margin-bottom:0.4rem; background:white;" type="text"/>
+<div style="display:flex; gap:0.4rem;">
+<input class="input-field" id="txCosto" placeholder="Costo $ (se cobra completo)" style="padding:0.5rem; background:white;" type="number"/>
+<button class="btn" type="button" onclick="agregarTratamientoHoy()" style="padding:0.5rem 0.9rem; white-space:nowrap; background:#d97706; color:white;"><i class="fa-solid fa-plus"></i></button>
+</div>
+<div style="font-size:0.72rem; color:#a16207; margin-top:0.5rem; line-height:1.4;"><i class="fa-solid fa-circle-info"></i> No afecta el Costo Total/Abonado/Debe del plan de arriba. Sí cuenta en Ingresos de hoy y tiene su propio recibo.</div>
+</div>
 
 <!-- Resumen visual saldo -->
 <div style="display:flex; gap:0.6rem; flex-wrap:wrap; margin-bottom:1rem;">
@@ -1827,6 +1836,7 @@ AVISO PRÓX. CITA (Recordatorio local):
 
 <!-- Historial de abonos -->
 <div id="listaAbonos" style="font-size:0.85rem;"></div>
+<div id="listaTratamientosExtra" style="font-size:0.85rem; margin-top:0.6rem;"></div>
 <textarea class="input-field" id="pNotaPago" oninput="triggerUnsavedWarning()" placeholder="Notas de pago (acuerdos, fechas, etc.)" style="min-height:50px; margin-top:0.8rem; font-size:0.85rem;"></textarea>
 </div>
 
@@ -4109,8 +4119,22 @@ No hay forma de recuperarlo: el cifrado es real y ni nosotros podemos abrirlo. G
 
     // Revisa si en la nube hay un punto de guardado MÁS NUEVO que lo que tiene
     // este dispositivo, y si es así avisa de forma clara y guía al doctor.
+    // Respaldo con etiqueta clara justo antes de aplicar una decision de
+    // sincronizacion (elegir nube o quedarse con lo local). Usa el mismo
+    // formato que los "puntos de guardado" normales para que aparezca ahi
+    // mismo y se pueda recuperar sin pasos especiales.
+    async function sfRespaldoAntesDeSync(etiqueta){
+        try {
+            const separado = sfSepararImgs(JSON.parse(JSON.stringify(db)));
+            const snap = separado.light;
+            const nPats = snap.pats ? Object.keys(snap.pats).length : 0;
+            await sfSafetyPut('slots', { id: 'sync_' + Date.now(), ts: new Date().toISOString(), nPats, tipo: etiqueta, data: snap });
+        } catch(e){ console.warn('respaldo antes de sync', e); }
+    }
+
     async function sfNubeRevisarNuevo(){
         try {
+            if(window._sfConflictoAbierto) return; // no empalmar con el dialogo de conflicto
             const t = sfTokenDrive(); if(!t) return;
             const files = await sfNubeListar();
             if(!files.length) return;
@@ -4142,8 +4166,8 @@ No hay forma de recuperarlo: el cifrado es real y ni nosotros podemos abrirlo. G
               + 'Ese guardado es <b>más nuevo</b> que lo que tienes en este aparato.</div>'
               + '<p style="color:#475569; font-size:0.9rem; line-height:1.6; margin:0 0 1rem;">¿Quieres traer ese trabajo a este dispositivo para continuar donde te quedaste?</p>'
               + '<div style="display:flex; gap:0.5rem; flex-wrap:wrap;">'
-              + '<button onclick="this.closest(\'div[style*=fixed]\').remove(); sfNubePanel();" style="border:none; border-radius:8px; padding:0.75rem 1rem; font-weight:800; background:#1d4ed8; color:white; flex:1; cursor:pointer;"><i class="fa-solid fa-cloud-arrow-down"></i> Ver y traer ese guardado</button>'
-              + '<button onclick="this.closest(\'div[style*=fixed]\').remove();" style="border:1px solid var(--border); border-radius:8px; padding:0.75rem 1rem; font-weight:800; background:white; color:#475569; cursor:pointer;">Ahora no</button>'
+              + '<button onclick="this.closest(\'[data-sf-overlay]\').remove(); sfNubePanel();" style="border:none; border-radius:8px; padding:0.75rem 1rem; font-weight:800; background:#1d4ed8; color:white; flex:1; cursor:pointer;"><i class="fa-solid fa-cloud-arrow-down"></i> Ver y traer ese guardado</button>'
+              + '<button onclick="this.closest(\'[data-sf-overlay]\').remove();" style="border:1px solid var(--border); border-radius:8px; padding:0.75rem 1rem; font-weight:800; background:white; color:#475569; cursor:pointer;">Ahora no</button>'
               + '</div>'
               + '<div style="background:#fffbeb; border:1px dashed #fde68a; color:#92400e; border-radius:8px; padding:0.7rem 0.9rem; margin-top:0.9rem; font-size:0.8rem; line-height:1.5;">'
               + '<b>Tranquilo:</b> nada se borra sin tu permiso. Si eliges traerlo, primero se guarda una copia de seguridad de lo que tienes ahora.</div>';
@@ -4291,6 +4315,190 @@ No hay forma de recuperarlo: el cifrado es real y ni nosotros podemos abrirlo. G
             + '<div style="text-align:center; margin-top:0.4rem;"><span onclick="sfOnbPaso(1)" style="font-size:0.82rem; color:#94a3b8; cursor:pointer; text-decoration:underline;">← Volver</span></div>';
         }
     }
+    // ================= PACIENTE DE PRUEBA + TOUR GUIADO =================
+    // Para que un doctor nuevo pueda ver la app funcionando con datos reales
+    // sin arriesgar (ni tener que capturar) un paciente de verdad.
+    function sfGenerarPacientePrueba(){
+        const id = 'p_demo_' + Date.now();
+        const consultorioId = db.consultorioActivo || Object.keys(db.consultorios||{})[0] || '';
+        const fechaHoy = new Date().toLocaleDateString('es-MX', {day:'2-digit',month:'2-digit',year:'numeric'});
+        const p = {
+            id: id,
+            displayId: 'Px-Paciente de Prueba (bórrame)',
+            name: 'Paciente de Prueba (bórrame)',
+            birth: '1995-04-12', age: '31', sex: 'Femenino',
+            guardian: '', phone: '4441234567', email: 'paciente.prueba@ejemplo.com',
+            consultorioId: consultorioId,
+            address: 'Calle Ejemplo 123, Col. Centro',
+            addr: { calle:'Calle Ejemplo 123', col:'Centro', ciudad:'San Luis Potosí' },
+            sum: 'Clase II esquelética, apiñamiento moderado inferior. Candidata a tratamiento con brackets.',
+            brackets: 'Metálicos MBT',
+            retra:false, factReq:false, hasAl:false, alPen:false, alAin:false, alLat:false, alSulfa:false, alOther:'',
+            costoTotal: '25000', notaPago: '',
+            notas: [], treats: {},
+            alertDate: sfHoyISO(), alert: 'Paciente de prueba — bórrala cuando quieras, es solo para practicar.',
+            factData: {},
+            odonto: {
+                16: { status:'Caries', surfaces:['O'] },
+                26: { status:'Resina', surfaces:['O','D'] },
+                36: { status:'Endodoncia' },
+                11: { status:'Corona' }
+            },
+            abonos: [ { id:'ab_demo1', monto:5000, fecha: fechaHoy, concepto:'Colocación de brackets' } ],
+            cargos: [],
+            tratamientosExtra: [ { id:'tx_demo1', costo:800, fecha: fechaHoy, concepto:'Limpieza dental' } ],
+            ordenesLab: [],
+            med: {
+                hcMotivo: 'Valoración y tratamiento de ortodoncia.',
+                hcOcupacion: 'Estudiante',
+                mdAsma: true, hbBruxismo: true,
+                orto: {
+                    ortoEvalActivo: true, ortoPerfilConvexo: true,
+                    ortoMolarDer2: true, ortoMolarIzq2: true,
+                    ortoCaninaDer2: true, ortoCaninaIzq2: true,
+                    ortoApinInf2: true
+                }
+            }
+        };
+        db.pats[id] = p;
+        db.curr = id;
+        saveDB();
+        try { renderPatSelect(); } catch(e){}
+        const pSel = $('pSelect'); if(pSel) pSel.value = id;
+        try { loadPatient(); } catch(e){}
+        try { pushHist('gen', sfHoyISO(), 'Paciente acude a valoración inicial. Se explica plan de tratamiento con brackets metálicos. Buena higiene oral.'); } catch(e){}
+        saveDB();
+        try { renderTimeline(); } catch(e){}
+        return id;
+    }
+
+    const SF_TOUR_PASOS = [
+        { seccion:'s-inicio', selector:'#inicioResumen', titulo:'Tu Centro de Mando', texto:'Aquí ves tu día de un vistazo: citas, pendientes, cuánto te deben y cuánto debes tú. Toca cualquier tarjeta para ver el detalle completo.' },
+        { seccion:'s-inicio', selector:'#pSelect', titulo:'Busca a tus pacientes', texto:'Desde aquí buscas y seleccionas pacientes en cualquier pantalla. Ya te dejé uno de prueba cargado, con datos de ejemplo en toda la app.' },
+        { seccion:'s-perfil', selector:'#s-perfil .card', titulo:'Perfil del Paciente', texto:'Datos personales, contacto, y el diagnóstico general. Todo se guarda solo — no necesitas un botón "Guardar" para cada campo.' },
+        { seccion:'s-hcgeneral', selector:'#s-hcgeneral > div:first-child', titulo:'Historia Clínica General', texto:'Antecedentes médicos, hábitos, y la Valoración Ortodóncica — clase molar, canina, mordida, todo en checkboxes.' },
+        { seccion:'s-odontograma', selector:'#odo-sup', titulo:'Odontograma interactivo', texto:'Marca hallazgos diente por diente. El diagnóstico se genera solo a partir de lo que marcas aquí, junto con la valoración ortodóncica.' },
+        { seccion:'s-tratamientos', selector:'#s-tratamientos > div:first-child', titulo:'Plan de Tratamiento', texto:'El checklist de tratamiento por especialidad, para llevar el control de qué falta y qué ya se hizo.' },
+        { seccion:'s-cobros', selector:'#accAbonos', titulo:'Cobros y Abonos', texto:'El costo del plan, los abonos, y "Tratamiento realizado hoy" para cobros aparte (como una resina) que no se mezclan con el plan principal.' },
+        { seccion:'s-historial', selector:'#tlRender', titulo:'Expediente Clínico', texto:'La línea de tiempo de todo lo que pasa con el paciente — notas, cobros, laboratorio. Se imprime completo con un clic.' },
+        { seccion:null, selector:null, titulo:'¡Listo! Ya conoces lo esencial', texto:'Esto es solo el recorrido rápido — hay mucho más (recetas, consentimientos, cefalometría, facturación...). El paciente de prueba se queda ahí para que sigas explorando; bórralo cuando quieras desde su perfil.' }
+    ];
+    let sfTourPaso = 0;
+    window._sfTourEnCurso = false;
+
+    function sfIniciarTour(){
+        try { const ov=document.querySelector('[data-sf-overlay]'); if(ov) ov.remove(); } catch(e){}
+        window._sfTourEnCurso = true;
+        sfGenerarPacientePrueba();
+        sfTourPaso = 0;
+        setTimeout(sfTourMostrarPaso, 300);
+    }
+
+    function sfTourQuitarUI(){
+        ['sfTourHoyo','sfTourCard'].forEach(id => { const el = document.getElementById(id); if(el) el.remove(); });
+    }
+
+    function sfTourMostrarPaso(){
+        sfTourQuitarUI();
+        if(sfTourPaso < 0) sfTourPaso = 0;
+        if(sfTourPaso >= SF_TOUR_PASOS.length){ sfTourFinalizar(); return; }
+        const paso = SF_TOUR_PASOS[sfTourPaso];
+        const ejecutar = () => {
+            const el = paso.selector ? document.querySelector(paso.selector) : null;
+            sfTourPintarSpotlight(el, paso);
+        };
+        if(paso.seccion){
+            openSection(paso.seccion, null);
+            setTimeout(ejecutar, 260);
+        } else {
+            ejecutar();
+        }
+    }
+
+    function sfTourPintarSpotlight(el, paso){
+        const avatarSrc = ($('astImg') && $('astImg').src) ? $('astImg').src : '';
+        const hoyo = document.createElement('div');
+        hoyo.id = 'sfTourHoyo';
+        if(el){
+            const r = el.getBoundingClientRect();
+            const pad = 8;
+            hoyo.style.cssText = `position:fixed; top:${Math.max(0,r.top-pad)}px; left:${Math.max(0,r.left-pad)}px; width:${r.width+pad*2}px; height:${r.height+pad*2}px; border-radius:12px; box-shadow:0 0 0 9999px rgba(15,23,42,0.72); border:3px solid #2dd4bf; z-index:999998; pointer-events:none; transition:all .25s;`;
+            try { el.scrollIntoView({ behavior:'smooth', block:'center' }); } catch(e){}
+        } else {
+            hoyo.style.cssText = 'position:fixed; inset:0; background:rgba(15,23,42,0.72); z-index:999998;';
+        }
+        document.body.appendChild(hoyo);
+
+        const card = document.createElement('div');
+        card.id = 'sfTourCard';
+        card.style.cssText = 'position:fixed; z-index:999999; max-width:360px; width:calc(100% - 2rem); background:white; border-radius:14px; box-shadow:0 20px 50px rgba(0,0,0,0.4); padding:1.1rem 1.2rem; left:50%; top:50%; transform:translate(-50%,-50%);';
+        const esUltimo = sfTourPaso === SF_TOUR_PASOS.length - 1;
+        card.innerHTML = `
+            <div style="display:flex; gap:0.7rem; align-items:flex-start; margin-bottom:0.9rem;">
+                ${avatarSrc ? `<img src="${avatarSrc}" style="width:44px; height:44px; border-radius:50%; flex-shrink:0; object-fit:cover;"/>` : ''}
+                <div>
+                    <div style="font-weight:800; color:#1e3a5f; font-size:0.98rem;">${paso.titulo}</div>
+                    <div style="font-size:0.86rem; color:#475569; margin-top:5px; line-height:1.5;">${paso.texto}</div>
+                </div>
+            </div>
+            <div style="display:flex; justify-content:space-between; align-items:center; gap:0.5rem; flex-wrap:wrap;">
+                <button onclick="sfTourSaltar()" style="border:none; background:transparent; color:#94a3b8; font-size:0.78rem; cursor:pointer; font-weight:700;">Saltar tour</button>
+                <div style="display:flex; gap:0.5rem; align-items:center;">
+                    <span style="font-size:0.76rem; color:#94a3b8;">${sfTourPaso+1}/${SF_TOUR_PASOS.length}</span>
+                    ${sfTourPaso>0 ? '<button onclick="sfTourAnterior()" style="border:1px solid #e2e8f0; background:white; color:#475569; border-radius:8px; padding:0.5rem 0.9rem; font-weight:700; font-size:0.82rem; cursor:pointer;">Atrás</button>' : ''}
+                    <button onclick="sfTourSiguiente()" style="border:none; background:#2dd4bf; color:#0c1830; border-radius:8px; padding:0.5rem 1rem; font-weight:800; font-size:0.82rem; cursor:pointer;">${esUltimo ? 'Terminar' : 'Siguiente'}</button>
+                </div>
+            </div>`;
+        document.body.appendChild(card);
+        // Reposicionar cerca del elemento si hay espacio; si no, se queda centrado.
+        if(el){
+            const r = el.getBoundingClientRect();
+            const ch = card.offsetHeight, cw = card.offsetWidth;
+            let top = r.bottom + 16;
+            if(top + ch > window.innerHeight - 10) top = Math.max(10, r.top - ch - 16);
+            let left = Math.min(Math.max(10, r.left), window.innerWidth - cw - 10);
+            card.style.top = top + 'px'; card.style.left = left + 'px'; card.style.transform = 'none';
+        }
+    }
+
+    function sfTourSiguiente(){ sfTourPaso++; sfTourMostrarPaso(); }
+    function sfTourAnterior(){ sfTourPaso--; sfTourMostrarPaso(); }
+    function sfTourSaltar(){ sfTourFinalizar(); }
+    function sfTourFinalizar(){
+        sfTourQuitarUI();
+        window._sfTourEnCurso = false;
+        localStorage.setItem('sf_tour_visto', '1');
+        if(typeof daniSpeak === 'function') daniSpeak('🎉 Cuando quieras, el paciente de prueba sigue ahí para que sigas practicando.', 6000, 'info');
+        try { sfOnboardingCheck(); } catch(e){}
+    }
+
+    function sfBienvenidaCheck(){
+        try {
+            if(localStorage.getItem('sf_tour_visto')) return;
+            if(Object.keys(db.pats||{}).length > 0) { localStorage.setItem('sf_tour_visto','1'); return; }
+            setTimeout(sfBienvenidaMostrar, 1200);
+        } catch(e){}
+    }
+    function sfBienvenidaMostrar(){
+        try {
+            // Revisar de nuevo por si ya se creo un paciente real mientras esperabamos
+            // (evita que la bienvenida aparezca de todos modos por una carrera de tiempos).
+            if(Object.keys(db.pats||{}).length > 0){ localStorage.setItem('sf_tour_visto','1'); return; }
+            window._sfTourEnCurso = true;
+            const { body } = sfOverlay('<i class="fa-solid fa-hand-sparkles"></i> ¡Bienvenido a SmileFlow!', '#0d9488');
+            body.innerHTML =
+                '<p style="color:#475569; font-size:0.92rem; line-height:1.6; margin:0 0 1.1rem;">Antes de meter tus pacientes reales, ¿quieres un recorrido rápido? Te genero un paciente de prueba y te voy mostrando cada sección con datos ya cargados.</p>'
+              + '<button class="btn" onclick="sfIniciarTour()" style="width:100%; background:#0d9488; color:white; font-weight:800; padding:0.9rem; margin-bottom:0.6rem;"><i class="fa-solid fa-route"></i> Sí, dame el tour</button>'
+              + '<button class="btn btn-outline" onclick="sfBienvenidaSaltar()" style="width:100%; padding:0.8rem;">No, gracias — empezar de cero</button>';
+        } catch(e){ window._sfTourEnCurso = false; }
+    }
+    function sfBienvenidaSaltar(){
+        localStorage.setItem('sf_tour_visto', '1');
+        window._sfTourEnCurso = false;
+        try { const ov=document.querySelector('[data-sf-overlay]'); if(ov) ov.remove(); } catch(e){}
+        try { sfOnboardingCheck(); } catch(e){}
+    }
+
     function sfOnboarding(){
         try {
             const { body } = sfOverlay('<i class="fa-solid fa-shield-halved"></i> Protege tu información', '#1d4ed8');
@@ -4301,7 +4509,7 @@ No hay forma de recuperarlo: el cifrado es real y ni nosotros podemos abrirlo. G
     function sfOnboardingCheck(){
         try {
             if(localStorage.getItem('sf_onboard_v2')) return;
-            setTimeout(() => { if(!document.querySelector('div[style*="z-index:99999"]')) sfOnboarding(); }, 3000);
+            setTimeout(() => { if(!window._sfTourEnCurso && !document.querySelector('[data-sf-overlay]')) sfOnboarding(); }, 3000);
         } catch(e){}
     }
 
@@ -5235,7 +5443,9 @@ db = {
                 protesis:   { t:'Prótesis activas',        ic:'fa-crown',            c:'#b45309' },
                 lab:        { t:'Trabajos en laboratorio', ic:'fa-truck-fast',       c:'#0e7490' },
                 adeudo:     { t:'Pacientes con adeudo',    ic:'fa-user-clock',       c:'#dc2626' },
-                ingresos:   { t:'Ingresos de hoy',         ic:'fa-cash-register',    c:'#059669' }
+                ingresos:   { t:'Ingresos de hoy',         ic:'fa-cash-register',    c:'#059669' },
+                debelabs:   { t:'Lo que debemos a laboratorios', ic:'fa-truck-ramp-box', c:'#9333ea' },
+                creditopac: { t:'A favor de pacientes',    ic:'fa-hand-holding-dollar', c:'#0d9488' }
             }[tipo] || { t:'Detalle', ic:'fa-list', c:'#475569' };
 
             const filas = [];
@@ -5258,15 +5468,32 @@ db = {
                     });
                 } else if(tipo === 'ingresos'){
                     const hoyI = sfHoyISO();
+                    const _fISO = txt => { const mm = String(txt||'').match(/^(\d{2})\/(\d{2})\/(\d{4})/); return mm ? (mm[3]+'-'+mm[2]+'-'+mm[1]) : String(txt||'').substring(0,10); };
                     (p.abonos || []).forEach(a => {
-                        if((a.fecha||'').substring(0,10) !== hoyI) return;
+                        if(_fISO(a.fecha) !== hoyI) return;
                         filas.push({ id:pid, n:p.name, d: dinero(parseFloat(a.monto)||0) + (a.concepto ? ' · ' + a.concepto : ''), orden: -(parseFloat(a.monto)||0) });
+                    });
+                    (p.tratamientosExtra || []).forEach(t => {
+                        if(_fISO(t.fecha) !== hoyI) return;
+                        filas.push({ id:pid, n:p.name, d: dinero(parseFloat(t.costo)||0) + ' · ' + (t.concepto||'Tratamiento') + ' (aparte)', orden: -(parseFloat(t.costo)||0) });
                     });
                 } else if(tipo === 'adeudo'){
                     const costo = parseFloat(p.costoTotal) || 0;
                     const abonado = (p.abonos || []).reduce((s,a)=>s+(parseFloat(a.monto)||0),0);
                     const deuda = costo - abonado;
                     if(deuda > 0) filas.push({ id:pid, n:p.name, d:'Debe ' + dinero(deuda) + ' de ' + dinero(costo), orden: -deuda });
+                } else if(tipo === 'debelabs'){
+                    (p.ordenesLab || []).forEach(o => {
+                        const sdo = parseFloat(o.saldo) || 0;
+                        if(sdo <= 0) return;
+                        const lab = (db.labsDentales && db.labsDentales[o.labId]) ? db.labsDentales[o.labId].nombre : 'Laboratorio';
+                        filas.push({ id:pid, n:p.name, d: dinero(sdo) + ' a ' + lab + (o.subtipo ? (' · '+o.subtipo) : ''), orden: -sdo });
+                    });
+                } else if(tipo === 'creditopac'){
+                    const costo = (parseFloat(p.costoTotal)||0) + (p.cargos||[]).reduce((s,c)=>s+(parseFloat(c.monto)||0),0);
+                    const abonado = (p.abonos || []).reduce((s,a)=>s+(parseFloat(a.monto)||0),0);
+                    const dif = abonado - costo;
+                    if(dif > 0) filas.push({ id:pid, n:p.name, d:'A favor: ' + dinero(dif), orden: -dif });
                 }
             });
             filas.sort((a,b)=>{
@@ -5361,12 +5588,22 @@ db = {
             return m ? (m[3]+'-'+m[2]+'-'+m[1]) : String(txt||'').substring(0,10);
         }
         let ingHoy = 0, ingMes = 0;
-        Object.values(db.pats || {}).forEach(p => { (p.abonos || []).forEach(a => {
-            const f = _sfFechaISO(a.fecha);
-            const m = parseFloat(a.monto) || 0;
-            if(f === _hoyISO) ingHoy += m;
-            if(f.substring(0,7) === _mesISO) ingMes += m;
-        }); });
+        Object.values(db.pats || {}).forEach(p => {
+            (p.abonos || []).forEach(a => {
+                const f = _sfFechaISO(a.fecha);
+                const m = parseFloat(a.monto) || 0;
+                if(f === _hoyISO) ingHoy += m;
+                if(f.substring(0,7) === _mesISO) ingMes += m;
+            });
+            // Tratamientos aparte (resinas, urgencias, etc.): se liquidan al
+            // momento, así que su costo completo cuenta como ingreso ya cobrado.
+            (p.tratamientosExtra || []).forEach(t => {
+                const f = _sfFechaISO(t.fecha);
+                const m = parseFloat(t.costo) || 0;
+                if(f === _hoyISO) ingHoy += m;
+                if(f.substring(0,7) === _mesISO) ingMes += m;
+            });
+        });
         // Trabajos en laboratorio dental (no recibidos) + vencidos
         let labActivos = 0, labVencidos = 0;
         const _hoy0 = new Date(); _hoy0.setHours(0,0,0,0);
@@ -5375,6 +5612,22 @@ db = {
             labActivos++;
             if(o.fechaEntrega){ const d=new Date(o.fechaEntrega+'T12:00:00'); d.setHours(0,0,0,0); if(d < _hoy0) labVencidos++; }
         }); });
+        // Lo que TU le debes a los laboratorios: se toma directo del saldo de
+        // cada orden ya enviada (costo - anticipo), sin capturar nada nuevo.
+        let debemosLabs = 0, ordenesConSaldo = 0;
+        Object.values(db.pats || {}).forEach(p => { (p.ordenesLab || []).forEach(o => {
+            const sdo = parseFloat(o.saldo) || 0;
+            if(sdo > 0) { debemosLabs += sdo; ordenesConSaldo++; }
+        }); });
+        // Credito a favor de pacientes: abonaron mas de lo que costaba su plan
+        // + cargos extra (sin contar tratamientos aparte, que ya se liquidan solos).
+        let creditoPacientes = 0, pacientesConCredito = 0;
+        Object.values(db.pats || {}).forEach(p => {
+            const costo = (parseFloat(p.costoTotal)||0) + (p.cargos||[]).reduce((s,c)=>s+(parseFloat(c.monto)||0),0);
+            const abonado = (p.abonos || []).reduce((s,a)=>s+(parseFloat(a.monto)||0),0);
+            const dif = abonado - costo;
+            if(dif > 0) { creditoPacientes += dif; pacientesConCredito++; }
+        });
         const tarjeta = (icon, valor, etiqueta, color, bg, tipo) => `
             <div ${tipo?`onclick="sfDetalleKPI('${tipo}')" title="Toca para ver el detalle"`:''} style="background:${bg}; border:1px solid ${color}33; border-radius:12px; padding:1rem; text-align:center; ${tipo?'cursor:pointer; transition:transform .12s, box-shadow .12s;':''}" ${tipo?'onmouseover="this.style.transform=\'translateY(-2px)\';this.style.boxShadow=\'0 6px 14px rgba(0,0,0,0.10)\';" onmouseout="this.style.transform=\'\';this.style.boxShadow=\'\';"':''}>
                 <div style="color:${color}; font-size:1.3rem; margin-bottom:2px;"><i class="fa-solid ${icon}"></i></div>
@@ -5390,7 +5643,9 @@ db = {
                 tarjeta('fa-truck-fast', labActivos + (labVencidos?' ⚠️':''), 'En laboratorio', labVencidos?'#dc2626':'#0e7490', labVencidos?'#fef2f2':'#ecfeff', 'lab') +
                 tarjeta('fa-user-clock', conAdeudo, 'Con adeudo', '#dc2626', '#fef2f2', 'adeudo') +
                 tarjeta('fa-cash-register', fmt(ingHoy), 'Ingresos hoy', '#059669', '#f0fdf4', 'ingresos') +
-                tarjeta('fa-sack-dollar', fmt(porCobrar), 'Por cobrar', '#0e7490', '#ecfeff', 'adeudo');
+                tarjeta('fa-sack-dollar', fmt(porCobrar), 'Por cobrar', '#0e7490', '#ecfeff', 'adeudo') +
+                tarjeta('fa-truck-ramp-box', fmt(debemosLabs), 'Debemos a labs', '#9333ea', '#faf5ff', 'debelabs') +
+                tarjeta('fa-hand-holding-dollar', fmt(creditoPacientes), 'A favor de pacientes', '#0d9488', '#f0fdfa', 'creditopac');
         }
 
         renderPromosBanner();
@@ -11963,6 +12218,110 @@ ${patientText}`;
             </div>`).join('');
         recalcSaldo();
         sfRenderAvisoFactura();
+        renderTratamientosExtra();
+    }
+
+    function renderTratamientosExtra() {
+        const cont = $('listaTratamientosExtra');
+        if(!cont) return;
+        const p = db.curr ? db.pats[db.curr] : null;
+        const txs = (p && p.tratamientosExtra) ? p.tratamientosExtra : [];
+        if(txs.length === 0) { cont.innerHTML = ''; return; }
+        cont.innerHTML = '<div style="font-weight:700; color:#92400e; font-size:0.8rem; margin-bottom:0.4rem;"><i class="fa-solid fa-tooth"></i> Tratamientos aparte cobrados:</div>' +
+            txs.map((t,i)=>`<div style="display:flex; justify-content:space-between; align-items:center; background:white; border:1px solid #fde68a; border-radius:6px; padding:0.4rem 0.7rem; margin-bottom:0.3rem;">
+                <span style="flex:1; min-width:0;"><i class="fa-solid fa-tooth" style="color:#d97706;"></i> <b>$${(parseFloat(t.costo)||0).toLocaleString('es-MX')}</b> <span style="color:#94a3b8; font-size:0.78rem;">— ${t.fecha}</span><div style="font-size:0.75rem; color:#475569; margin-left:1.2rem;">${t.concepto||''}</div></span>
+                <span style="display:flex; gap:0.7rem; align-items:center; flex-shrink:0;">
+                    <i class="fa-solid fa-share-nodes" onclick="reciboTratamientoExtra(${i})" style="cursor:pointer; color:#d97706;" title="Recibo PDF / compartir"></i>
+                    <i class="fa-solid fa-xmark" onclick="quitarTratamientoExtra(${i})" style="cursor:pointer; color:#cbd5e1;" title="Quitar"></i>
+                </span>
+            </div>`).join('');
+    }
+
+    function agregarTratamientoHoy() {
+        if(!db.curr) return alert("Selecciona o guarda un paciente primero.");
+        const costo = parseFloat($('txCosto').value) || 0;
+        if(costo <= 0) return alert("Escribe un costo válido.");
+        const concepto = $('txConcepto') ? $('txConcepto').value.trim() : '';
+        if(!concepto) return alert("Escribe qué tratamiento fue.");
+        const p = db.pats[db.curr];
+        p.tratamientosExtra = p.tratamientosExtra || [];
+        const f = new Date().toLocaleDateString('es-MX', {day:'2-digit',month:'2-digit',year:'numeric'});
+        const idTx = 'tx_'+Date.now();
+        p.tratamientosExtra.push({ id:idTx, costo: costo, fecha: f, concepto: concepto });
+        db.log = db.log || [];
+        db.log.push({ f: sfHoyISO(), p: p.name || '', t:'tx_extra', ing: costo, op: 0, inv: 0, ref: idTx, concepto: concepto });
+        $('txCosto').value = '';
+        $('txConcepto').value = '';
+        saveDB();
+        renderAbonos();
+        if(typeof daniSpeak === 'function') daniSpeak(`🦷 "${concepto}" registrado y cobrado ($${costo.toLocaleString('es-MX')}). No afecta el plan de tratamiento.`, 5000, 'info');
+    }
+
+    function quitarTratamientoExtra(i) {
+        if(!db.curr) return;
+        const p = db.pats[db.curr];
+        if(!p.tratamientosExtra || !p.tratamientosExtra[i]) return;
+        if(!confirm('¿Quitar este tratamiento cobrado? También se quita de Ingresos.')) return;
+        const t = p.tratamientosExtra[i];
+        p.tratamientosExtra.splice(i,1);
+        db.log = (db.log||[]).filter(r => r.ref !== t.id);
+        saveDB();
+        renderAbonos();
+    }
+
+    function reciboTratamientoExtra(i) {
+        if(!db.curr) return;
+        if(typeof ensurePdfMake === 'function' && !ensurePdfMake()) return;
+        const p = db.pats[db.curr];
+        const t = (p.tratamientosExtra || [])[i];
+        if(!t) return;
+        const cfg = sfClinicaActiva();
+        const activeD = (db.docs && db.activeDoc && db.docs[db.activeDoc]) ? db.docs[db.activeDoc] : {};
+        const accent = '#d97706';
+        const costo = parseFloat(t.costo) || 0;
+        const folio = t.id ? t.id.replace(/\D/g,'').slice(-6) : String(Date.now()).slice(-6);
+        let letras = '';
+        try { const ent = Math.floor(costo), cent = Math.round((costo-ent)*100); letras = numALetras(ent) + ' PESOS ' + String(cent).padStart(2,'0') + '/100 M.N.'; } catch(e) { letras = ''; }
+        const header = { columns:[
+            { stack:[
+                { text: cfg.cli || 'Consultorio Dental', bold:true, fontSize:15, color:accent },
+                cfg.slogan ? { text: cfg.slogan, fontSize:8, color:'#64748b' } : {},
+                cfg.address ? { text: cfg.address, fontSize:8, color:'#64748b' } : {}
+            ], width:'*' },
+            cfg.logo ? { image: cfg.logo, width:60, alignment:'right' } : { text:'', width:'auto' }
+        ]};
+        const content = [
+            header,
+            { canvas:[{type:'line',x1:0,y1:4,x2:515,y2:4,lineWidth:2,lineColor:accent}], margin:[0,3,0,10] },
+            { columns:[ { text:'RECIBO DE PAGO', fontSize:15, bold:true, color:accent }, { text:'Folio: '+folio+'\nFecha: '+t.fecha, fontSize:9, alignment:'right', color:'#64748b' } ], margin:[0,0,0,14] },
+            { text:[ {text:'Recibí de: ',bold:true}, (p.name||'—') ], fontSize:11, margin:[0,0,0,5] },
+            { text:[ {text:'La cantidad de: ',bold:true}, '$'+costo.toLocaleString('es-MX',{minimumFractionDigits:2}) + (letras ? '  ('+letras+')' : '') ], fontSize:11, margin:[0,0,0,5] },
+            { text:[ {text:'Por concepto de: ',bold:true}, (t.concepto || 'Tratamiento') ], fontSize:11, margin:[0,0,0,10] },
+            { text:'PAGADO EN SU TOTALIDAD', bold:true, fontSize:10, color:accent, margin:[0,0,0,16] }
+        ];
+        const pie = [];
+        if(activeD.name) pie.push(activeD.name + (activeD.spec ? (' — '+activeD.spec) : ''));
+        if(cfg.cofepris) pie.push('COFEPRIS: '+cfg.cofepris);
+        content.push({ columns:[ { text:'', width:'*' }, { stack:[
+            { canvas:[{type:'line',x1:0,y1:0,x2:180,y2:0,lineWidth:0.8,lineColor:'#0f172a'}] },
+            { text: (pie[0] || 'Firma y sello'), fontSize:8.5, alignment:'center', bold:true, margin:[0,3,0,0] },
+            (pie[1] ? { text:pie[1], fontSize:7.5, color:'#64748b', alignment:'center' } : {})
+        ], width:'auto' } ], margin:[0,28,0,0] });
+        content.push({ text:'Gracias por su pago.', fontSize:8, italics:true, color:'#94a3b8', alignment:'center', margin:[0,18,0,0] });
+        const doc = { pageSize:'LETTER', pageMargins:[45,40,45,55], content: content, footer: (typeof pdfFooter==='function'?pdfFooter():undefined) };
+        const filename = 'Recibo_' + (p.name||'paciente').replace(/\s+/g,'_') + '_' + folio + '.pdf';
+        const pdf = pdfMake.createPdf(doc);
+        pdf.getBlob(function(blob){
+            let shared = false;
+            try {
+                const file = new File([blob], filename, { type:'application/pdf' });
+                if(navigator.canShare && navigator.canShare({ files:[file] })) {
+                    shared = true;
+                    navigator.share({ files:[file], title:'Recibo de pago', text:`Recibo de pago — ${cfg.cli||''}` }).catch(()=>{});
+                }
+            } catch(e) { shared = false; }
+            if(!shared) { pdf.download(filename); }
+        });
     }
 
     // Si se baja el costo del plan por debajo de lo ya cobrado, avisar:
@@ -14376,7 +14735,8 @@ Reglas: español de México; terminología dental correcta; máximo 6 líneas; u
         if(!f.rfc) {
             return alert('⚠️ Este paciente no tiene datos fiscales guardados.\n\nLlena RFC, Nombre, Régimen, etc. en "Datos Fiscales del Paciente" (sección Facturación) y dale clic a Guardar — luego intenta enviar la solicitud otra vez.');
         }
-        let msg=`Solicitud de Factura.\nPaciente: ${f.nom}\nRFC: ${f.rfc}\nRégimen Fiscal: ${f.reg}\nCódigo Postal: ${f.cp}\nUso de CFDI: ${f.uso}\nMonto: $${$('facMonto').value}\nConcepto: ${$('facConcepto').value}`;
+        const fechaFactura = ($('facDate') && $('facDate').value) ? $('facDate').value : sfHoyISO();
+        let msg=`Solicitud de Factura.\nFecha del servicio: ${fechaFactura}\nPaciente: ${f.nom}\nRFC: ${f.rfc}\nRégimen Fiscal: ${f.reg}\nCódigo Postal: ${f.cp}\nUso de CFDI: ${f.uso}\nMonto: $${$('facMonto').value}\nConcepto: ${$('facConcepto').value}`;
         if(m==='wa') window.open(`https://wa.me/52${db.cfg.contPhone.replace(/\D/g,'')}?text=${encodeURIComponent(msg)}`);
         else window.open(`mailto:${db.cfg.contEmail}?subject=Factura&body=${encodeURIComponent(msg)}`);
     }
@@ -16933,7 +17293,13 @@ Reglas: español de México; terminología dental correcta; máximo 6 líneas; u
 
     // --- UI: overlay modal autónomo (respeta el estilo de la app) ---
     function sfOverlay(titulo, color){
+        // Nunca dos overlays a la vez: si ya hay uno abierto, se quita antes de
+        // abrir este. Así un aviso tardío (p. ej. "hay un guardado más nuevo")
+        // nunca se puede quedar oculto detrás de otro, dando la sensación de
+        // que un dialogo "no cierra" al hacer clic.
+        try { document.querySelectorAll('[data-sf-overlay="1"]').forEach(el => el.remove()); } catch(e){}
         const ov = document.createElement('div');
+        ov.setAttribute('data-sf-overlay', '1');
         ov.style.cssText = 'position:fixed; inset:0; background:rgba(15,23,42,0.55); z-index:99999; display:flex; align-items:center; justify-content:center; padding:1rem;';
         const card = document.createElement('div');
         card.style.cssText = 'background:white; border-radius:var(--radius-md,14px); max-width:640px; width:100%; max-height:85vh; display:flex; flex-direction:column; box-shadow:0 20px 50px rgba(0,0,0,0.35); overflow:hidden;';
@@ -17146,9 +17512,9 @@ Reglas: español de México; terminología dental correcta; máximo 6 líneas; u
             + '<div style="font-size:0.87rem; color:#475569; line-height:1.6; margin-top:3px;">En <b>Configuración → Sistema y Nube</b> puedes elegir una carpeta y se respalda solo. <i>La sincronización con Google Drive está en desarrollo: solicita el acceso a soporte@dentilike.com.mx.</i></div></div>'
             + '<div style="display:flex; gap:0.5rem; flex-wrap:wrap;">'
             + '<button class="btn" onclick="localStorage.setItem(\'sf_guia_resp\',\'1\'); backupDB();" style="background:#059669; color:white; font-weight:800; padding:0.7rem 1rem; flex:1;"><i class="fa-solid fa-download"></i> Descargar copia ahora</button>'
-            + '<button class="btn btn-outline" onclick="localStorage.setItem(\'sf_guia_resp\',\'1\'); this.closest(\'div[style*=fixed]\').remove(); openSection(\'s-ayuda\');" style="border-color:#475569; color:#475569; font-weight:800; padding:0.7rem 1rem;">Ver la guía completa</button>'
+            + '<button class="btn btn-outline" onclick="localStorage.setItem(\'sf_guia_resp\',\'1\'); this.closest(\'[data-sf-overlay]\').remove(); openSection(\'s-ayuda\');" style="border-color:#475569; color:#475569; font-weight:800; padding:0.7rem 1rem;">Ver la guía completa</button>'
             + '</div>'
-            + '<div style="text-align:center; margin-top:0.8rem;"><span onclick="localStorage.setItem(\'sf_guia_resp\',\'1\'); this.closest(\'div[style*=fixed]\').remove();" style="font-size:0.82rem; color:#94a3b8; cursor:pointer; text-decoration:underline;">Ahora no, recordármelo después</span></div>';
+            + '<div style="text-align:center; margin-top:0.8rem;"><span onclick="localStorage.setItem(\'sf_guia_resp\',\'1\'); this.closest(\'[data-sf-overlay]\').remove();" style="font-size:0.82rem; color:#94a3b8; cursor:pointer; text-decoration:underline;">Ahora no, recordármelo después</span></div>';
         } catch(e){ console.warn('guia respaldo', e); }
     }
 
@@ -17491,7 +17857,8 @@ Reglas: español de México; terminología dental correcta; máximo 6 líneas; u
         // Puede costar informacion: decide el clinico, no el reloj.
         const fFmt = t => t ? new Date(t).toLocaleString('es-MX') : 'fecha desconocida';
         try {
-            const { body } = sfOverlay('<i class="fa-solid fa-cloud-arrow-down"></i> Cual version conservas?', '#b45309');
+            window._sfConflictoAbierto = true;
+            const { body, ov } = sfOverlay('<i class="fa-solid fa-cloud-arrow-down"></i> Cual version conservas?', '#b45309');
             body.innerHTML =
                 '<p style="color:#475569; font-size:0.9rem; line-height:1.6; margin:0 0 1rem;">Los datos de tu nube y los de este equipo <b>no coinciden</b>. Para no perder nada, elige tu cual se queda.</p>'
               + '<div style="border:1px solid var(--border); border-left:4px solid #2563eb; border-radius:10px; padding:0.9rem 1.1rem; margin-bottom:0.6rem;">'
@@ -17509,20 +17876,20 @@ Reglas: español de México; terminología dental correcta; máximo 6 líneas; u
             // quede pegado) y hace el trabajo pesado justo después, mostrando el
             // avance con el avatar en vez de con una ventana bloqueante.
             let _sfSyncEligiendo = false;
-            const _cerrarYa = () => { try { const ov=document.querySelector('div[style*="z-index:99999"]'); if(ov) ov.remove(); } catch(e){} };
+            const _cerrarYa = () => { try { ov.remove(); } catch(e){} window._sfConflictoAbierto = false; };
             window.sfElegirNube = () => {
                 if(_sfSyncEligiendo) return; _sfSyncEligiendo = true;
                 _cerrarYa();
-                if(typeof daniSpeak === 'function') daniSpeak('☁️ Trayendo tus datos de la nube...', 4000, 'info');
-                setTimeout(() => { try { aplicarNube(); } catch(e){ console.warn('aplicarNube', e); sfSyncInicialPendiente = false; if(typeof daniSpeak==='function') daniSpeak('No se pudo aplicar la versión de la nube. Tus datos locales siguen intactos.', 8000, 'warn'); } }, 60);
+                if(typeof daniSpeak === 'function') daniSpeak('☁️ Guardando un respaldo de este equipo por seguridad y trayendo tus datos de la nube...', 5000, 'info');
+                setTimeout(async () => { try { await sfRespaldoAntesDeSync('Antes de traer la nube (se reemplazaron los ' + nLocal + ' pacientes de este equipo)'); aplicarNube(); } catch(e){ console.warn('aplicarNube', e); sfSyncInicialPendiente = false; if(typeof daniSpeak==='function') daniSpeak('No se pudo aplicar la versión de la nube. Tus datos locales siguen intactos.', 8000, 'warn'); } }, 60);
             };
             window.sfElegirLocal = () => {
                 if(_sfSyncEligiendo) return; _sfSyncEligiendo = true;
                 _cerrarYa();
-                if(typeof daniSpeak === 'function') daniSpeak('💻 Conservando los datos de este equipo y subiéndolos...', 5000, 'info');
-                setTimeout(() => { try { conservarLocal(); } catch(e){ console.warn('conservarLocal', e); sfSyncInicialPendiente = false; } }, 60);
+                if(typeof daniSpeak === 'function') daniSpeak('💻 Guardando un respaldo de la nube por seguridad y conservando los datos de este equipo...', 5000, 'info');
+                setTimeout(async () => { try { await sfRespaldoAntesDeSync('Antes de subir este equipo (se reemplazaron los ' + nRemoto + ' pacientes que había en la nube)'); conservarLocal(); } catch(e){ console.warn('conservarLocal', e); sfSyncInicialPendiente = false; } }, 60);
             };
-        } catch(e){ console.warn('dialogo conflicto', e); conservarLocal(); }
+        } catch(e){ console.warn('dialogo conflicto', e); window._sfConflictoAbierto = false; conservarLocal(); }
         return;
         }catch(e){ console.warn('downloadFromDrive', e); } }
     async function uploadToDrive(isNew=false) { let t=null; try{t=gapi.client.getToken();}catch(e){} if(!t) return; updateGlobalSyncStatus('syncing'); let _payload=JSON.stringify(db); const _cp=localStorage.getItem('sf_cloud_pass'); if(_cp){ try{ _payload=JSON.stringify(await sfEncrypt(_payload,_cp)); }catch(e){} } const bnd='31415926535897'; const body="\r\n--"+bnd+"\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n{\"name\":\"SmileFlow_Database.json\",\"mimeType\":\"application/json\"}\r\n--"+bnd+"\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n"+_payload+"\r\n--"+bnd+"--"; let url=isNew?'https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart':`https://www.googleapis.com/upload/drive/v3/files/${driveFileId}?uploadType=multipart`; try { let res=await fetch(url,{method:isNew?'POST':'PATCH',headers:new Headers({'Authorization':'Bearer '+t.access_token,'Content-Type':'multipart/related; boundary='+bnd}),body:body}); let val=await res.json(); if(res.ok){if(isNew){driveFileId=val.id; localStorage.setItem('sf_drive_file_id',driveFileId);} try{ localStorage.setItem('sf_drive_seen', String(val && val.modifiedTime ? new Date(val.modifiedTime).getTime() : Date.now())); }catch(e){} setTimeout(()=>{updateGlobalSyncStatus('online'); checkTopAlert();},1000);} else throw new Error(); }catch(e){updateGlobalSyncStatus('offline'); setDaniStatus('error');} }
@@ -17827,6 +18194,7 @@ function saveDB() {
     await initDB(); 
         try { sfMigrarConsultoriosYDoctores(); } catch(e) { console.error('Error migracion consultorios/doctores', e); }
         try { sfChequeoNavegador(); } catch(e) {}
+        try { sfBienvenidaCheck(); } catch(e) {}
         try { sfOnboardingCheck(); } catch(e) {}
         // Reacomodo de controles desactivado: la barra se queda como estaba.
         try { loadConfigUI(); } catch(e) { console.error("Error UI Inicial", e); }
