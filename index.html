@@ -48,17 +48,17 @@
             --radius-md: 8px; --shadow-sm: 0 1px 3px rgba(0,0,0,0.1); --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.05);
         }
 
-        .app-layout { display: flex; height: 100vh; width: 100vw; max-width: 100vw; overflow: hidden; }
+        .app-layout { display: flex; height: 100vh; width: 100vw; }
         
         /* SIDEBAR (MENÚ LATERAL) */
-        .sidebar { width: 260px; min-width: 260px; max-width: 260px; background: var(--sidebar-bg); color: var(--sidebar-text); display: flex; flex-direction: column; transition: transform 0.3s ease; z-index: 100; flex-shrink: 0; flex-grow: 0; height: 100vh; overflow: hidden; }
+        .sidebar { width: 260px; background: var(--sidebar-bg); color: var(--sidebar-text); display: flex; flex-direction: column; transition: transform 0.3s ease; z-index: 100; flex-shrink: 0; height: 100vh; overflow: hidden; }
         .sidebar-header { padding: 1.5rem; background: linear-gradient(135deg, #1f5b9e 0%, #0c4a6e 100%); color: white; display: flex; align-items: center; gap: 0.8rem; box-shadow: 0 4px 6px rgba(0,0,0,0.2); }
         .sidebar-header img { width: 35px; height: 35px; border-radius: 6px; background: white; padding: 2px; display: none; }
         .sidebar-header h2 { margin: 0; font-size: 1.2rem; font-weight: 900; line-height: 1.1; }
         .sidebar-header h2 span { display: block; font-size: 0.7rem; font-weight: 500; color: #bae6fd; letter-spacing: 0.5px; margin-top: 2px;}
         
         .nav-list { list-style: none; padding: 1rem 0; padding-bottom: 2rem; overflow-y: auto; flex-grow: 1; min-height: 0; }
-        .nav-list::-webkit-scrollbar { width: 6px; } .nav-list::-webkit-scrollbar-track { background: rgba(255,255,255,0.08); } .nav-list::-webkit-scrollbar-thumb { background: #ffffff; opacity: 0.6; border-radius: 10px; } .nav-list { scrollbar-color: #ffffff rgba(255,255,255,0.08); }
+        .nav-list::-webkit-scrollbar { width: 6px; } .nav-list::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
         .nav-label { padding: 1rem 1.5rem 0.5rem; font-size: 0.7rem; font-weight: 800; color: #64748b; text-transform: uppercase; letter-spacing: 1px; }
         
         .nav-item { padding: 0.8rem 1.5rem; cursor: pointer; display: flex; align-items: center; justify-content: space-between; gap: 10px; transition: all 0.2s; border-left: 4px solid transparent; font-size: 0.95rem; font-weight: 500;}
@@ -80,15 +80,15 @@
         @keyframes slideDown { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
 
         /* ÁREA CENTRAL Y TOPBAR */
-        .main-wrapper { flex-grow: 1; flex-shrink: 1; min-width: 0; width: 0; display: flex; flex-direction: column; height: 100vh; overflow: hidden; position: relative; }
-        .topbar { background: white; min-height: 70px; min-width: 0; max-width: 100%; padding: 0 1.5rem; display: flex; align-items: center; justify-content: space-between; box-shadow: var(--shadow-sm); z-index: 10; gap: 1rem; border-bottom: 1px solid var(--border); flex-wrap: wrap; }
+        .main-wrapper { flex-grow: 1; display: flex; flex-direction: column; height: 100vh; overflow: hidden; position: relative; }
+        .topbar { background: white; min-height: 70px; padding: 0 1.5rem; display: flex; align-items: center; justify-content: space-between; box-shadow: var(--shadow-sm); z-index: 10; gap: 1rem; border-bottom: 1px solid var(--border); }
         .top-alert { background: var(--danger-text); color: white; text-align: center; padding: 0.6rem; font-weight: 700; font-size: 0.85rem; display: none; width: 100%; z-index: 20;}
         .menu-toggle { font-size: 1.5rem; cursor: pointer; color: var(--text-muted); display: none; padding: 0.5rem; }
         .menu-toggle:hover { color: var(--primary); }
 
-        .search-area { display: flex; align-items: center; gap: 0.8rem; flex-grow: 1; min-width: 0; max-width: 600px; background: #f1f5f9; padding: 0.4rem 0.8rem; border-radius: var(--radius-md); border: 1px solid var(--border); }
+        .search-area { display: flex; align-items: center; gap: 0.8rem; flex-grow: 1; max-width: 600px; background: #f1f5f9; padding: 0.4rem 0.8rem; border-radius: var(--radius-md); border: 1px solid var(--border); }
         .search-area i { color: var(--text-muted); }
-        .search-input { border: none; background: transparent; outline: none; width: 100%; min-width: 40px; font-size: 0.95rem; font-weight: 500; color: var(--text); }
+        .search-input { border: none; background: transparent; outline: none; width: 100%; font-size: 0.95rem; font-weight: 500; color: var(--text); }
         .search-select { border: none; background: white; padding: 0.4rem; border-radius: 4px; font-weight: 700; color: var(--primary-dark); outline: none; cursor: pointer; flex-shrink: 0; max-width: 200px; box-shadow: var(--shadow-sm); }
         
         .topbar-actions { display: flex; align-items: center; gap: 1rem; }
@@ -104,7 +104,7 @@
         .sync-badge:hover { filter: brightness(0.95); transform: translateY(-1px); box-shadow: var(--shadow-sm);}
 
         /* ESTRUCTURA DE PANTALLAS */
-        .content-area { flex-grow: 1; min-width: 0; max-width: 100%; padding: 2rem; padding-bottom: 140px; overflow-y: auto; overflow-x: hidden; background: var(--bg); position: relative; -webkit-overflow-scrolling: touch; }
+        .content-area { flex-grow: 1; padding: 2rem; padding-bottom: 140px; overflow-y: auto; background: var(--bg); position: relative; -webkit-overflow-scrolling: touch; }
         .content-area::-webkit-scrollbar { width: 8px; } .content-area::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
         .app-section { display: none; animation: fadeIn 0.3s cubic-bezier(0.4, 0, 0.2, 1); max-width: 1100px; margin: 0 auto; }
         .app-section.active { display: block; }
@@ -581,7 +581,7 @@ window._pdfReady=true;
         <h2 style="margin: 0 !important; font-size: 1.5rem !important; color: white !important;">SmileFlow</h2>
         <a href="https://www.dentilike.com.mx" target="_blank" style="color: #bae6fd; font-size: 0.75rem; text-decoration: none; font-weight: 600; cursor: pointer; transition: color 0.2s;" onmouseover="this.style.color='white'" onmouseout="this.style.color='#bae6fd'">www.dentilike.com.mx</a>
         <a href="mailto:soporte@dentilike.com.mx" style="color: #bae6fd; font-size: 0.75rem; text-decoration: none; font-weight: 600; cursor: pointer; transition: color 0.2s;" onmouseover="this.style.color='white'" onmouseout="this.style.color='#bae6fd'">soporte@dentilike.com.mx</a>
-<span style="color:#7dd3fc; font-size:0.62rem; opacity:0.8; margin-top:2px;">© 2026 Dentilike · Todos los derechos reservados · <b id="sfVersion">v121</b></span>
+<span style="color:#7dd3fc; font-size:0.62rem; opacity:0.8; margin-top:2px;">© 2026 Dentilike · Todos los derechos reservados · <b id="sfVersion">v114</b></span>
     </div></div>
 <!-- Doctor en sesion: informativo, lleva a Configuracion para cambiarlo -->
 <div id="sideDocBox" onclick="openSection('s-admin-id', document.querySelector('.nav-item[onclick*=&quot;s-admin-id&quot;]'))" title="Doctor en sesion. Toca para cambiarlo o editar el perfil." style="margin:0 12px 10px; padding:0.7rem 0.85rem; background:rgba(255,255,255,0.07); border:1px solid rgba(125,211,252,0.28); border-left:3px solid #5DC1BF; border-radius:10px; cursor:pointer; display:flex; align-items:center; gap:0.6rem;">
@@ -748,10 +748,11 @@ window._pdfReady=true;
 </div>
 </header>
 <main class="content-area">
-<div id="sfPatientBar" style="position:relative; z-index:2; background:var(--card); border-radius:14px; box-shadow:var(--shadow-sm); border:1px solid var(--border); padding:1rem 1.2rem; margin-bottom:1.5rem; display:block; width:100%; box-sizing:border-box; overflow:hidden;">
-<h2 id="lblId" style="color:var(--primary-dark); margin:0; font-size:1.35rem; font-weight:800; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; display:flex; align-items:center; gap:0.5rem;"><i class="fa-solid fa-address-card" style="flex-shrink:0;"></i> <span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">Nuevo Paciente</span></h2>
+<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem; border-bottom: 2px solid var(--border); padding-bottom:1rem;">
+<h2 id="lblId" style="color:var(--primary-dark); margin:0; font-size:1.6rem; font-weight:800;"><i class="fa-solid fa-address-card"></i> Nuevo Paciente</h2>
+</div>
 <!-- Acceso rápido del paciente: acciones de cada cita, sin escarbar el menú -->
-<div id="sfQuickBar" style="display:none; flex-wrap:wrap; gap:0.5rem; margin-top:0.9rem;">
+<div id="sfQuickBar" style="display:none; flex-wrap:wrap; gap:0.5rem; margin:-0.9rem 0 1.3rem 0;">
 <div style="position:relative; display:inline-block;">
 <button onclick="sfMenuNota(event)" style="border:none; border-radius:10px; padding:0.55rem 0.9rem; font-weight:800; font-size:0.85rem; cursor:pointer; display:inline-flex; align-items:center; gap:0.4rem; white-space:nowrap; background:#1f5b9e; color:white;" title="Nota clínica de hoy"><i class="fa-solid fa-notes-medical"></i> Nota <i class="fa-solid fa-caret-down" style="font-size:0.75rem;"></i></button>
 <div id="sfNotaMenu" style="display:none; position:absolute; top:calc(100% + 4px); left:0; z-index:50; background:white; border:1px solid var(--border); border-radius:10px; box-shadow:0 8px 24px rgba(0,0,0,0.15); overflow:hidden; min-width:200px;">
@@ -766,7 +767,6 @@ window._pdfReady=true;
 <button onclick="sfQuickGo('s-odontograma')" style="border:none; border-radius:10px; padding:0.55rem 0.9rem; font-weight:800; font-size:0.85rem; cursor:pointer; display:inline-flex; align-items:center; gap:0.4rem; white-space:nowrap; background:#0891b2; color:white;" title="Odontograma"><i class="fa-solid fa-teeth-open"></i> Odontograma</button>
 <button onclick="sfQuickGo('s-tratamientos')" style="border:none; border-radius:10px; padding:0.55rem 0.9rem; font-weight:800; font-size:0.85rem; cursor:pointer; display:inline-flex; align-items:center; gap:0.4rem; white-space:nowrap; background:#059669; color:white;" title="Plan de tratamiento"><i class="fa-solid fa-list-check"></i> Plan</button>
 <button onclick="sfQuickGo('s-cobros','listaAbonos')" style="border:none; border-radius:10px; padding:0.55rem 0.9rem; font-weight:800; font-size:0.85rem; cursor:pointer; display:inline-flex; align-items:center; gap:0.4rem; white-space:nowrap; background:#b45309; color:white;" title="Registrar abono o cobro"><i class="fa-solid fa-cash-register"></i> Cobro</button>
-</div>
 </div>
 <div class="app-section active" id="s-inicio">
 <div style="background:linear-gradient(135deg, var(--primary), var(--secondary)); color:white; border-radius:14px; padding:1.2rem 1.5rem; margin-bottom:1.2rem; box-shadow:0 6px 16px rgba(31,91,158,0.22); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.8rem;">
@@ -1324,7 +1324,7 @@ window._pdfReady=true;
 </div>
 </div>
 
-<div class="app-section" id="s-hcgeneral" onchange="sfGuardarHCGeneralAuto()">
+<div class="app-section" id="s-hcgeneral">
 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.2rem; background:white; padding:1.2rem; border-radius:var(--radius-md); border:1px solid var(--border); box-shadow:var(--shadow-sm); border-left:5px solid #7c3aed; flex-wrap:wrap; gap:1rem;">
 <div>
 <h3 style="margin:0 0 0.3rem 0; color:#6d28d9; font-size:1.3rem; font-weight:800;"><i class="fa-solid fa-heart-pulse"></i> Historia Clínica General</h3>
@@ -1761,22 +1761,31 @@ AVISO PRÓX. CITA (Recordatorio local):
 <div style="background:#eff6ff; border:1px dashed #bae6fd; color:#1e40af; padding:0.7rem 1rem; border-radius:8px; margin-bottom:1.2rem; font-size:0.8rem; line-height:1.5;">
 <i class="fa-solid fa-lock"></i> Sección confidencial: evita mostrar esta pantalla al paciente o asistente.
 </div>
-<div id="accAbonos" style="display:block;">
+<!-- ABONOS Y DEUDAS (control de pagos del paciente) -->
+<h3 onclick="toggleAccordion('accAbonos', this)" style="color:var(--secondary-dark); font-size:1.15rem; border-bottom:2px solid #cffafe; padding-bottom:0.7rem; margin-bottom:1.2rem; margin-top:2rem; display:flex; align-items:center; gap:0.7rem; cursor:pointer; user-select:none;">
+    <span style="background:linear-gradient(135deg, var(--secondary), var(--secondary-dark)); color:white; width:36px; height:36px; border-radius:10px; display:inline-flex; align-items:center; justify-content:center; font-size:0.95rem;"><i class="fa-solid fa-money-bill-wave"></i></span>
+    Abonos y Deudas
+    <i class="fa-solid fa-chevron-down acc-chevron" style="margin-left:auto; font-size:0.9rem; color:#94a3b8; transition:transform 0.3s;"></i>
+</h3>
+<div id="accAbonos" style="display:none;">
 <div style="background:#f0fdfa; border:1px solid #99f6e4; border-radius:10px; padding:1.2rem; margin-bottom:1rem;">
-<label style="font-size:0.85rem; font-weight:800; color:var(--secondary-dark); display:flex; align-items:center; gap:0.4rem; margin-bottom:0.8rem;"><i class="fa-solid fa-layer-group"></i> Planes de Tratamiento <span style="font-weight:400; font-size:0.72rem; color:#0f766e;">(brackets, corona, implante… cada uno con su propio costo y abonos)</span></label>
-<div id="listaPlanes"></div>
-<div style="background:white; border:1px dashed #5eead4; border-radius:8px; padding:0.8rem; margin-top:0.6rem;">
-<div style="font-size:0.78rem; font-weight:700; color:var(--secondary-dark); margin-bottom:0.4rem;"><i class="fa-solid fa-circle-plus"></i> Agregar nuevo plan</div>
-<input class="input-field" id="planNuevoConcepto" type="text" placeholder="Concepto (ej. Colocación de brackets metálicos)" style="padding:0.5rem; margin-bottom:0.4rem;"/>
+<div class="grid-2" style="gap:0.7rem; margin-bottom:1rem;">
+<div class="input-group" style="margin:0;">
+<label style="font-size:0.82rem;"><i class="fa-solid fa-sack-dollar"></i> Costo total del tratamiento ($)</label>
+<input class="input-field" id="pCostoTotal" type="number" oninput="recalcSaldo(); triggerUnsavedWarning()" onchange="sfAvisarBajaPlan(); sfGuardarCostoTotal();" placeholder="0" style="padding:0.5rem;"/>
+</div>
+<div class="input-group" style="margin:0;">
+<label style="font-size:0.82rem;"><i class="fa-solid fa-circle-plus"></i> Registrar nuevo abono</label>
+<input class="input-field" id="pNuevoConcepto" type="text" placeholder="Concepto (ej. Colocación de brackets metálicos)" style="padding:0.5rem; margin-bottom:0.4rem;"/>
 <div style="display:flex; gap:0.4rem;">
-<input class="input-field" id="planNuevoCosto" type="number" placeholder="Costo total del plan $" style="padding:0.5rem;"/>
-<button class="btn btn-success" type="button" onclick="agregarPlanTratamiento()" style="padding:0.5rem 0.9rem; white-space:nowrap;"><i class="fa-solid fa-plus"></i></button>
+<input class="input-field" id="pNuevoAbono" type="number" placeholder="Monto $" style="padding:0.5rem;"/>
+<button class="btn btn-success" type="button" onclick="agregarAbono()" style="padding:0.5rem 0.9rem; white-space:nowrap;"><i class="fa-solid fa-plus"></i></button>
 </div>
-</div>
-<label style="display:flex; align-items:center; gap:0.4rem; font-size:0.78rem; color:#0f766e; margin-top:0.7rem; cursor:pointer;">
+<label style="display:flex; align-items:center; gap:0.4rem; font-size:0.78rem; color:#0f766e; margin-top:0.5rem; cursor:pointer;">
 <input id="pAbonoPideFactura" style="width:16px; height:16px; accent-color:#0f766e;" type="checkbox"/>
-🧾 El próximo abono que registre pidió factura
+🧾 Pidió factura
 </label>
+</div>
 </div>
 <div class="hidden" id="fbAvisoFacturaCobros" style="background:#fff7ed; border:1px solid #fdba74; border-left:4px solid #ea580c; border-radius:8px; padding:0.7rem 1rem; margin-bottom:1rem; font-size:0.82rem; color:#9a3412;"></div>
 <div style="background:#fffbeb; border:1px solid #fde68a; border-radius:10px; padding:1.2rem; margin-bottom:1rem;">
@@ -1824,7 +1833,6 @@ AVISO PRÓX. CITA (Recordatorio local):
 </div>
 
 <button class="btn btn-outline" type="button" onclick="panelCorteDelDia()" style="width:100%; margin-bottom:1rem; font-weight:800;"><i class="fa-solid fa-cash-register"></i> Ver abonos del dia (corte de caja)</button>
-<button class="btn btn-outline" type="button" onclick="sfResumenDiaWA()" style="width:100%; margin-bottom:1rem; font-weight:800; border-color:#059669; color:#059669;"><i class="fa-brands fa-whatsapp"></i> Enviar resumen del día completo</button>
 
 <!-- Historial de abonos -->
 <div id="listaAbonos" style="font-size:0.85rem;"></div>
@@ -3781,9 +3789,7 @@ SmileFlow <b>no es un Expediente Clínico Electrónico certificado</b> conforme 
 <div style="margin-bottom: 2rem;">
 <h4 id="help-respaldo" style="color:#0f172a; font-size:1.1rem; border-bottom:2px solid #e2e8f0; padding-bottom:0.5rem; margin-bottom:1rem;"><i class="fa-solid fa-shield-halved" style="color:#059669;"></i> Respaldos: protege la información de tus pacientes</h4>
 <button class="btn" onclick="sfOnboarding()" style="background:#1d4ed8; color:white; font-weight:800; padding:0.6rem 1rem; margin-bottom:1rem;"><i class="fa-solid fa-wand-magic-sparkles"></i> Abrir el asistente guiado</button>
-<button class="btn" onclick="sfIniciarTour()" style="background:#0d9488; color:white; font-weight:800; padding:0.6rem 1rem; margin-bottom:1rem; margin-left:0.5rem;"><i class="fa-solid fa-route"></i> Ver el tour guiado de nuevo</button>
 <div style="background:#fffbeb; border:1px solid #fde68a; border-radius:8px; padding:0.8rem 1rem; margin-bottom:1rem; font-size:0.88rem; color:#92400e; line-height:1.6;"><b><i class="fa-solid fa-triangle-exclamation"></i> Lo más importante que debes saber:</b> tus datos viven en <b>este dispositivo</b>. Si se pierde, se daña o borras los datos del navegador, la información se va con él. El respaldo es tu única red de seguridad real.</div>
-<div style="background:#fef2f2; border:1px solid #fecaca; border-radius:8px; padding:0.8rem 1rem; margin-bottom:1rem; font-size:0.84rem; color:#7f1d1d; line-height:1.6;"><b><i class="fa-solid fa-scale-balanced"></i> Aviso de responsabilidad:</b> SmileFlow es una herramienta que ayuda a organizar tu consultorio, no un servicio de almacenamiento garantizado. No nos hacemos responsables por pérdida de información derivada de fallas del dispositivo, del navegador, borrado accidental o falta de respaldo. Por eso se recomienda respaldar seguido y mantener siempre un archivo local actualizado, además de la nube.</div>
 <p style="line-height:1.6; color:#475569;">Tienes tres formas de respaldar, y no son excluyentes. Lo ideal es usar al menos dos.</p>
 
 <div style="border:1px solid var(--border); border-left:4px solid #059669; border-radius:10px; padding:1rem 1.2rem; margin-bottom:0.8rem;">
@@ -4500,22 +4506,6 @@ No hay forma de recuperarlo: el cifrado es real y ni nosotros podemos abrirlo. G
             sfOnbPaso(1);
         } catch(e){ console.warn('onboarding', e); }
     }
-    // Avisa si Drive esta conectado pero llevan varios dias sin subir un
-    // respaldo — para enterarse ANTES de que sea un problema, no despues.
-    function sfRevisarSyncAtrasado(){
-        try {
-            if(!sfTokenDrive()) return;
-            const last = localStorage.getItem('sf_last_cloud_save');
-            const dias = last ? (Date.now() - new Date(last).getTime()) / 86400000 : 999;
-            if(dias >= 3){
-                const txt = last
-                    ? `☁️ Llevas ${Math.floor(dias)} días sin subir tus datos a la nube. Sube un respaldo cuando puedas, para no quedarte sin red de seguridad.`
-                    : '☁️ Tienes la nube conectada pero aún no se ha subido ningún respaldo desde este dispositivo.';
-                if(typeof daniSpeak === 'function') daniSpeak(txt, 10000, 'warn');
-            }
-        } catch(e){}
-    }
-
     function sfOnboardingCheck(){
         try {
             if(localStorage.getItem('sf_onboard_v2')) return;
@@ -5488,9 +5478,10 @@ db = {
                         filas.push({ id:pid, n:p.name, d: dinero(parseFloat(t.costo)||0) + ' · ' + (t.concepto||'Tratamiento') + ' (aparte)', orden: -(parseFloat(t.costo)||0) });
                     });
                 } else if(tipo === 'adeudo'){
-                    const cc = sfCuenta(p);
-                    const deuda = cc.saldo;
-                    if(deuda > 0) filas.push({ id:pid, n:p.name, d:'Debe ' + dinero(deuda) + ' de ' + dinero(cc.total), orden: -deuda });
+                    const costo = parseFloat(p.costoTotal) || 0;
+                    const abonado = (p.abonos || []).reduce((s,a)=>s+(parseFloat(a.monto)||0),0);
+                    const deuda = costo - abonado;
+                    if(deuda > 0) filas.push({ id:pid, n:p.name, d:'Debe ' + dinero(deuda) + ' de ' + dinero(costo), orden: -deuda });
                 } else if(tipo === 'debelabs'){
                     (p.ordenesLab || []).forEach(o => {
                         const sdo = parseFloat(o.saldo) || 0;
@@ -5499,11 +5490,10 @@ db = {
                         filas.push({ id:pid, n:p.name, d: dinero(sdo) + ' a ' + lab + (o.subtipo ? (' · '+o.subtipo) : ''), orden: -sdo });
                     });
                 } else if(tipo === 'creditopac'){
-                    sfMigrarPlanesPaciente(p);
-                    (p.planes || []).forEach(pl => {
-                        const c = sfCuentaPlan(p, pl.id);
-                        if(c.saldo < 0) filas.push({ id:pid, n:p.name, d:'A favor: ' + dinero(Math.abs(c.saldo)) + ' en "' + (pl.concepto||'su plan') + '"', orden: c.saldo });
-                    });
+                    const costo = (parseFloat(p.costoTotal)||0) + (p.cargos||[]).reduce((s,c)=>s+(parseFloat(c.monto)||0),0);
+                    const abonado = (p.abonos || []).reduce((s,a)=>s+(parseFloat(a.monto)||0),0);
+                    const dif = abonado - costo;
+                    if(dif > 0) filas.push({ id:pid, n:p.name, d:'A favor: ' + dinero(dif), orden: -dif });
                 }
             });
             filas.sort((a,b)=>{
@@ -5571,7 +5561,9 @@ db = {
         let totalPend = pend.length;
         let conAdeudo = 0, porCobrar = 0;
         Object.values(db.pats || {}).forEach(p => {
-            const deuda = sfCuenta(p).saldo;
+            const costo = parseFloat(p.costoTotal) || 0;
+            const abonado = (p.abonos || []).reduce((s,a)=>s+(parseFloat(a.monto)||0),0);
+            const deuda = costo - abonado;
             if(deuda > 0) { conAdeudo++; porCobrar += deuda; }
         });
         const fmt = n => '$' + n.toLocaleString('es-MX');
@@ -5627,20 +5619,14 @@ db = {
             const sdo = parseFloat(o.saldo) || 0;
             if(sdo > 0) { debemosLabs += sdo; ordenesConSaldo++; }
         }); });
-        // Credito a favor de pacientes: se revisa PLAN POR PLAN (no contra el
-        // total agregado), porque un paciente puede tener abonos sin plan
-        // formal (pagos sueltos de antes de que existieran los planes) que NO
-        // representan un sobrepago - solo dinero recibido sin un total que
-        // comparar. Comparar en bloque los marcaba a todos como "a favor".
+        // Credito a favor de pacientes: abonaron mas de lo que costaba su plan
+        // + cargos extra (sin contar tratamientos aparte, que ya se liquidan solos).
         let creditoPacientes = 0, pacientesConCredito = 0;
         Object.values(db.pats || {}).forEach(p => {
-            sfMigrarPlanesPaciente(p);
-            let creditoDeEste = 0;
-            (p.planes || []).forEach(pl => {
-                const c = sfCuentaPlan(p, pl.id);
-                if(c.saldo < 0) creditoDeEste += Math.abs(c.saldo);
-            });
-            if(creditoDeEste > 0) { creditoPacientes += creditoDeEste; pacientesConCredito++; }
+            const costo = (parseFloat(p.costoTotal)||0) + (p.cargos||[]).reduce((s,c)=>s+(parseFloat(c.monto)||0),0);
+            const abonado = (p.abonos || []).reduce((s,a)=>s+(parseFloat(a.monto)||0),0);
+            const dif = abonado - costo;
+            if(dif > 0) { creditoPacientes += dif; pacientesConCredito++; }
         });
         const tarjeta = (icon, valor, etiqueta, color, bg, tipo) => `
             <div ${tipo?`onclick="sfDetalleKPI('${tipo}')" title="Toca para ver el detalle"`:''} style="background:${bg}; border:1px solid ${color}33; border-radius:12px; padding:1rem; text-align:center; ${tipo?'cursor:pointer; transition:transform .12s, box-shadow .12s;':''}" ${tipo?'onmouseover="this.style.transform=\'translateY(-2px)\';this.style.boxShadow=\'0 6px 14px rgba(0,0,0,0.10)\';" onmouseout="this.style.transform=\'\';this.style.boxShadow=\'\';"':''}>
@@ -12084,46 +12070,15 @@ ${patientText}`;
     function sfSuma(lista){ return (lista||[]).reduce((a,x)=>a + (parseFloat(x.monto)||0), 0); }
 
     // Cuenta completa del paciente en un solo lugar.
-    // Migra al modelo de "varios planes" a un paciente que aun trae el Costo
-    // Total viejo (un solo numero). No se pierde nada: el costo y los abonos
-    // que ya tenia se vuelven su primer plan, tal cual estaban.
-    function sfMigrarPlanesPaciente(p){
-        if(!p || p.planes) return;
-        p.planes = [];
-        const costoViejo = parseFloat(p.costoTotal) || 0;
-        // Solo se crea un plan migrado si de verdad habia un total capturado.
-        // Si el paciente solo tiene abonos sueltos sin un total nunca definido
-        // (pagos de antes de que existieran los planes), se dejan sin plan:
-        // forzarlos a un plan de "$0" los hacia ver como "sobrepago" en el
-        // tablero de creditos, cuando en realidad nunca hubo nada que comparar.
-        if(costoViejo > 0){
-            const planId = 'plan_' + (p.id || 'x') + '_migrado';
-            const abonosSinPlan = (p.abonos || []).filter(a => !a.planId);
-            p.planes.push({ id: planId, concepto: p.brackets || 'Plan de tratamiento', costoTotal: costoViejo, creado: sfHoyMX() });
-            abonosSinPlan.forEach(a => { a.planId = planId; });
-        }
-    }
-
     function sfCuenta(p){
         p = p || (db.curr ? db.pats[db.curr] : null);
-        if(p) sfMigrarPlanesPaciente(p);
-        const planes  = (p && p.planes) ? p.planes : [];
+        const plan    = parseFloat($('pCostoTotal') ? $('pCostoTotal').value : 0) || 0;
         const cargos  = (p && p.cargos) ? p.cargos : [];
         const abonos  = (p && p.abonos) ? p.abonos : [];
-        const plan    = planes.reduce((s,pl)=>s+(parseFloat(pl.costoTotal)||0), 0);
         const extra   = sfSuma(cargos);
         const abonado = sfSuma(abonos);
         const total   = plan + extra;
-        return { plan, extra, total, abonado, saldo: total - abonado, cargos, abonos, planes };
-    }
-
-    // Cuenta de UN plan especifico (para su tarjeta y su recibo individual)
-    function sfCuentaPlan(p, planId){
-        const plan = (p.planes || []).find(pl => pl.id === planId) || { costoTotal: 0, concepto: '' };
-        const abonosDelPlan = (p.abonos || []).filter(a => a.planId === planId);
-        const abonado = sfSuma(abonosDelPlan);
-        const total = parseFloat(plan.costoTotal) || 0;
-        return { plan, total, abonado, saldo: total - abonado, abonos: abonosDelPlan };
+        return { plan, extra, total, abonado, saldo: total - abonado, cargos, abonos };
     }
 
     function recalcSaldo() {
@@ -12201,40 +12156,8 @@ ${patientText}`;
             (p.abonos || []).forEach(a => {
                 if(a.fecha === dia) filas.push({ paciente: p.name || 'Sin nombre', monto: parseFloat(a.monto)||0, concepto: a.concepto || '' });
             });
-            (p.tratamientosExtra || []).forEach(t => {
-                if(t.fecha === dia) filas.push({ paciente: p.name || 'Sin nombre', monto: parseFloat(t.costo)||0, concepto: (t.concepto || 'Tratamiento') + ' (aparte)' });
-            });
         });
         return { dia, filas, total: filas.reduce((t,f)=>t+f.monto, 0) };
-    }
-
-    // Resumen completo del dia (no solo lo cobrado): para saber de un vistazo
-    // como va el consultorio antes de cerrar, y poder mandarlo por WhatsApp.
-    function sfResumenDelDia(){
-        const hoyISO = sfHoyISO();
-        const corte = sfCorteDelDia();
-        const pacientesHoy = new Set();
-        let conAdeudo = 0, porCobrar = 0, citasHoy = 0;
-        Object.values(db.pats || {}).forEach(p => {
-            (p.abonos||[]).forEach(a => { if(a.fecha === corte.dia) pacientesHoy.add(p.name); });
-            (p.tratamientosExtra||[]).forEach(t => { if(t.fecha === corte.dia) pacientesHoy.add(p.name); });
-            (p.notas||[]).forEach(n => { if(n.f === hoyISO) pacientesHoy.add(p.name); });
-            if(p.nextAppt === hoyISO) citasHoy++;
-            const deuda = sfCuenta(p).saldo;
-            if(deuda > 0) { conAdeudo++; porCobrar += deuda; }
-        });
-        return { dia: corte.dia, totalCobrado: corte.total, movimientos: corte.filas.length, pacientesAtendidos: pacientesHoy.size, citasHoy, conAdeudo, porCobrar };
-    }
-
-    function sfResumenDiaWA(){
-        const r = sfResumenDelDia();
-        const fmt = n => '$' + n.toLocaleString('es-MX');
-        let t = `*Resumen del día — ${r.dia}*\n\n`;
-        t += `💰 Cobrado hoy: ${fmt(r.totalCobrado)} (${r.movimientos} movimiento(s))\n`;
-        t += `🧑‍⚕️ Pacientes atendidos: ${r.pacientesAtendidos}\n`;
-        if(r.citasHoy) t += `📅 Citas de hoy: ${r.citasHoy}\n`;
-        t += `⚠️ Pacientes con adeudo: ${r.conAdeudo} (${fmt(r.porCobrar)} por cobrar)`;
-        window.open('https://wa.me/?text=' + encodeURIComponent(t), '_blank');
     }
 
     function panelCorteDelDia(){
@@ -12279,12 +12202,11 @@ ${patientText}`;
     }
 
     function renderAbonos() {
-        renderPlanes();
         const cont = $('listaAbonos');
         if(!cont) return;
         const p = db.curr ? db.pats[db.curr] : null;
         const abonos = (p && p.abonos) ? p.abonos : [];
-        if(abonos.length === 0) { cont.innerHTML = '<div style="color:#94a3b8; font-style:italic; font-size:0.8rem;">Sin abonos registrados aún.</div>'; recalcSaldo(); sfRenderAvisoFactura(); renderTratamientosExtra(); return; }
+        if(abonos.length === 0) { cont.innerHTML = '<div style="color:#94a3b8; font-style:italic; font-size:0.8rem;">Sin abonos registrados aún.</div>'; recalcSaldo(); return; }
         cont.innerHTML = '<div style="font-weight:700; color:var(--secondary-dark); font-size:0.8rem; margin-bottom:0.4rem;">Historial de abonos:</div>' +
             abonos.map((a,i)=>`<div style="display:flex; justify-content:space-between; align-items:center; background:white; border:1px solid #99f6e4; border-radius:6px; padding:0.4rem 0.7rem; margin-bottom:0.3rem;">
                 <span style="flex:1; min-width:0;"><i class="fa-solid fa-receipt" style="color:#059669;"></i> <b>$${(parseFloat(a.monto)||0).toLocaleString('es-MX')}</b> <span style="color:#94a3b8; font-size:0.78rem;">— ${a.fecha}</span>${a.concepto?`<div style="font-size:0.75rem; color:#475569; margin-left:1.2rem;">${a.concepto}</div>`:''}</span>
@@ -12424,109 +12346,26 @@ ${patientText}`;
         } catch(e){}
     }
 
-    // ===== PLANES DE TRATAMIENTO (varios por paciente) =====
-    function renderPlanes(){
-        const cont = $('listaPlanes');
-        if(!cont) return;
-        const p = db.curr ? db.pats[db.curr] : null;
-        if(!p){ cont.innerHTML = ''; return; }
-        sfMigrarPlanesPaciente(p);
-        const planes = p.planes || [];
-        if(!planes.length){ cont.innerHTML = '<div style="color:#94a3b8; font-style:italic; font-size:0.8rem; margin-bottom:0.4rem;">Sin planes todavía. Agrega el primero abajo.</div>'; return; }
-        cont.innerHTML = planes.map(pl => {
-            const c = sfCuentaPlan(p, pl.id);
-            const pct = c.total > 0 ? Math.min(100, Math.round((c.abonado / c.total) * 100)) : 100;
-            const liquidado = c.saldo <= 0;
-            return `<div style="background:white; border:1px solid #99f6e4; border-radius:10px; padding:0.9rem 1rem; margin-bottom:0.7rem; box-shadow:0 1px 2px rgba(15,23,42,0.04); transition:box-shadow .15s;">
-                <div onclick="sfTogglePlanBox('${pl.id}')" style="display:flex; justify-content:space-between; align-items:center; gap:0.6rem; cursor:pointer; user-select:none;" onmouseover="this.style.opacity=0.75" onmouseout="this.style.opacity=1">
-                    <div style="flex:1; min-width:0;">
-                        <div style="display:flex; align-items:center; gap:0.5rem;">
-                            ${liquidado ? '<i class="fa-solid fa-circle-check" style="color:#059669; font-size:0.9rem;"></i>' : ''}
-                            <b style="color:#0f766e; font-size:0.94rem;">${pl.concepto||'Plan de tratamiento'}</b>
-                        </div>
-                        <div style="font-size:0.78rem; color:${liquidado?'#059669':'#dc2626'}; font-weight:700; margin-top:3px;">
-                            ${liquidado ? 'Liquidado ($'+c.total.toLocaleString('es-MX')+')' : 'Debe $'+c.saldo.toLocaleString('es-MX')+' de $'+c.total.toLocaleString('es-MX')}
-                        </div>
-                        <div style="background:#e2e8f0; border-radius:6px; height:5px; margin-top:6px; overflow:hidden; max-width:220px;">
-                            <div style="background:${liquidado?'#059669':'#2dd4bf'}; height:100%; width:${pct}%; border-radius:6px; transition:width .3s;"></div>
-                        </div>
-                    </div>
-                    <span style="display:flex; align-items:center; gap:0.9rem; flex-shrink:0;">
-                        <i class="fa-solid fa-xmark" onclick="event.stopPropagation(); eliminarPlanTratamiento('${pl.id}')" style="cursor:pointer; color:#cbd5e1; font-size:0.9rem;" title="Eliminar plan" onmouseover="this.style.color='#ef4444'" onmouseout="this.style.color='#cbd5e1'"></i>
-                        <i class="fa-solid fa-chevron-down" id="chev_${pl.id}" style="color:#94a3b8; font-size:0.85rem; transition:transform .2s;"></i>
-                    </span>
-                </div>
-                <div class="hidden" id="planBox_${pl.id}" style="margin-top:0.8rem; padding-top:0.8rem; border-top:1px dashed #cbd5e1;">
-                <div style="display:flex; gap:0.9rem; flex-wrap:wrap; font-size:0.78rem; color:#475569; margin-bottom:0.7rem;">
-                    <span>Total: <b>$${c.total.toLocaleString('es-MX')}</b></span>
-                    <span>Abonado: <b style="color:#059669;">$${c.abonado.toLocaleString('es-MX')}</b></span>
-                    <span>Debe: <b style="color:${liquidado?'#059669':'#dc2626'};">$${c.saldo.toLocaleString('es-MX')}</b></span>
-                </div>
-                <div style="display:flex; gap:0.4rem;">
-                    <input class="input-field" id="abonoMonto_${pl.id}" type="number" placeholder="Monto a abonar $" style="padding:0.5rem;"/>
-                    <button class="btn btn-success" type="button" onclick="abonarPlanTratamiento('${pl.id}')" style="padding:0.5rem 0.9rem; white-space:nowrap;"><i class="fa-solid fa-plus"></i></button>
-                </div>
-                </div>
-            </div>`;
-        }).join('');
-    }
-
-    function sfTogglePlanBox(planId){
-        const box = document.getElementById('planBox_'+planId);
-        const chev = document.getElementById('chev_'+planId);
-        if(!box) return;
-        const abrir = box.classList.contains('hidden');
-        box.classList.toggle('hidden', !abrir);
-        if(chev) chev.style.transform = abrir ? 'rotate(180deg)' : '';
-    }
-
-    function agregarPlanTratamiento(){
+    function agregarAbono() {
         if(!db.curr) return alert("Selecciona o guarda un paciente primero.");
-        const concepto = $('planNuevoConcepto') ? $('planNuevoConcepto').value.trim() : '';
-        const costo = parseFloat($('planNuevoCosto').value) || 0;
-        if(!concepto) return alert("Escribe el concepto del plan (ej. Brackets metálicos).");
-        if(costo <= 0) return alert("Escribe un costo total válido.");
-        const p = db.pats[db.curr];
-        sfMigrarPlanesPaciente(p);
-        p.planes.push({ id: 'plan_'+Date.now(), concepto, costoTotal: costo, creado: sfHoyMX() });
-        $('planNuevoConcepto').value = ''; $('planNuevoCosto').value = '';
-        saveDB();
-        renderAbonos();
-        if(typeof daniSpeak === 'function') daniSpeak(`📋 Plan "${concepto}" agregado ($${costo.toLocaleString('es-MX')}).`, 4000, 'info');
-    }
-
-    function eliminarPlanTratamiento(planId){
-        if(!db.curr) return;
-        const p = db.pats[db.curr];
-        const c = sfCuentaPlan(p, planId);
-        if(c.abonos.length && !confirm(`Este plan ya tiene ${c.abonos.length} abono(s) por $${c.abonado.toLocaleString('es-MX')}. ¿Eliminarlo de todos modos? Los abonos NO se borran, pero quedarán sin plan.`)) return;
-        else if(!c.abonos.length && !confirm('¿Eliminar este plan?')) return;
-        p.planes = (p.planes||[]).filter(pl => pl.id !== planId);
-        saveDB();
-        renderAbonos();
-    }
-
-    function abonarPlanTratamiento(planId){
-        if(!db.curr) return alert("Selecciona o guarda un paciente primero.");
-        const input = $('abonoMonto_'+planId);
-        const monto = parseFloat(input ? input.value : 0) || 0;
+        const monto = parseFloat($('pNuevoAbono').value) || 0;
         if(monto <= 0) return alert("Escribe un monto válido.");
+        const concepto = $('pNuevoConcepto') ? $('pNuevoConcepto').value.trim() : '';
         const p = db.pats[db.curr];
-        const plan = (p.planes||[]).find(pl => pl.id === planId);
-        const concepto = plan ? plan.concepto : '';
         p.abonos = p.abonos || [];
         const f = new Date().toLocaleDateString('es-MX', {day:'2-digit',month:'2-digit',year:'numeric'});
         const idAb = 'ab_'+Date.now();
-        p.abonos.push({ id:idAb, monto: monto, fecha: f, concepto: concepto, planId: planId });
+        p.abonos.push({ id:idAb, monto: monto, fecha: f, concepto: concepto });
         // Asiento en el libro de ingresos (fecha ISO, que es la que filtran
         // el panel de Inicio y los reportes). 'ref' permite deshacerlo.
         db.log = db.log || [];
         db.log.push({ f: sfHoyISO(), p: p.name || '', t:'abono',
                       ing: monto, op: 0, inv: 0, ref: idAb, concepto: concepto });
-        if(input) input.value = '';
+        $('pNuevoAbono').value = '';
+        if($('pNuevoConcepto')) $('pNuevoConcepto').value = '';
         saveDB();
         renderAbonos();
-        if(typeof daniSpeak === 'function') daniSpeak(`💰 Abono de $${monto.toLocaleString('es-MX')} registrado a "${concepto}".`, 4500, 'info');
+        if(typeof daniSpeak === 'function') daniSpeak(`💰 Abono de $${monto.toLocaleString('es-MX')} registrado.`, 4000, 'info');
         if($('pAbonoPideFactura') && $('pAbonoPideFactura').checked) {
             $('pAbonoPideFactura').checked = false;
             const tieneFiscales = p.factData && p.factData.rfc;
@@ -12582,13 +12421,9 @@ ${patientText}`;
         const activeD = (db.docs && db.activeDoc && db.docs[db.activeDoc]) ? db.docs[db.activeDoc] : {};
         const accent = '#059669';
         const monto = parseFloat(a.monto) || 0;
-        // El recibo muestra el total/abonado/saldo del PLAN especifico al que
-        // pertenece este abono (no la suma de todos los planes del paciente),
-        // para no mezclar, por ejemplo, brackets con una corona aparte.
-        const cPlan = a.planId ? sfCuentaPlan(p, a.planId) : null;
-        const total = cPlan ? cPlan.total : 0;
-        const abonadoAcum = cPlan ? cPlan.abonado : monto;
-        const saldo = cPlan ? cPlan.saldo : 0;
+        const total = parseFloat(p.costoTotal) || 0;
+        const abonadoAcum = (p.abonos || []).reduce((s,x)=> s + (parseFloat(x.monto)||0), 0);
+        const saldo = total - abonadoAcum;
         const folio = a.id ? a.id.replace(/\D/g,'').slice(-6) : String(Date.now()).slice(-6);
 
         let letras = '';
@@ -12668,10 +12503,9 @@ ${patientText}`;
         const cfg = sfClinicaActiva();
         const activeD = (db.docs && db.activeDoc && db.docs[db.activeDoc]) ? db.docs[db.activeDoc] : {};
         const monto = parseFloat(a.monto) || 0;
-        const cPlanWA = a.planId ? sfCuentaPlan(p, a.planId) : null;
-        const total = cPlanWA ? cPlanWA.total : 0;
-        const abonado = cPlanWA ? cPlanWA.abonado : monto;
-        const saldo = cPlanWA ? cPlanWA.saldo : 0;
+        const total = parseFloat(p.costoTotal) || 0;
+        const abonado = (p.abonos || []).reduce((s,x)=> s + (parseFloat(x.monto)||0), 0);
+        const saldo = total - abonado;
 
         let msg = `*${cfg.cli || 'Tu consultorio dental'}*\n\n`;
         msg += `✅ ¡Hola *${p.name || ''}*! Confirmamos la recepción de tu pago:\n\n`;
@@ -14264,15 +14098,25 @@ Reglas: español de México; terminología dental correcta; máximo 6 líneas; u
         if(typeof daniSpeak === 'function') daniSpeak('🧪 Paciente de Prueba creado con datos en todos los módulos: odontograma, alertas médicas, endodoncia, prótesis, Smile Plan, laboratorio dental y abonos. ¡Explóralos!', 9000, 'info');
     }
 
-    function savePatient() { const n=$('pName').value.trim(); if(!n) return alert("Falta Nombre."); const dId='Px-'+n; if(!db.curr){ db.curr='p_'+Date.now(); db.pats[db.curr]={id:db.curr,displayId:dId,notas:[],treats:{},alertDate:sfHoyISO(),factReq:false,factData:{},odonto:{}}; }else db.pats[db.curr].displayId=dId; let p=db.pats[db.curr]; p.name=n;p.birth=sfBirthToISO($('pBirth').value);p.age=$('pAge').value;p.guardian=$('pGuardian').value;p.phone=$('pPhone').value;p.email=$('pEmail').value; p.sex=$('pSexo')?$('pSexo').value:''; p.consultorioId=$('pConsultorio')?($('pConsultorio').value||db.consultorioActivo):db.consultorioActivo; sfSyncDireccion(); p.address=$('pAddress').value; p.addr={ calle:($('pAddrCalle')?$('pAddrCalle').value:''), col:($('pAddrCol')?$('pAddrCol').value:''), ciudad:($('pAddrCiudad')?$('pAddrCiudad').value:'') };p.sum=$('pSum').value;p.brackets=$('pBrackets').value;p.retra=$('pRetra').checked;p.factReq=$('pFactReq').checked;p.hasAl=$('pHasAl').checked;p.alPen=$('pAlPen').checked;p.alAin=$('pAlAin').checked;p.alLat=$('pAlLat').checked;p.alSulfa=$('pAlSulfa').checked;p.alOther=$('pAlOther').value; p.notaPago=$('pNotaPago')?$('pNotaPago').value:''; saveMedHistory(p); saveTreats(p); saveDB(); renderPatSelect(); $('lblId').innerHTML=`<i class="fa-solid fa-address-card"></i> ${dId}`; renderPendingTreatsMain(p); renderMedsList(); renderAgendaList(); if(typeof daniSpeak === 'function') daniSpeak("💾 Px guardado."); try{ sfQuickBar(); }catch(e){} }
+    function savePatient() { const n=$('pName').value.trim(); if(!n) return alert("Falta Nombre."); const dId='Px-'+n; if(!db.curr){ db.curr='p_'+Date.now(); db.pats[db.curr]={id:db.curr,displayId:dId,notas:[],treats:{},alertDate:sfHoyISO(),factReq:false,factData:{},odonto:{}}; }else db.pats[db.curr].displayId=dId; let p=db.pats[db.curr]; p.name=n;p.birth=sfBirthToISO($('pBirth').value);p.age=$('pAge').value;p.guardian=$('pGuardian').value;p.phone=$('pPhone').value;p.email=$('pEmail').value; p.sex=$('pSexo')?$('pSexo').value:''; p.consultorioId=$('pConsultorio')?($('pConsultorio').value||db.consultorioActivo):db.consultorioActivo; sfSyncDireccion(); p.address=$('pAddress').value; p.addr={ calle:($('pAddrCalle')?$('pAddrCalle').value:''), col:($('pAddrCol')?$('pAddrCol').value:''), ciudad:($('pAddrCiudad')?$('pAddrCiudad').value:'') };p.sum=$('pSum').value;p.brackets=$('pBrackets').value;p.retra=$('pRetra').checked;p.factReq=$('pFactReq').checked;p.hasAl=$('pHasAl').checked;p.alPen=$('pAlPen').checked;p.alAin=$('pAlAin').checked;p.alLat=$('pAlLat').checked;p.alSulfa=$('pAlSulfa').checked;p.alOther=$('pAlOther').value; p.costoTotal=$('pCostoTotal')?$('pCostoTotal').value:'';p.notaPago=$('pNotaPago')?$('pNotaPago').value:''; saveMedHistory(p); saveTreats(p); saveDB(); renderPatSelect(); $('lblId').innerHTML=`<i class="fa-solid fa-address-card"></i> ${dId}`; renderPendingTreatsMain(p); renderMedsList(); renderAgendaList(); if(typeof daniSpeak === 'function') daniSpeak("💾 Px guardado."); try{ sfQuickBar(); }catch(e){} }
     
     function loadPatient() { const v=$('pSelect').value; if(!v) return newPatient(); db.curr=v; saveDB(); try{ sfLimpiarImagenesPaciente(); }catch(e){} const p=db.pats[v]; $('lblId').innerHTML=`<i class="fa-solid fa-address-card"></i> ${p.displayId}`; $('pName').value=p.name||'';$('pBirth').value=sfISOToBirth(p.birth||'');try{sfBirthConfirm($('pBirth').value);}catch(e){}$('pGuardian').value=p.guardian||'';$('pPhone').value=p.phone||'';$('pEmail').value=p.email||''; if($('pSexo')) $('pSexo').value=p.sex||''; if($('pConsultorio')) $('pConsultorio').value=p.consultorioId||db.consultorioActivo||''; sfCargarDireccion(p);$('pSum').value=p.sum||'';$('pAlert').value=p.alert||'';$('pBrackets').value=p.brackets||'';$('pRetra').checked=p.retra||false;$('pFactReq').checked=p.factReq||false;$('pHasAl').checked=p.hasAl||false;$('pAlPen').checked=p.alPen||false;$('pAlAin').checked=p.alAin||false;$('pAlLat').checked=p.alLat||false;$('pAlSulfa').checked=p.alSulfa||false;$('pAlOther').value=p.alOther||''; if($('pCostoTotal'))$('pCostoTotal').value=p.costoTotal||'';if($('pNotaPago'))$('pNotaPago').value=p.notaPago||''; renderAbonos(); loadMedHistory(p); calcPatientAge(); autoLoadWaDate(); toggleAllergies(); loadTreats(p); sfResetOdontoState(); renderOdonto(); renderTimeline(); setAlertLabel(p.alertDate); if($('txtReceta'))$('txtReceta').value=''; if($('chkAntibiotico'))$('chkAntibiotico').checked=false; loadFacturacion(p); renderMedsList(); openSection('s-perfil', document.querySelector('.nav-item.active')); autoAbrirAbonosSiDeuda(); window._resenaSug=false; try{ checkResenaSugerencia(); }catch(e){} try{ sfQuickBar(); }catch(e){} try{ sfRefrescarVistasPaciente(); }catch(e){} }
 
-    // La seccion de Cobros ya vive en su propio menu (no comparte espacio con
-    // lo clinico), y cada plan ahora se despliega solo por su cuenta — ya no
-    // hace falta ocultar/mostrar todo el bloque segun si hay deuda o no.
     function autoAbrirAbonosSiDeuda() {
-        try { const acc = $('accAbonos'); if(acc) acc.style.display = 'block'; } catch(e){}
+        try {
+            const p = db.curr ? db.pats[db.curr] : null; if(!p) return;
+            const costo = parseFloat(p.costoTotal) || 0;
+            const abonado = (p.abonos || []).reduce((s,a)=>s+(parseFloat(a.monto)||0),0);
+            const acc = $('accAbonos');
+            const chev = document.querySelector('h3[onclick*="accAbonos"] .acc-chevron');
+            if(costo - abonado > 0 && acc) {
+                acc.style.display = 'block';
+                if(chev) chev.style.transform = 'rotate(180deg)';
+            } else if(acc) {
+                acc.style.display = 'none';
+                if(chev) chev.style.transform = 'rotate(0deg)';
+            }
+        } catch(e) { console.error('autoAbrirAbonos', e); }
     }
     
     function copyPatFolder() { if(navigator.clipboard && window.isSecureContext) { navigator.clipboard.writeText(db.pats[db.curr].displayId); alert("ID copiado.");} }
@@ -15139,15 +14983,6 @@ Reglas: español de México; terminología dental correcta; máximo 6 líneas; u
     // Guarda la valoracion ortodoncica al momento de cualquier cambio, para que
     // no dependa de dar clic en "Guardar" antes de imprimir (mismo problema que
     // ya se corrigio para Costo Total).
-    // Guarda TODA la Historia Clinica General (antecedentes, habitos, alergias,
-    // ocupacion, valoracion ortodoncica, etc.) ante cualquier cambio, sin
-    // depender del boton "Guardar" de arriba. Mismo problema que Costo Total:
-    // se veia guardado en pantalla pero no llegaba a la base hasta dar clic.
-    function sfGuardarHCGeneralAuto(){
-        if(!db.curr) return;
-        saveMedHistory(db.pats[db.curr]);
-        saveDB();
-    }
     function sfGuardarOrtoAuto(){
         if(!db.curr) return;
         const p = db.pats[db.curr];
@@ -18360,7 +18195,6 @@ function saveDB() {
         try { sfMigrarConsultoriosYDoctores(); } catch(e) { console.error('Error migracion consultorios/doctores', e); }
         try { sfChequeoNavegador(); } catch(e) {}
         try { sfBienvenidaCheck(); } catch(e) {}
-        try { setTimeout(sfRevisarSyncAtrasado, 6000); } catch(e) {}
         try { sfOnboardingCheck(); } catch(e) {}
         // Reacomodo de controles desactivado: la barra se queda como estaba.
         try { loadConfigUI(); } catch(e) { console.error("Error UI Inicial", e); }
