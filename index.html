@@ -581,7 +581,7 @@ window._pdfReady=true;
         <h2 style="margin: 0 !important; font-size: 1.5rem !important; color: white !important;">SmileFlow</h2>
         <a href="https://www.dentilike.com.mx" target="_blank" style="color: #bae6fd; font-size: 0.75rem; text-decoration: none; font-weight: 600; cursor: pointer; transition: color 0.2s;" onmouseover="this.style.color='white'" onmouseout="this.style.color='#bae6fd'">www.dentilike.com.mx</a>
         <a href="mailto:soporte@dentilike.com.mx" style="color: #bae6fd; font-size: 0.75rem; text-decoration: none; font-weight: 600; cursor: pointer; transition: color 0.2s;" onmouseover="this.style.color='white'" onmouseout="this.style.color='#bae6fd'">soporte@dentilike.com.mx</a>
-<span style="color:#7dd3fc; font-size:0.62rem; opacity:0.8; margin-top:2px;">© 2026 Dentilike · Todos los derechos reservados · <b id="sfVersion">v120</b></span>
+<span style="color:#7dd3fc; font-size:0.62rem; opacity:0.8; margin-top:2px;">© 2026 Dentilike · Todos los derechos reservados · <b id="sfVersion">v121</b></span>
     </div></div>
 <!-- Doctor en sesion: informativo, lleva a Configuracion para cambiarlo -->
 <div id="sideDocBox" onclick="openSection('s-admin-id', document.querySelector('.nav-item[onclick*=&quot;s-admin-id&quot;]'))" title="Doctor en sesion. Toca para cambiarlo o editar el perfil." style="margin:0 12px 10px; padding:0.7rem 0.85rem; background:rgba(255,255,255,0.07); border:1px solid rgba(125,211,252,0.28); border-left:3px solid #5DC1BF; border-radius:10px; cursor:pointer; display:flex; align-items:center; gap:0.6rem;">
@@ -748,11 +748,10 @@ window._pdfReady=true;
 </div>
 </header>
 <main class="content-area">
-<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem; border-bottom: 2px solid var(--border); padding-bottom:1rem;">
-<h2 id="lblId" style="color:var(--primary-dark); margin:0; font-size:1.6rem; font-weight:800;"><i class="fa-solid fa-address-card"></i> Nuevo Paciente</h2>
-</div>
+<div id="sfPatientBar" style="position:relative; z-index:2; background:var(--card); border-radius:14px; box-shadow:var(--shadow-sm); border:1px solid var(--border); padding:1rem 1.2rem; margin-bottom:1.5rem; display:block; width:100%; box-sizing:border-box; overflow:hidden;">
+<h2 id="lblId" style="color:var(--primary-dark); margin:0; font-size:1.35rem; font-weight:800; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; display:flex; align-items:center; gap:0.5rem;"><i class="fa-solid fa-address-card" style="flex-shrink:0;"></i> <span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">Nuevo Paciente</span></h2>
 <!-- Acceso rápido del paciente: acciones de cada cita, sin escarbar el menú -->
-<div id="sfQuickBar" style="display:none; flex-wrap:wrap; gap:0.5rem; margin:-0.9rem 0 1.3rem 0;">
+<div id="sfQuickBar" style="display:none; flex-wrap:wrap; gap:0.5rem; margin-top:0.9rem;">
 <div style="position:relative; display:inline-block;">
 <button onclick="sfMenuNota(event)" style="border:none; border-radius:10px; padding:0.55rem 0.9rem; font-weight:800; font-size:0.85rem; cursor:pointer; display:inline-flex; align-items:center; gap:0.4rem; white-space:nowrap; background:#1f5b9e; color:white;" title="Nota clínica de hoy"><i class="fa-solid fa-notes-medical"></i> Nota <i class="fa-solid fa-caret-down" style="font-size:0.75rem;"></i></button>
 <div id="sfNotaMenu" style="display:none; position:absolute; top:calc(100% + 4px); left:0; z-index:50; background:white; border:1px solid var(--border); border-radius:10px; box-shadow:0 8px 24px rgba(0,0,0,0.15); overflow:hidden; min-width:200px;">
@@ -767,6 +766,7 @@ window._pdfReady=true;
 <button onclick="sfQuickGo('s-odontograma')" style="border:none; border-radius:10px; padding:0.55rem 0.9rem; font-weight:800; font-size:0.85rem; cursor:pointer; display:inline-flex; align-items:center; gap:0.4rem; white-space:nowrap; background:#0891b2; color:white;" title="Odontograma"><i class="fa-solid fa-teeth-open"></i> Odontograma</button>
 <button onclick="sfQuickGo('s-tratamientos')" style="border:none; border-radius:10px; padding:0.55rem 0.9rem; font-weight:800; font-size:0.85rem; cursor:pointer; display:inline-flex; align-items:center; gap:0.4rem; white-space:nowrap; background:#059669; color:white;" title="Plan de tratamiento"><i class="fa-solid fa-list-check"></i> Plan</button>
 <button onclick="sfQuickGo('s-cobros','listaAbonos')" style="border:none; border-radius:10px; padding:0.55rem 0.9rem; font-weight:800; font-size:0.85rem; cursor:pointer; display:inline-flex; align-items:center; gap:0.4rem; white-space:nowrap; background:#b45309; color:white;" title="Registrar abono o cobro"><i class="fa-solid fa-cash-register"></i> Cobro</button>
+</div>
 </div>
 <div class="app-section active" id="s-inicio">
 <div style="background:linear-gradient(135deg, var(--primary), var(--secondary)); color:white; border-radius:14px; padding:1.2rem 1.5rem; margin-bottom:1.2rem; box-shadow:0 6px 16px rgba(31,91,158,0.22); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.8rem;">
