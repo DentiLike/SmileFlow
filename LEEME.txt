@@ -1,0 +1,31 @@
+========================================================
+SMILEFLOW v126 — VERSIÓN BUENA CONFIRMADA (RESPALDO)
+========================================================
+
+Fecha del respaldo: 08/agosto/2026
+
+Esta es una versión SANA y VERIFICADA de SmileFlow.
+Guárdala como punto de retorno seguro. Si alguna vez
+una versión futura se ve rota, puedes volver a esta.
+
+QUÉ INCLUYE:
+- index.html  (la app completa, v126)
+- sw.js       (service worker correspondiente)
+- Los 3 banners de marketing (whatsapp, facebook, logo)
+
+VERIFICACIÓN TRIPLE (pasada antes de sellar):
+  1) JavaScript sin errores de sintaxis .... OK
+  2) CSS con llaves {} balanceadas ......... OK
+  3) <div>/</div> balanceados (dif = 0) .... OK   <- la clave
+
+QUÉ SE ARREGLÓ EN ESTA VERSIÓN:
+Se eliminó un </div> sobrante que cerraba el contenedor
+de Cobros antes de tiempo. Ese cierre de más rompía el
+layout en móvil/pantalla angosta (el contenido se partía
+en columnas), aunque en pantalla ancha se veía bien.
+
+CÓMO SUBIR A GITHUB:
+Sube TODO el contenido de esta carpeta a la raíz del repo,
+reemplazando lo que ya está. No edites los archivos antes
+de subirlos.
+========================================================
