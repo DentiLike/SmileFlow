@@ -544,7 +544,16 @@
 .cef-measurement-name { font-size:0.76rem; color:#64748b; font-weight:700; }
 .cef-measurement-value { font-size:1.15rem; font-weight:900; color:#1e293b; }
 .cef-measurement-normal { font-size:0.7rem; color:#94a3b8; }
-@media (max-width:1024px){ .cef-layout { grid-template-columns:1fr; } .cef-canvas-area { height:400px; } }
+@media (max-width:1024px){
+  .cef-layout { grid-template-columns:1fr; }
+  /* Mas alto en movil para que la radiografia se vea mas grande y los puntos
+     no se amontonen tanto. NO se cambia como se posiciona la imagen ni los
+     puntos (eso descoordinaria los marcadores). */
+  .cef-canvas-area { height:65vh; min-height:360px; }
+  /* Etiquetas mas pequeñas para que no se encimen entre si. */
+  .cef-point-marker .cef-point-label { font-size:0.5rem; top:-13px; padding:0px 3px; }
+  .cef-next-hint { font-size:0.74rem; padding:5px 9px; }
+}
 
 .sf-nota-op:hover { background:#f1f5f9; }
 </style>
@@ -581,7 +590,7 @@ window._pdfReady=true;
         <h2 style="margin: 0 !important; font-size: 1.5rem !important; color: white !important;">SmileFlow</h2>
         <a href="https://www.dentilike.com.mx" target="_blank" style="color: #bae6fd; font-size: 0.75rem; text-decoration: none; font-weight: 600; cursor: pointer; transition: color 0.2s;" onmouseover="this.style.color='white'" onmouseout="this.style.color='#bae6fd'">www.dentilike.com.mx</a>
         <a href="mailto:soporte@dentilike.com.mx" style="color: #bae6fd; font-size: 0.75rem; text-decoration: none; font-weight: 600; cursor: pointer; transition: color 0.2s;" onmouseover="this.style.color='white'" onmouseout="this.style.color='#bae6fd'">soporte@dentilike.com.mx</a>
-<span style="color:#7dd3fc; font-size:0.62rem; opacity:0.8; margin-top:2px;">© 2026 Dentilike · Todos los derechos reservados · <b id="sfVersion">v126</b></span>
+<span style="color:#7dd3fc; font-size:0.62rem; opacity:0.8; margin-top:2px;">© 2026 Dentilike · Todos los derechos reservados · <b id="sfVersion">v127</b></span>
     </div></div>
 <!-- Doctor en sesion: informativo, lleva a Configuracion para cambiarlo -->
 <div id="sideDocBox" onclick="openSection('s-admin-id', document.querySelector('.nav-item[onclick*=&quot;s-admin-id&quot;]'))" title="Doctor en sesion. Toca para cambiarlo o editar el perfil." style="margin:0 12px 10px; padding:0.7rem 0.85rem; background:rgba(255,255,255,0.07); border:1px solid rgba(125,211,252,0.28); border-left:3px solid #5DC1BF; border-radius:10px; cursor:pointer; display:flex; align-items:center; gap:0.6rem;">
