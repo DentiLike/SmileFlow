@@ -590,7 +590,7 @@ window._pdfReady=true;
         <h2 style="margin: 0 !important; font-size: 1.5rem !important; color: white !important;">SmileFlow</h2>
         <a href="https://www.dentilike.com.mx" target="_blank" style="color: #bae6fd; font-size: 0.75rem; text-decoration: none; font-weight: 600; cursor: pointer; transition: color 0.2s;" onmouseover="this.style.color='white'" onmouseout="this.style.color='#bae6fd'">www.dentilike.com.mx</a>
         <a href="mailto:soporte@dentilike.com.mx" style="color: #bae6fd; font-size: 0.75rem; text-decoration: none; font-weight: 600; cursor: pointer; transition: color 0.2s;" onmouseover="this.style.color='white'" onmouseout="this.style.color='#bae6fd'">soporte@dentilike.com.mx</a>
-<span style="color:#7dd3fc; font-size:0.62rem; opacity:0.8; margin-top:2px;">© 2026 Dentilike · Todos los derechos reservados · <b id="sfVersion">v127</b></span>
+<span style="color:#7dd3fc; font-size:0.62rem; opacity:0.8; margin-top:2px;">© 2026 Dentilike · Todos los derechos reservados · <b id="sfVersion">v128</b></span>
     </div></div>
 <!-- Doctor en sesion: informativo, lleva a Configuracion para cambiarlo -->
 <div id="sideDocBox" onclick="openSection('s-admin-id', document.querySelector('.nav-item[onclick*=&quot;s-admin-id&quot;]'))" title="Doctor en sesion. Toca para cambiarlo o editar el perfil." style="margin:0 12px 10px; padding:0.7rem 0.85rem; background:rgba(255,255,255,0.07); border:1px solid rgba(125,211,252,0.28); border-left:3px solid #5DC1BF; border-radius:10px; cursor:pointer; display:flex; align-items:center; gap:0.6rem;">
@@ -9790,15 +9790,30 @@ El doctor adjunta una fotografía clínica para una lectura de APOYO (nunca diag
             }
         });
 
-        // 4) Pie con paciente, análisis y fecha
+        // 4) Pie con paciente, análisis, fecha Y datos clave del diagnóstico
         const p = db.curr ? db.pats[db.curr] : null;
         const nomAn = (CEF_ANALISIS[cefState.analisis] || CEF_ANALISIS.steiner).nombre;
-        const pie = (p && p.name ? p.name + '  ·  ' : '') + nomAn + '  ·  ' + new Date().toLocaleDateString('es-MX');
+        // Línea 1: nombre · análisis · fecha
+        const linea1 = (p && p.name ? p.name + '  ·  ' : '') + nomAn + '  ·  ' + new Date().toLocaleDateString('es-MX');
+        // Línea 2: hallazgos clave del análisis (clase, patrón, etc.)
+        const m = cefState._lastM || {};
+        const clave = [];
+        if(m.ANB != null) clave.push(m.ANB < 0 ? 'Clase III' : (m.ANB > 4 ? 'Clase II' : 'Clase I'));
+        if(m.Gonial != null) clave.push(m.Gonial > 127 ? 'Dolicofacial' : (m.Gonial < 117 ? 'Braquifacial' : 'Mesofacial'));
+        if(m.SNA != null && (m.SNA > 84 || m.SNA < 80)) clave.push(m.SNA > 84 ? 'Protrusión maxilar' : 'Retrusión maxilar');
+        if(m.SNB != null && (m.SNB > 82 || m.SNB < 78)) clave.push(m.SNB > 82 ? 'Protrusión mand.' : 'Retrusión mand.');
+        const linea2 = clave.join('  ·  ');
+        const altoPie = linea2 ? 40*K : 22*K;
+        ctx.fillStyle = 'rgba(255,255,255,0.92)';
+        ctx.fillRect(0, cv.height - altoPie, cv.width, altoPie);
         ctx.font = '700 ' + Math.round(11 * K) + 'px -apple-system, Roboto, sans-serif';
-        ctx.fillStyle = 'rgba(255,255,255,0.9)';
-        ctx.fillRect(0, cv.height - 22*K, cv.width, 22*K);
         ctx.fillStyle = '#334155';
-        ctx.fillText(pie, 8*K, cv.height - 7*K);
+        ctx.fillText(linea1, 8*K, cv.height - (linea2 ? 25*K : 7*K));
+        if(linea2){
+            ctx.font = '800 ' + Math.round(10 * K) + 'px -apple-system, Roboto, sans-serif';
+            ctx.fillStyle = '#1f5b9e';
+            ctx.fillText(linea2, 8*K, cv.height - 8*K);
+        }
         return cv;
     }
 
