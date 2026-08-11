@@ -590,7 +590,7 @@ window._pdfReady=true;
         <h2 style="margin: 0 !important; font-size: 1.5rem !important; color: white !important;">SmileFlow</h2>
         <a href="https://www.dentilike.com.mx" target="_blank" style="color: #bae6fd; font-size: 0.75rem; text-decoration: none; font-weight: 600; cursor: pointer; transition: color 0.2s;" onmouseover="this.style.color='white'" onmouseout="this.style.color='#bae6fd'">www.dentilike.com.mx</a>
         <a href="mailto:soporte@dentilike.com.mx" style="color: #bae6fd; font-size: 0.75rem; text-decoration: none; font-weight: 600; cursor: pointer; transition: color 0.2s;" onmouseover="this.style.color='white'" onmouseout="this.style.color='#bae6fd'">soporte@dentilike.com.mx</a>
-<span style="color:#7dd3fc; font-size:0.62rem; opacity:0.8; margin-top:2px;">© 2026 Dentilike · Todos los derechos reservados · <b id="sfVersion">v128</b></span>
+<span style="color:#7dd3fc; font-size:0.62rem; opacity:0.8; margin-top:2px;">© 2026 Dentilike · Todos los derechos reservados · <b id="sfVersion">v129</b></span>
     </div></div>
 <!-- Doctor en sesion: informativo, lleva a Configuracion para cambiarlo -->
 <div id="sideDocBox" onclick="openSection('s-admin-id', document.querySelector('.nav-item[onclick*=&quot;s-admin-id&quot;]'))" title="Doctor en sesion. Toca para cambiarlo o editar el perfil." style="margin:0 12px 10px; padding:0.7rem 0.85rem; background:rgba(255,255,255,0.07); border:1px solid rgba(125,211,252,0.28); border-left:3px solid #5DC1BF; border-radius:10px; cursor:pointer; display:flex; align-items:center; gap:0.6rem;">
@@ -4433,17 +4433,17 @@ No hay forma de recuperarlo: el cifrado es real y ni nosotros podemos abrirlo. G
 
         const card = document.createElement('div');
         card.id = 'sfTourCard';
-        card.style.cssText = 'position:fixed; z-index:999999; max-width:360px; width:calc(100% - 2rem); background:white; border-radius:14px; box-shadow:0 20px 50px rgba(0,0,0,0.4); padding:1.1rem 1.2rem; left:50%; top:50%; transform:translate(-50%,-50%);';
+        card.style.cssText = 'position:fixed; z-index:999999; max-width:360px; width:calc(100% - 2rem); max-height:85vh; display:flex; flex-direction:column; background:white; border-radius:14px; box-shadow:0 20px 50px rgba(0,0,0,0.4); padding:1.1rem 1.2rem; left:50%; top:50%; transform:translate(-50%,-50%); box-sizing:border-box;';
         const esUltimo = sfTourPaso === SF_TOUR_PASOS.length - 1;
         card.innerHTML = `
-            <div style="display:flex; gap:0.7rem; align-items:flex-start; margin-bottom:0.9rem;">
+            <div style="display:flex; gap:0.7rem; align-items:flex-start; margin-bottom:0.9rem; overflow-y:auto; flex:1 1 auto; min-height:0;">
                 ${avatarSrc ? `<img src="${avatarSrc}" style="width:44px; height:44px; border-radius:50%; flex-shrink:0; object-fit:cover;"/>` : ''}
                 <div>
                     <div style="font-weight:800; color:#1e3a5f; font-size:0.98rem;">${paso.titulo}</div>
                     <div style="font-size:0.86rem; color:#475569; margin-top:5px; line-height:1.5;">${paso.texto}</div>
                 </div>
             </div>
-            <div style="display:flex; justify-content:space-between; align-items:center; gap:0.5rem; flex-wrap:wrap;">
+            <div style="display:flex; justify-content:space-between; align-items:center; gap:0.5rem; flex-wrap:wrap; flex-shrink:0; border-top:1px solid #f1f5f9; padding-top:0.8rem;">
                 <button onclick="sfTourSaltar()" style="border:none; background:transparent; color:#94a3b8; font-size:0.78rem; cursor:pointer; font-weight:700;">Saltar tour</button>
                 <div style="display:flex; gap:0.5rem; align-items:center;">
                     <span style="font-size:0.76rem; color:#94a3b8;">${sfTourPaso+1}/${SF_TOUR_PASOS.length}</span>
@@ -4456,9 +4456,15 @@ No hay forma de recuperarlo: el cifrado es real y ni nosotros podemos abrirlo. G
         if(el){
             const r = el.getBoundingClientRect();
             const ch = card.offsetHeight, cw = card.offsetWidth;
+            const margen = 10;
             let top = r.bottom + 16;
-            if(top + ch > window.innerHeight - 10) top = Math.max(10, r.top - ch - 16);
-            let left = Math.min(Math.max(10, r.left), window.innerWidth - cw - 10);
+            // Si no cabe abajo, intentar arriba; si tampoco, pegar al borde
+            // superior disponible. El scroll interno cubre el resto.
+            if(top + ch > window.innerHeight - margen){
+                const arriba = r.top - ch - 16;
+                top = arriba >= margen ? arriba : Math.max(margen, window.innerHeight - ch - margen);
+            }
+            let left = Math.min(Math.max(margen, r.left), window.innerWidth - cw - margen);
             card.style.top = top + 'px'; card.style.left = left + 'px'; card.style.transform = 'none';
         }
     }
