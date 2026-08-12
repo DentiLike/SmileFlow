@@ -590,7 +590,7 @@ window._pdfReady=true;
         <h2 style="margin: 0 !important; font-size: 1.5rem !important; color: white !important;">SmileFlow</h2>
         <a href="https://www.dentilike.com.mx" target="_blank" style="color: #bae6fd; font-size: 0.75rem; text-decoration: none; font-weight: 600; cursor: pointer; transition: color 0.2s;" onmouseover="this.style.color='white'" onmouseout="this.style.color='#bae6fd'">www.dentilike.com.mx</a>
         <a href="mailto:soporte@dentilike.com.mx" style="color: #bae6fd; font-size: 0.75rem; text-decoration: none; font-weight: 600; cursor: pointer; transition: color 0.2s;" onmouseover="this.style.color='white'" onmouseout="this.style.color='#bae6fd'">soporte@dentilike.com.mx</a>
-<span style="color:#7dd3fc; font-size:0.62rem; opacity:0.8; margin-top:2px;">© 2026 Dentilike · Todos los derechos reservados · <b id="sfVersion">v129</b></span>
+<span style="color:#7dd3fc; font-size:0.62rem; opacity:0.8; margin-top:2px;">© 2026 Dentilike · Todos los derechos reservados · <b id="sfVersion">v130</b></span>
     </div></div>
 <!-- Doctor en sesion: informativo, lleva a Configuracion para cambiarlo -->
 <div id="sideDocBox" onclick="openSection('s-admin-id', document.querySelector('.nav-item[onclick*=&quot;s-admin-id&quot;]'))" title="Doctor en sesion. Toca para cambiarlo o editar el perfil." style="margin:0 12px 10px; padding:0.7rem 0.85rem; background:rgba(255,255,255,0.07); border:1px solid rgba(125,211,252,0.28); border-left:3px solid #5DC1BF; border-radius:10px; cursor:pointer; display:flex; align-items:center; gap:0.6rem;">
@@ -4455,15 +4455,26 @@ No hay forma de recuperarlo: el cifrado es real y ni nosotros podemos abrirlo. G
         // Reposicionar cerca del elemento si hay espacio; si no, se queda centrado.
         if(el){
             const r = el.getBoundingClientRect();
-            const ch = card.offsetHeight, cw = card.offsetWidth;
-            const margen = 10;
-            let top = r.bottom + 16;
-            // Si no cabe abajo, intentar arriba; si tampoco, pegar al borde
-            // superior disponible. El scroll interno cubre el resto.
-            if(top + ch > window.innerHeight - margen){
-                const arriba = r.top - ch - 16;
-                top = arriba >= margen ? arriba : Math.max(margen, window.innerHeight - ch - margen);
+            const margen = 12;
+            const cw = card.offsetWidth;
+            // Altura REAL que ocupara el cuadro, respetando su tope de 85vh: si el
+            // contenido es mas alto, el cuadro medira 85vh (y su texto tendra
+            // scroll). Usamos ese valor para garantizar que SIEMPRE quepa entero.
+            const tope = window.innerHeight * 0.85;
+            const ch = Math.min(card.offsetHeight, tope);
+            // Espacio disponible arriba y abajo del elemento resaltado
+            const espacioAbajo = window.innerHeight - r.bottom - margen - 16;
+            const espacioArriba = r.top - margen - 16;
+            let top;
+            if(espacioAbajo >= ch){          // cabe debajo del elemento
+                top = r.bottom + 16;
+            } else if(espacioArriba >= ch){  // cabe arriba del elemento
+                top = r.top - ch - 16;
+            } else {                          // no cabe ni arriba ni abajo:
+                top = Math.max(margen, (window.innerHeight - ch) / 2);  // centrar vertical
             }
+            // Clamp final: nunca salir por arriba ni por abajo de la pantalla
+            top = Math.min(Math.max(margen, top), window.innerHeight - ch - margen);
             let left = Math.min(Math.max(margen, r.left), window.innerWidth - cw - margen);
             card.style.top = top + 'px'; card.style.left = left + 'px'; card.style.transform = 'none';
         }
