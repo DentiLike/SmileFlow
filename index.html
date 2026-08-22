@@ -590,7 +590,7 @@ window._pdfReady=true;
         <h2 style="margin: 0 !important; font-size: 1.5rem !important; color: white !important;">SmileFlow</h2>
         <a href="https://www.dentilike.com.mx" target="_blank" style="color: #bae6fd; font-size: 0.75rem; text-decoration: none; font-weight: 600; cursor: pointer; transition: color 0.2s;" onmouseover="this.style.color='white'" onmouseout="this.style.color='#bae6fd'">www.dentilike.com.mx</a>
         <a href="mailto:soporte@dentilike.com.mx" style="color: #bae6fd; font-size: 0.75rem; text-decoration: none; font-weight: 600; cursor: pointer; transition: color 0.2s;" onmouseover="this.style.color='white'" onmouseout="this.style.color='#bae6fd'">soporte@dentilike.com.mx</a>
-<span style="color:#7dd3fc; font-size:0.62rem; opacity:0.8; margin-top:2px;">© 2026 Dentilike · Todos los derechos reservados · <b id="sfVersion">v130</b></span>
+<span style="color:#7dd3fc; font-size:0.62rem; opacity:0.8; margin-top:2px;">© 2026 Dentilike · Todos los derechos reservados · <b id="sfVersion">v135</b></span>
     </div></div>
 <!-- Doctor en sesion: informativo, lleva a Configuracion para cambiarlo -->
 <div id="sideDocBox" onclick="openSection('s-admin-id', document.querySelector('.nav-item[onclick*=&quot;s-admin-id&quot;]'))" title="Doctor en sesion. Toca para cambiarlo o editar el perfil." style="margin:0 12px 10px; padding:0.7rem 0.85rem; background:rgba(255,255,255,0.07); border:1px solid rgba(125,211,252,0.28); border-left:3px solid #5DC1BF; border-radius:10px; cursor:pointer; display:flex; align-items:center; gap:0.6rem;">
@@ -2908,6 +2908,10 @@ Se tomaron signos vitales
 </div>
 
 <button class="btn btn-success" onclick="printReceta()" style="font-size:1.15rem; padding:1.2rem; width:100%; box-shadow: 0 4px 6px -1px rgba(5, 150, 105, 0.4);"><i class="fa-solid fa-print"></i> Previsualizar e Imprimir Receta</button>
+<div style="display:flex; gap:0.6rem; margin-top:0.7rem;">
+<button class="btn btn-outline" onclick="compartirReceta()" style="flex:1; padding:0.9rem; font-size:0.95rem; font-weight:700;"><i class="fa-solid fa-share-nodes"></i> Compartir</button>
+<button class="btn btn-outline" onclick="descargarReceta()" style="flex:1; padding:0.9rem; font-size:0.95rem; font-weight:700;"><i class="fa-solid fa-download"></i> Descargar PDF</button>
+</div>
 </div>
 <div class="app-section" id="s-labs">
 <h3 style="color:#1f5b9e; font-size:1.3rem; margin-bottom:1.2rem; font-weight:800; display:flex; align-items:center; gap:0.7rem;"><span style="background:linear-gradient(135deg, var(--secondary), var(--secondary-dark)); color:white; width:36px; height:36px; border-radius:10px; display:inline-flex; align-items:center; justify-content:center; font-size:0.95rem;"><i class="fa-solid fa-flask-vial"></i></span> Órdenes de Laboratorio</h3>
@@ -3139,7 +3143,7 @@ Se tomaron signos vitales
 </div>
 </div>
 <div class="card" style="border-top-color:#b45309;">
-<h4 style="margin-bottom:1.2rem; color:#b45309; font-size:1.1rem; border-bottom:2px solid #fef3c7; padding-bottom:0.6rem;"><i class="fa-solid fa-scale-balanced"></i> Documentos y Consentimientos Legales</h4>
+<h4 style="margin-bottom:1.2rem; color:#b45309; font-size:1.1rem; border-bottom:2px solid #fef3c7; padding-bottom:0.6rem;"><i class="fa-solid fa-scale-balanced"></i> Consentimientos e Indicaciones</h4>
 
 <div style="background:#eff6ff; border:1px solid #bfdbfe; border-radius:8px; padding:0.8rem 1rem; margin-bottom:1.2rem; font-size:0.85rem; color:#1e40af;">
 <i class="fa-solid fa-signature"></i> Cada documento abre un panel de <b>firma digital</b>. Si el paciente es <b>menor de edad</b>, el sistema pedirá automáticamente el nombre del tutor. La firma se incrusta en el PDF.
@@ -5785,7 +5789,7 @@ db = {
     
     function abrirAgenda() { window.open(db.cfg.agenda || 'https://calendar.google.com', '_blank'); }
     function abrirAgendaNuevaCita() { window.open('https://calendar.google.com/calendar/r/eventedit', '_blank'); }
-    function openWaPatient(pid) { const p = db.pats[pid]; if(!p || !p.phone) return alert("Paciente sin teléfono."); window.open(`https://wa.me/52${p.phone.replace(/\D/g,'')}?text=${encodeURIComponent(`Hola ${p.name}, excelente día 👋. Te escribimos de ${sfClinicaActiva(p).cli} para confirmar tu cita programada.`)}`, '_blank'); }
+    function openWaPatient(pid) { const p = db.pats[pid]; if(!p || !p.phone) return alert("Paciente sin teléfono."); sfWhatsApp(p.phone, `Hola ${p.name}, excelente día 👋. Te escribimos de ${sfClinicaActiva(p).cli} para confirmar tu cita programada.`); }
 
     // --- CUMPLEAÑOS Y EDAD AUTOMÁTICA ---
     // Fecha de nacimiento escribible: DD/MM/AAAA en pantalla, ISO (AAAA-MM-DD) al guardar.
@@ -11962,7 +11966,7 @@ function selectTooth(t, ev) {
         const txt = $('dxPatient').value || '';
         let msg = `*${cfg.cli || 'Tu consultorio dental'}*\n\n${txt}`;
         if(activeD.name) msg += `\n\n👨‍⚕️ ${activeD.name}`;
-        window.open(`https://wa.me/52${p.phone.replace(/\D/g,'')}?text=${encodeURIComponent(msg)}`, '_blank');
+        sfWhatsApp(p.phone, msg);
     }
 
     // ============================================================
@@ -12117,7 +12121,7 @@ ${patientText}`;
     // --- GESTIÓN DE PACIENTES ---
     function checkAge() { const a=$('pAge').value; if($('divGuardian')) $('divGuardian').classList.toggle('hidden', a===''||a>=18); }
     
-    function newPatient() { db.curr=null; saveDB(); $('pSelect').value=''; $('lblId').innerHTML='<i class="fa-solid fa-address-card"></i> Nuevo Px'; ['pName','pBirth','pAge','pGuardian','pPhone','pEmail','pAddress','pAddrCalle','pAddrCol','pAddrCiudad','pSum','pAlert','pBrackets','pSexo'].forEach(id=>{if($(id))$(id).value='';}); if($('pConsultorio')) $('pConsultorio').value=db.consultorioActivo||''; ['pRetra','pFactReq','pHasAl','pAlPen','pAlAin','pAlLat','pAlSulfa'].forEach(id=>{if($(id))$(id).checked=false;}); if($('pAlOther')) $('pAlOther').value=''; if($('pCostoTotal'))$('pCostoTotal').value='';if($('pNotaPago'))$('pNotaPago').value=''; if($('listaAbonos'))$('listaAbonos').innerHTML=''; recalcSaldo(); clearMedHistory(); if($('pCakeIcon')) $('pCakeIcon').style.display='none'; autoLoadWaDate(); checkAge(); toggleAllergies(); loadTreats({}); sfResetOdontoState(); renderOdonto(); renderTimeline(); setAlertLabel(null); if($('txtReceta')) $('txtReceta').value=''; if($('chkAntibiotico')) $('chkAntibiotico').checked=false; loadFacturacion({}); renderMedsList(); try{ sfQuickBar(); }catch(e){} try{ sfLimpiarImagenesPaciente(); sfRefrescarVistasPaciente(); }catch(e){} }
+    function newPatient() { db.curr=null; saveDB(); $('pSelect').value=''; $('lblId').innerHTML='<i class="fa-solid fa-address-card"></i> Nuevo Px'; ['pName','pBirth','pAge','pGuardian','pPhone','pEmail','pAddress','pAddrCalle','pAddrCol','pAddrCiudad','pSum','pAlert','pBrackets','pSexo'].forEach(id=>{if($(id))$(id).value='';}); if($('pConsultorio')) $('pConsultorio').value=db.consultorioActivo||''; ['pRetra','pFactReq','pHasAl','pAlPen','pAlAin','pAlLat','pAlSulfa'].forEach(id=>{if($(id))$(id).checked=false;}); if($('pAlOther')) $('pAlOther').value=''; if($('pCostoTotal'))$('pCostoTotal').value='';if($('pNotaPago'))$('pNotaPago').value=''; if($('listaAbonos'))$('listaAbonos').innerHTML=''; recalcSaldo(); clearMedHistory(); sfLimpiarCamposNota(); if($('pCakeIcon')) $('pCakeIcon').style.display='none'; autoLoadWaDate(); checkAge(); toggleAllergies(); loadTreats({}); sfResetOdontoState(); renderOdonto(); renderTimeline(); setAlertLabel(null); if($('txtReceta')) $('txtReceta').value=''; if($('chkAntibiotico')) $('chkAntibiotico').checked=false; loadFacturacion({}); renderMedsList(); try{ sfQuickBar(); }catch(e){} try{ sfLimpiarImagenesPaciente(); sfRefrescarVistasPaciente(); }catch(e){} }
     
     function savePatientAlert() { if(!db.curr) return; db.pats[db.curr].alert=$('pAlert').value; db.pats[db.curr].alertDate=sfHoyISO(); saveDB(); setAlertLabel(db.pats[db.curr].alertDate); }
 
@@ -12730,7 +12734,7 @@ ${patientText}`;
         msg += `\n🙏 ¡Gracias por tu pago!`;
         if(activeD.name) msg += `\n\n👨‍⚕️ ${activeD.name}`;
 
-        window.open(`https://wa.me/52${p.phone.replace(/\D/g,'')}?text=${encodeURIComponent(msg)}`, '_blank');
+        sfWhatsApp(p.phone, msg);
     }
 
     // ===================== SMILE PLAN by Dentilike =====================
@@ -14309,7 +14313,7 @@ Reglas: español de México; terminología dental correcta; máximo 6 líneas; u
 
     function savePatient() { const n=$('pName').value.trim(); if(!n) return alert("Falta Nombre."); const dId='Px-'+n; if(!db.curr){ db.curr='p_'+Date.now(); db.pats[db.curr]={id:db.curr,displayId:dId,notas:[],treats:{},alertDate:sfHoyISO(),factReq:false,factData:{},odonto:{}}; }else db.pats[db.curr].displayId=dId; let p=db.pats[db.curr]; p.name=n;p.birth=sfBirthToISO($('pBirth').value);p.age=$('pAge').value;p.guardian=$('pGuardian').value;p.phone=$('pPhone').value;p.email=$('pEmail').value; p.sex=$('pSexo')?$('pSexo').value:''; p.consultorioId=$('pConsultorio')?($('pConsultorio').value||db.consultorioActivo):db.consultorioActivo; sfSyncDireccion(); p.address=$('pAddress').value; p.addr={ calle:($('pAddrCalle')?$('pAddrCalle').value:''), col:($('pAddrCol')?$('pAddrCol').value:''), ciudad:($('pAddrCiudad')?$('pAddrCiudad').value:'') };p.sum=$('pSum').value;p.brackets=$('pBrackets').value;p.retra=$('pRetra').checked;p.factReq=$('pFactReq').checked;p.hasAl=$('pHasAl').checked;p.alPen=$('pAlPen').checked;p.alAin=$('pAlAin').checked;p.alLat=$('pAlLat').checked;p.alSulfa=$('pAlSulfa').checked;p.alOther=$('pAlOther').value; p.notaPago=$('pNotaPago')?$('pNotaPago').value:''; saveMedHistory(p); saveTreats(p); saveDB(); renderPatSelect(); $('lblId').innerHTML=`<i class="fa-solid fa-address-card"></i> ${dId}`; renderPendingTreatsMain(p); renderMedsList(); renderAgendaList(); if(typeof daniSpeak === 'function') daniSpeak("💾 Px guardado."); try{ sfQuickBar(); }catch(e){} }
     
-    function loadPatient() { const v=$('pSelect').value; if(!v) return newPatient(); db.curr=v; saveDB(); try{ sfLimpiarImagenesPaciente(); }catch(e){} const p=db.pats[v]; $('lblId').innerHTML=`<i class="fa-solid fa-address-card"></i> ${p.displayId}`; $('pName').value=p.name||'';$('pBirth').value=sfISOToBirth(p.birth||'');try{sfBirthConfirm($('pBirth').value);}catch(e){}$('pGuardian').value=p.guardian||'';$('pPhone').value=p.phone||'';$('pEmail').value=p.email||''; if($('pSexo')) $('pSexo').value=p.sex||''; if($('pConsultorio')) $('pConsultorio').value=p.consultorioId||db.consultorioActivo||''; sfCargarDireccion(p);$('pSum').value=p.sum||'';$('pAlert').value=p.alert||'';$('pBrackets').value=p.brackets||'';$('pRetra').checked=p.retra||false;$('pFactReq').checked=p.factReq||false;$('pHasAl').checked=p.hasAl||false;$('pAlPen').checked=p.alPen||false;$('pAlAin').checked=p.alAin||false;$('pAlLat').checked=p.alLat||false;$('pAlSulfa').checked=p.alSulfa||false;$('pAlOther').value=p.alOther||''; if($('pCostoTotal'))$('pCostoTotal').value=p.costoTotal||'';if($('pNotaPago'))$('pNotaPago').value=p.notaPago||''; renderAbonos(); loadMedHistory(p); calcPatientAge(); autoLoadWaDate(); toggleAllergies(); loadTreats(p); sfResetOdontoState(); renderOdonto(); renderTimeline(); setAlertLabel(p.alertDate); if($('txtReceta'))$('txtReceta').value=''; if($('chkAntibiotico'))$('chkAntibiotico').checked=false; loadFacturacion(p); renderMedsList(); openSection('s-perfil', document.querySelector('.nav-item.active')); autoAbrirAbonosSiDeuda(); window._resenaSug=false; try{ checkResenaSugerencia(); }catch(e){} try{ sfQuickBar(); }catch(e){} try{ sfRefrescarVistasPaciente(); }catch(e){} }
+    function loadPatient() { const v=$('pSelect').value; if(!v) return newPatient(); db.curr=v; saveDB(); try{ sfLimpiarImagenesPaciente(); }catch(e){} const p=db.pats[v]; $('lblId').innerHTML=`<i class="fa-solid fa-address-card"></i> ${p.displayId}`; $('pName').value=p.name||'';$('pBirth').value=sfISOToBirth(p.birth||'');try{sfBirthConfirm($('pBirth').value);}catch(e){}$('pGuardian').value=p.guardian||'';$('pPhone').value=p.phone||'';$('pEmail').value=p.email||''; if($('pSexo')) $('pSexo').value=p.sex||''; if($('pConsultorio')) $('pConsultorio').value=p.consultorioId||db.consultorioActivo||''; sfCargarDireccion(p);$('pSum').value=p.sum||'';$('pAlert').value=p.alert||'';$('pBrackets').value=p.brackets||'';$('pRetra').checked=p.retra||false;$('pFactReq').checked=p.factReq||false;$('pHasAl').checked=p.hasAl||false;$('pAlPen').checked=p.alPen||false;$('pAlAin').checked=p.alAin||false;$('pAlLat').checked=p.alLat||false;$('pAlSulfa').checked=p.alSulfa||false;$('pAlOther').value=p.alOther||''; if($('pCostoTotal'))$('pCostoTotal').value=p.costoTotal||'';if($('pNotaPago'))$('pNotaPago').value=p.notaPago||''; renderAbonos(); loadMedHistory(p); sfLimpiarCamposNota(); calcPatientAge(); autoLoadWaDate(); toggleAllergies(); loadTreats(p); sfResetOdontoState(); renderOdonto(); renderTimeline(); setAlertLabel(p.alertDate); if($('txtReceta'))$('txtReceta').value=''; if($('chkAntibiotico'))$('chkAntibiotico').checked=false; loadFacturacion(p); renderMedsList(); openSection('s-perfil', document.querySelector('.nav-item.active')); autoAbrirAbonosSiDeuda(); window._resenaSug=false; try{ checkResenaSugerencia(); }catch(e){} try{ sfQuickBar(); }catch(e){} try{ sfRefrescarVistasPaciente(); }catch(e){} }
 
     // La seccion de Cobros ya vive en su propio menu (no comparte espacio con
     // lo clinico), y cada plan ahora se despliega solo por su cuenta — ya no
@@ -14935,7 +14939,13 @@ Reglas: español de México; terminología dental correcta; máximo 6 líneas; u
             return alert('⚠️ Este paciente no tiene datos fiscales guardados.\n\nLlena RFC, Nombre, Régimen, etc. en "Datos Fiscales del Paciente" (sección Facturación) y dale clic a Guardar — luego intenta enviar la solicitud otra vez.');
         }
         const fechaFactura = ($('facDate') && $('facDate').value) ? $('facDate').value : sfHoyISO();
-        let msg=`Solicitud de Factura.\nFecha del servicio: ${fechaFactura}\nPaciente: ${f.nom}\nRFC: ${f.rfc}\nRégimen Fiscal: ${f.reg}\nCódigo Postal: ${f.cp}\nUso de CFDI: ${f.uso}\nMonto: $${$('facMonto').value}\nConcepto: ${$('facConcepto').value}`;
+        // Correo del paciente: primero el de datos fiscales (si lo capturaron ahí),
+        // si no, el correo general del expediente. Así el contador puede enviarle
+        // la factura directamente.
+        const correoPx = (f.email || p.email || '').trim();
+        let msg=`Solicitud de Factura.\nFecha del servicio: ${fechaFactura}\nPaciente: ${f.nom}\nRFC: ${f.rfc}\nRégimen Fiscal: ${f.reg}\nCódigo Postal: ${f.cp}\nUso de CFDI: ${f.uso}`;
+        if(correoPx) msg += `\nCorreo del paciente: ${correoPx}`;
+        msg += `\nMonto: $${$('facMonto').value}\nConcepto: ${$('facConcepto').value}`;
         if(m==='wa') window.open(`https://wa.me/52${db.cfg.contPhone.replace(/\D/g,'')}?text=${encodeURIComponent(msg)}`);
         else window.open(`mailto:${db.cfg.contEmail}?subject=Factura&body=${encodeURIComponent(msg)}`);
     }
@@ -15305,6 +15315,27 @@ Reglas: español de México; terminología dental correcta; máximo 6 líneas; u
         renderPatientMeds();
         checkMedAlerts();
     }
+    // Limpia TODOS los campos de captura de notas clínicas (ortodoncia, general,
+    // alineadores). Sin esto, el texto y las selecciones de un paciente quedaban
+    // visibles al pasar al siguiente, arriesgando guardar la nota en el paciente
+    // equivocado. Se llama al cargar o crear un paciente.
+    function sfLimpiarCamposNota() {
+        // Áreas de texto de las notas
+        ['nObs','nObsGen','aObs'].forEach(id => { if($(id)) $(id).value = ''; });
+        // Campos "próxima cita / plan"
+        ['nFut','aFut'].forEach(id => { if($(id)) $(id).value = ''; });
+        // Checkboxes de colocación de brackets y sus selectores
+        ['chkBktSup','chkBktInf'].forEach(id => { if($(id)) $(id).checked = false; });
+        ['selBktSup','selBktInf'].forEach(id => { if($(id)) $(id).classList.add('hidden'); });
+        // Elásticos y tubo de repuesto
+        if($('eNo')) $('eNo').checked = true;
+        if($('chkTuboRepo')) $('chkTuboRepo').checked = false;
+        // Fase/etapa de alineadores
+        ['aEtapa','aNum'].forEach(id => { if($(id)) $(id).value = ''; });
+        // Restaurar la fecha de las notas a hoy
+        ['nDate','nDateAli'].forEach(id => { if($(id)) $(id).value = sfHoyISO(); });
+    }
+
     function clearMedHistory() {
         MED_DISEASE_IDS.concat(MED_RX_IDS).concat(HC_HF_IDS).concat(HC_HB_IDS).forEach(id => { if($(id)) $(id).checked = false; });
         if($('mdOtras')) $('mdOtras').value = '';
@@ -15588,6 +15619,14 @@ Reglas: español de México; terminología dental correcta; máximo 6 líneas; u
             { lbl:'Clorhexidina 0.12% | Antiséptico post-cirugía', rx:'Clorhexidina 0.12% - Enjuague con 15ml durante 1 minuto cada 12 horas.' },
             { lbl:'Bexident Encías | Coadyuvante periodontal', rx:'Bexident Encías - Enjuague o gel 3 veces al día.' },
             { lbl:'Nistatina 100,000 UI | Candidiasis oral', rx:'Nistatina 100,000 UI - 5ml en boca 2 minutos y tragar, cada 6 horas.' },
+        ]},
+        { grupo:'Auxiliares de higiene', meds:[
+            { lbl:'Enjuague Periogard (Colgate) | Clorhexidina 0.12%, control de placa/gingivitis', rx:'Enjuague Periogard (clorhexidina 0.12%) - Enjuagar con 15 ml durante 30 segundos, 2 veces al día, después del cepillado. No enjuagar con agua después. Uso por 7 a 14 días (puede pigmentar dientes de forma temporal y reversible).' },
+            { lbl:'Enjuague Oral-B | Uso diario, refuerza higiene', rx:'Enjuague Oral-B - Enjuagar con 20 ml durante 30 segundos, 2 veces al día después del cepillado. Uso diario continuo.' },
+            { lbl:'Enjuague GUM | Coadyuvante en salud de encías', rx:'Enjuague GUM - Enjuagar con 15 ml durante 30 segundos, 2 veces al día. Uso diario continuo.' },
+            { lbl:'Enjuague para gingivitis | Control de inflamación gingival', rx:'Enjuague antiséptico para gingivitis - Enjuagar con 15 ml durante 30 segundos, 2 veces al día, después del cepillado. Uso por 10 a 14 días o según indicación.' },
+            { lbl:'Cepillos interproximales | Limpieza entre dientes y brackets', rx:'Cepillos interproximales - Usar 1 vez al día, pasando suavemente entre cada espacio interdental (usar la medida que ajuste sin forzar). Ideal en ortodoncia, puentes e implantes.' },
+            { lbl:'SuperFloss Oral-B | Hilo para brackets, puentes e implantes', rx:'SuperFloss (Oral-B) - Usar 1 vez al día. Pasar el extremo rígido bajo el alambre/puente, limpiar con la parte esponjosa y el hilo normal en cada espacio.' },
         ]},
     ];
 
@@ -15986,8 +16025,16 @@ Reglas: español de México; terminología dental correcta; máximo 6 líneas; u
     }
 
     function printReceta() {
-        if(!db.curr) return alert("Selecciona o guarda un paciente primero.");
-        if(!ensurePdfMake()) return;
+        const doc = _recetaDocActual();
+        if(doc) pdfMake.createPdf(doc).open();
+    }
+
+    // Construye y devuelve el objeto "doc" de pdfMake para la receta actual.
+    // Centraliza la maquetación para que imprimir, descargar y compartir usen
+    // exactamente el mismo formato.
+    function _recetaDocActual() {
+        if(!db.curr) { alert("Selecciona o guarda un paciente primero."); return null; }
+        if(!ensurePdfMake()) return null;
         const p = db.pats[db.curr];
         const cfg = sfClinicaActiva();
         const activeD = (db.docs && db.activeDoc && db.docs[db.activeDoc]) ? db.docs[db.activeDoc] : {};
@@ -16003,8 +16050,8 @@ Reglas: español de México; terminología dental correcta; máximo 6 líneas; u
         function bloqueReceta(esCopia) {
             // Escudos universitarios registrados en el perfil del doctor (licenciatura / especialidad)
             const escudos = [];
-            if(activeD.uni1) escudos.push({ image: activeD.uni1, fit:[36,36], margin:[0,0,6,0], width:42 });
-            if(activeD.uni2) escudos.push({ image: activeD.uni2, fit:[36,36], margin:[0,0,6,0], width:42 });
+            if(activeD.uni1) escudos.push({ image: activeD.uni1, fit:[44,44], margin:[0,0,8,0], width:48, alignment:'center' });
+            if(activeD.uni2) escudos.push({ image: activeD.uni2, fit:[44,44], margin:[0,0,8,0], width:48, alignment:'center' });
             const header = {
                 columns: [
                     ...escudos,
@@ -16017,7 +16064,7 @@ Reglas: español de México; terminología dental correcta; máximo 6 líneas; u
                             cfg.cofepris ? { text: 'Reg. COFEPRIS: '+cfg.cofepris, fontSize:7, color:'#64748b' } : {}
                         ], width:'*'
                     },
-                    cfg.logo ? { image: cfg.logo, fit:[42,42], alignment:'right', width:46 } : { text:'', width:1 }
+                    cfg.logo ? { image: cfg.logo, fit:[48,48], alignment:'right', width:52 } : { text:'', width:1 }
                 ], columnGap: 8
             };
             // Doble filete tipo papelería profesional
@@ -16051,28 +16098,75 @@ Reglas: español de México; terminología dental correcta; máximo 6 líneas; u
             return stack;
         }
 
-        let content;
+        let content, pageSize, pageMargins;
         if(esAntibiotico) {
-            // Original en una hoja, Copia en otra (cada una media carta independiente)
+            // Original ARRIBA y Copia ABAJO en UNA SOLA hoja carta (una página),
+            // separadas por una línea de corte. Así se imprime en 1 hoja y no en 2.
+            const lineaCorte = { canvas:[
+                {type:'line',x1:0,y1:0,x2:540,y2:0,lineWidth:0.8,lineColor:'#cbd5e1',dash:{length:4}}
+            ], margin:[0,14,0,14] };
             content = [
                 ...bloqueReceta(false),
-                { text:'', pageBreak:'after' },
+                { text:'✂ - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -', fontSize:7, color:'#94a3b8', alignment:'center', margin:[0,10,0,10] },
                 ...bloqueReceta(true)
             ];
+            // Carta completa vertical: 612 x 792 pt
+            pageSize = { width: 612, height: 792 };
+            pageMargins = [36, 26, 36, 26];
         } else {
             // Una sola media carta
             content = bloqueReceta(false);
+            pageSize = { width: 612, height: 396 };
+            pageMargins = [36, 28, 36, 30];
         }
 
         const doc = {
-            // Media carta (half-letter): 612 x 396 puntos = 21.6 x 14 cm (apaisado bajo)
-            pageSize: { width: 612, height: 396 },
-            pageMargins:[36,28,36,30],
+            pageSize: pageSize,
+            pageMargins: pageMargins,
             footer: pdfFooter(),
             content: content,
             styles: pdfStyles()
         };
-        pdfMake.createPdf(doc).open();
+        return doc;
+    }
+
+    // Descarga la receta como archivo PDF (sin abrir el diálogo de impresión).
+    function descargarReceta() {
+        const pdf = _recetaPdfMake();
+        if(!pdf) return;
+        const p = db.pats[db.curr];
+        const nombre = 'Receta_' + ((p.name||'paciente').replace(/[^a-z0-9]+/gi,'_')) + '_' + sfHoyISO() + '.pdf';
+        pdf.download(nombre);
+    }
+
+    // Comparte la receta por el menú nativo del celular/PC (WhatsApp, correo…).
+    // Si el equipo no soporta compartir archivos, cae a descarga.
+    function compartirReceta() {
+        const pdf = _recetaPdfMake();
+        if(!pdf) return;
+        const p = db.pats[db.curr];
+        const nombre = 'Receta_' + ((p.name||'paciente').replace(/[^a-z0-9]+/gi,'_')) + '_' + sfHoyISO() + '.pdf';
+        pdf.getBlob(function(blob){
+            const file = new File([blob], nombre, { type:'application/pdf' });
+            if(navigator.canShare && navigator.canShare({ files:[file] })) {
+                navigator.share({ files:[file], title:'Receta médica', text:'Receta de ' + (p.name||'') }).catch(()=>{});
+            } else {
+                // Fallback: descargar (el doctor la adjunta manualmente)
+                pdf.download(nombre);
+                if(typeof daniSpeak === 'function') daniSpeak('Tu equipo no permite compartir directo; descargué la receta para que la adjuntes.', 5000, 'info');
+            }
+        });
+    }
+
+    // Devuelve el objeto pdfMake de la receta actual, reutilizando toda la
+    // maquetación de printReceta (mismo formato, media carta, alertas, etc.).
+    function _recetaPdfMake() {
+        if(!db.curr) { alert("Selecciona o guarda un paciente primero."); return null; }
+        if(!ensurePdfMake()) return null;
+        const rxText = ($('txtReceta').value || '').trim();
+        if(!rxText) { alert("La receta está vacía."); return null; }
+        const doc = _recetaDocActual();
+        return doc ? pdfMake.createPdf(doc) : null;
     }
     
     // ============================================================
@@ -16619,7 +16713,7 @@ Reglas: español de México; terminología dental correcta; máximo 6 líneas; u
                     (activeD.ced2 ? `\nCéd. Esp. ${activeD.ced2}` : '') +
                     (cfg.contact ? `\n📞 ${cfg.contact}` : '');
 
-        window.open(`https://wa.me/52${p.phone.replace(/\D/g,'')}?text=${encodeURIComponent(msg)}`, '_blank');
+        sfWhatsApp(p.phone, msg);
     }
 
     // ============================================================
@@ -17500,6 +17594,51 @@ Reglas: español de México; terminología dental correcta; máximo 6 líneas; u
     }
 
     // --- UI: overlay modal autónomo (respeta el estilo de la app) ---
+    // WhatsApp centralizado: ofrece Abrir (intenta respetar la app por defecto,
+    // ideal cuando usas WhatsApp Business con número propio) o Copiar el mensaje
+    // para pegarlo tú mismo en la app que quieras. Resuelve el caso de tener
+    // WhatsApp normal y Business como dos apps distintas en el mismo equipo.
+    function sfWhatsApp(tel, msg){
+        const num = tel ? String(tel).replace(/\D/g,'') : '';
+        const numFull = num ? (num.length===10 ? '52'+num : num) : '';
+        const texto = msg || '';
+        const { ov, body } = sfOverlay('<i class="fa-brands fa-whatsapp"></i> Enviar por WhatsApp', '#25d366');
+        body.innerHTML = `
+            <p style="margin:0 0 1rem 0; color:#475569; font-size:0.92rem; line-height:1.5;">
+                Elige cómo enviarlo. Si usas <b>WhatsApp Business</b> con número propio y se te abre el WhatsApp equivocado,
+                usa <b>Copiar</b> y pégalo en Business, o en tu celular marca "Siempre → WhatsApp Business" la primera vez.
+            </p>
+            <div style="display:flex; flex-direction:column; gap:0.6rem;">
+                <button class="btn btn-success" id="sfWaAbrir" style="width:100%; padding:0.9rem; font-weight:700;"><i class="fa-brands fa-whatsapp"></i> Abrir WhatsApp</button>
+                <button class="btn btn-outline" id="sfWaCopiar" style="width:100%; padding:0.9rem; font-weight:700;"><i class="fa-solid fa-copy"></i> Copiar mensaje</button>
+            </div>`;
+        body.querySelector('#sfWaAbrir').onclick = function(){
+            const url = numFull
+                ? `https://wa.me/${numFull}?text=${encodeURIComponent(texto)}`
+                : `https://wa.me/?text=${encodeURIComponent(texto)}`;
+            window.open(url, '_blank');
+            if(ov) ov.remove();
+        };
+        body.querySelector('#sfWaCopiar').onclick = function(){
+            const btn = body.querySelector('#sfWaCopiar');
+            const copiar = () => {
+                if(navigator.clipboard && navigator.clipboard.writeText){
+                    return navigator.clipboard.writeText(texto);
+                }
+                const ta = document.createElement('textarea');
+                ta.value = texto; ta.style.position='fixed'; ta.style.opacity='0';
+                document.body.appendChild(ta); ta.select();
+                try { document.execCommand('copy'); } catch(e){}
+                document.body.removeChild(ta);
+                return Promise.resolve();
+            };
+            copiar().then(()=>{
+                btn.innerHTML = '<i class="fa-solid fa-check"></i> ¡Copiado! Pégalo en Business';
+                btn.style.background = '#dcfce7'; btn.style.color = '#166534';
+            });
+        };
+    }
+
     function sfOverlay(titulo, color){
         // Nunca dos overlays a la vez: si ya hay uno abierto, se quita antes de
         // abrir este. Así un aviso tardío (p. ej. "hay un guardado más nuevo")
