@@ -590,7 +590,7 @@ window._pdfReady=true;
         <h2 style="margin: 0 !important; font-size: 1.5rem !important; color: white !important;">SmileFlow</h2>
         <a href="https://www.dentilike.com.mx" target="_blank" style="color: #bae6fd; font-size: 0.75rem; text-decoration: none; font-weight: 600; cursor: pointer; transition: color 0.2s;" onmouseover="this.style.color='white'" onmouseout="this.style.color='#bae6fd'">www.dentilike.com.mx</a>
         <a href="mailto:soporte@dentilike.com.mx" style="color: #bae6fd; font-size: 0.75rem; text-decoration: none; font-weight: 600; cursor: pointer; transition: color 0.2s;" onmouseover="this.style.color='white'" onmouseout="this.style.color='#bae6fd'">soporte@dentilike.com.mx</a>
-<span style="color:#7dd3fc; font-size:0.62rem; opacity:0.8; margin-top:2px;">© 2026 Dentilike · Todos los derechos reservados · <b id="sfVersion">v141</b></span>
+<span style="color:#7dd3fc; font-size:0.62rem; opacity:0.8; margin-top:2px;">© 2026 Dentilike · Todos los derechos reservados · <b id="sfVersion">v142</b></span>
     </div></div>
 <!-- Doctor en sesion: informativo, lleva a Configuracion para cambiarlo -->
 <div id="sideDocBox" onclick="openSection('s-admin-id', document.querySelector('.nav-item[onclick*=&quot;s-admin-id&quot;]'))" title="Doctor en sesion. Toca para cambiarlo o editar el perfil." style="margin:0 12px 10px; padding:0.7rem 0.85rem; background:rgba(255,255,255,0.07); border:1px solid rgba(125,211,252,0.28); border-left:3px solid #5DC1BF; border-radius:10px; cursor:pointer; display:flex; align-items:center; gap:0.6rem;">
@@ -3439,6 +3439,43 @@ Se tomaron signos vitales
 </div>
 </div>
 
+<!-- ===== GANANCIA DEL MES (ingresos - egresos) ===== -->
+<div class="card" style="border-top-color:#1d4ed8;">
+<div style="display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid var(--border); margin-bottom:1.2rem; padding-bottom:0.9rem; flex-wrap:wrap; gap:0.8rem;">
+<h3 style="color:#1d4ed8; font-size:1.2rem; margin:0; font-weight:900; display:flex; align-items:center; gap:0.6rem;"><span style="background:linear-gradient(135deg,#2563eb,#1d4ed8); color:white; width:34px; height:34px; border-radius:10px; display:inline-flex; align-items:center; justify-content:center; font-size:0.9rem;"><i class="fa-solid fa-scale-balanced"></i></span> Ganancia del mes</h3>
+<button class="btn btn-outline" onclick="sfFinExportar()" style="border-color:#1d4ed8; color:#1d4ed8; font-weight:800; font-size:0.82rem;"><i class="fa-brands fa-whatsapp"></i> Compartir reporte</button>
+</div>
+<div style="display:flex; gap:0.6rem; align-items:flex-end; flex-wrap:wrap; margin-bottom:1rem;">
+<div class="input-group" style="margin:0;"><label style="font-size:0.8rem;">Mes</label><input type="month" id="finMes" class="input-field" onchange="sfFinRender()" style="margin:0; padding:0.45rem;"/></div>
+<button class="btn btn-outline" onclick="sfFinHoyBtn()" style="font-size:0.8rem; padding:0.5rem 0.9rem;">Mes actual</button>
+</div>
+<div id="finResumen"></div>
+<!-- Registrar egreso -->
+<div style="margin-top:1.4rem; padding-top:1rem; border-top:1px dashed var(--border);">
+<div style="font-weight:800; color:#334155; font-size:0.9rem; margin-bottom:0.7rem;"><i class="fa-solid fa-plus" style="color:#dc2626;"></i> Registrar un egreso (gasto)</div>
+<div style="display:flex; flex-direction:column; gap:0.5rem;">
+<select class="input-field" id="egrCat" style="padding:0.55rem;">
+<option value="Renta">Renta</option>
+<option value="Sueldos">Sueldos</option>
+<option value="Servicios (luz/agua/internet)">Servicios (luz/agua/internet)</option>
+<option value="Laboratorio">Laboratorio</option>
+<option value="Insumos y materiales">Insumos y materiales</option>
+<option value="Equipo">Equipo</option>
+<option value="Publicidad">Publicidad</option>
+<option value="Impuestos">Impuestos</option>
+<option value="Otros">Otros</option>
+</select>
+<input class="input-field" id="egrConcepto" type="text" placeholder="Concepto (ej. Renta agosto, Pago laboratorio Pérez)" style="padding:0.55rem;"/>
+<div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
+<input class="input-field" id="egrMonto" type="number" placeholder="Monto $" style="padding:0.55rem; flex:1; min-width:110px;"/>
+<input class="input-field" id="egrFecha" type="date" style="padding:0.55rem; flex:1; min-width:130px;" title="Fecha del gasto (opcional)"/>
+<button class="btn btn-success" type="button" onclick="sfEgresoAgregar()" style="padding:0.55rem 1rem; white-space:nowrap;"><i class="fa-solid fa-plus"></i> Agregar</button>
+</div>
+</div>
+<p style="font-size:0.76rem; color:var(--text-muted); margin:0.6rem 0 0;"><i class="fa-solid fa-circle-info" style="color:#1d4ed8;"></i> Si no eliges fecha, se registra en el mes que estás viendo. Los ingresos se toman automáticamente de los abonos y tratamientos cobrados.</p>
+</div>
+</div>
+
 <!-- ===== REGISTRO DE INGRESOS ===== -->
 <div class="card" style="border-top-color:#059669;">
 <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid var(--border); margin-bottom:1.2rem; padding-bottom:0.9rem; flex-wrap:wrap; gap:0.8rem;">
@@ -4185,16 +4222,174 @@ No hay forma de recuperarlo: el cifrado es real y ni nosotros podemos abrirlo. G
 
     // ================= REGISTRO DE INGRESOS =================
     // Suma los abonos registrados en los pacientes: día por día y por mes.
+    // Devuelve 'yyyy-mm' desde una fecha en formato ISO (yyyy-mm-dd) o
+    // local mexicano (dd/mm/yyyy). Unifica el filtrado por mes sin importar
+    // cómo se guardó la fecha.
+    function sfMesDeFecha(f){
+        if(!f) return '';
+        f = String(f);
+        if(/^\d{4}-\d{2}/.test(f)) return f.substring(0,7);          // ISO
+        const m = f.match(/^(\d{2})\/(\d{2})\/(\d{4})/);              // dd/mm/yyyy
+        if(m) return m[3] + '-' + m[2];
+        return '';
+    }
+    // Mismo criterio pero a día completo 'yyyy-mm-dd'
+    function sfDiaDeFecha(f){
+        if(!f) return '';
+        f = String(f);
+        if(/^\d{4}-\d{2}-\d{2}/.test(f)) return f.substring(0,10);
+        const m = f.match(/^(\d{2})\/(\d{2})\/(\d{4})/);
+        if(m) return m[3] + '-' + m[2] + '-' + m[1];
+        return '';
+    }
+
+    const SF_EGRESO_CATS = ['Renta','Sueldos','Servicios (luz/agua/internet)','Laboratorio','Insumos y materiales','Equipo','Publicidad','Impuestos','Otros'];
+
+    // Ingresos reales cobrados en un mes (abonos + tratamientos aparte).
+    function sfIngresosDelMes(mes){
+        let total = 0;
+        Object.values(db.pats || {}).forEach(p => {
+            (p.abonos || []).forEach(a => { if(sfMesDeFecha(a.fecha)===mes) total += parseFloat(a.monto)||0; });
+            (p.tratamientosExtra || []).forEach(t => { if(sfMesDeFecha(t.fecha)===mes) total += parseFloat(t.costo)||0; });
+        });
+        return total;
+    }
+    function sfEgresosDelMes(mes){
+        return (db.egresos || []).filter(e => sfMesDeFecha(e.fecha)===mes);
+    }
+
+    function sfFinMesSel(){
+        const el = $('finMes');
+        return (el && el.value) ? el.value : sfMesISO();
+    }
+
+    // Registrar un egreso del consultorio
+    function sfEgresoAgregar(){
+        const mes = sfFinMesSel();
+        const cat = $('egrCat') ? $('egrCat').value : 'Otros';
+        const concepto = $('egrConcepto') ? $('egrConcepto').value.trim() : '';
+        const monto = parseFloat($('egrMonto') ? $('egrMonto').value : 0) || 0;
+        const fechaInput = $('egrFecha') ? $('egrFecha').value : '';
+        if(monto <= 0) return alert('Escribe un monto válido.');
+        if(!concepto) return alert('Escribe un concepto (ej. Renta agosto, Pago laboratorio).');
+        // Si no eligió fecha, usa el día 1 del mes visible (o hoy si es el mes actual)
+        let fecha = fechaInput;
+        if(!fecha){
+            fecha = (mes === sfMesISO()) ? sfHoyISO() : (mes + '-01');
+        }
+        db.egresos = db.egresos || [];
+        db.egresos.push({ id:'egr_'+Date.now(), fecha:fecha, categoria:cat, concepto:concepto, monto:monto });
+        if($('egrConcepto')) $('egrConcepto').value = '';
+        if($('egrMonto')) $('egrMonto').value = '';
+        if($('egrFecha')) $('egrFecha').value = '';
+        saveDB();
+        sfFinRender();
+        if(typeof daniSpeak === 'function') daniSpeak(`📉 Egreso registrado: ${concepto} ($${monto.toLocaleString('es-MX')}).`, 4000, 'info');
+    }
+    function sfEgresoQuitar(id){
+        if(!confirm('¿Quitar este egreso?')) return;
+        db.egresos = (db.egresos || []).filter(e => e.id !== id);
+        saveDB();
+        sfFinRender();
+    }
+
+    function sfFinFmt(n){ return '$' + (n||0).toLocaleString('es-MX', {maximumFractionDigits:2}); }
+
+    // Pinta el resumen del mes: Cobré / Gasté / Gané + desglose de egresos
+    function sfFinRender(){
+        const cont = $('finResumen'); if(!cont) return;
+        const mes = sfFinMesSel();
+        const ingresos = sfIngresosDelMes(mes);
+        const egresosArr = sfEgresosDelMes(mes);
+        const egresos = egresosArr.reduce((a,b)=>a+(parseFloat(b.monto)||0), 0);
+        const ganancia = ingresos - egresos;
+
+        const mesLbl = (()=>{ try { return new Date(mes+'-15T12:00:00').toLocaleDateString('es-MX',{month:'long',year:'numeric'}); } catch(e){ return mes; } })();
+
+        const caja = (lbl, val, col, bg, icon) => '<div style="background:'+bg+'; border:1px solid '+col+'33; border-radius:14px; padding:1.1rem 0.8rem; text-align:center;">'
+            + '<div style="font-size:1.6rem; font-weight:900; color:'+col+'; line-height:1;">'+val+'</div>'
+            + '<div style="font-size:0.72rem; color:#64748b; font-weight:800; text-transform:uppercase; letter-spacing:0.4px; margin-top:6px;">'+icon+' '+lbl+'</div></div>';
+
+        let h = '<div style="text-align:center; font-weight:800; color:#334155; font-size:0.95rem; margin-bottom:0.9rem; text-transform:capitalize;">'+mesLbl+'</div>';
+        h += '<div style="display:grid; grid-template-columns:repeat(3,1fr); gap:0.7rem; margin-bottom:0.5rem;">'
+            + caja('Cobré (ingresos)', sfFinFmt(ingresos), '#059669', '#f0fdf4', '💵')
+            + caja('Gasté (egresos)', sfFinFmt(egresos), '#dc2626', '#fef2f2', '📉')
+            + caja(ganancia>=0?'Gané (ganancia)':'Pérdida', sfFinFmt(ganancia), ganancia>=0?'#1d4ed8':'#b45309', ganancia>=0?'#eff6ff':'#fffbeb', ganancia>=0?'📈':'⚠️')
+            + '</div>';
+        // Frase clara en lenguaje simple
+        h += '<div style="text-align:center; font-size:0.85rem; color:#475569; background:#f8fafc; border-radius:10px; padding:0.7rem; margin-bottom:1rem;">'
+            + 'En <b style="text-transform:capitalize;">'+mesLbl+'</b> cobraste <b style="color:#059669;">'+sfFinFmt(ingresos)+'</b>, '
+            + 'gastaste <b style="color:#dc2626;">'+sfFinFmt(egresos)+'</b> y '
+            + (ganancia>=0 ? 'te quedó una ganancia de <b style="color:#1d4ed8;">'+sfFinFmt(ganancia)+'</b>.' : 'tuviste una pérdida de <b style="color:#b45309;">'+sfFinFmt(Math.abs(ganancia))+'</b>.')
+            + '</div>';
+
+        // Desglose de egresos por categoría
+        if(egresosArr.length){
+            const porCat = {};
+            egresosArr.forEach(e => { porCat[e.categoria] = (porCat[e.categoria]||0) + (parseFloat(e.monto)||0); });
+            h += '<div style="font-weight:800; color:#334155; font-size:0.86rem; margin:0.5rem 0 0.5rem;">Egresos por categoría</div>';
+            Object.entries(porCat).sort((a,b)=>b[1]-a[1]).forEach(([cat,val])=>{
+                const pct = egresos ? Math.round(val/egresos*100) : 0;
+                h += '<div style="margin-bottom:0.5rem;">'
+                   + '<div style="display:flex; justify-content:space-between; font-size:0.82rem; color:#475569;"><span>'+cat+'</span><b>'+sfFinFmt(val)+' <span style="color:#94a3b8; font-weight:600;">('+pct+'%)</span></b></div>'
+                   + '<div style="background:#e2e8f0; border-radius:6px; height:6px; margin-top:3px; overflow:hidden;"><div style="background:#f87171; height:100%; width:'+pct+'%;"></div></div>'
+                   + '</div>';
+            });
+            // Lista detallada con opción de quitar
+            h += '<div style="font-weight:800; color:#334155; font-size:0.86rem; margin:1rem 0 0.5rem;">Detalle de egresos</div>';
+            egresosArr.slice().sort((a,b)=>sfDiaDeFecha(b.fecha).localeCompare(sfDiaDeFecha(a.fecha))).forEach(e=>{
+                h += '<div style="display:flex; justify-content:space-between; align-items:center; gap:0.6rem; background:white; border:1px solid #fecaca; border-radius:8px; padding:0.5rem 0.7rem; margin-bottom:0.35rem;">'
+                   + '<span style="flex:1; min-width:0; font-size:0.83rem;"><b style="color:#dc2626;">'+sfFinFmt(e.monto)+'</b> <span style="color:#94a3b8; font-size:0.76rem;">— '+sfDiaDeFecha(e.fecha)+'</span><div style="font-size:0.76rem; color:#475569;">'+e.categoria+' · '+e.concepto+'</div></span>'
+                   + '<i class="fa-solid fa-xmark" onclick="sfEgresoQuitar(\''+e.id+'\')" style="cursor:pointer; color:#cbd5e1;" title="Quitar"></i>'
+                   + '</div>';
+            });
+        } else {
+            h += '<p style="color:#94a3b8; font-style:italic; font-size:0.85rem;">Aún no registras egresos en este mes. Agrégalos abajo (renta, sueldos, laboratorio, insumos…) para calcular tu ganancia real.</p>';
+        }
+        cont.innerHTML = h;
+    }
+
+    function sfFinExportar(){
+        const mes = sfFinMesSel();
+        const ingresos = sfIngresosDelMes(mes);
+        const egresosArr = sfEgresosDelMes(mes);
+        const egresos = egresosArr.reduce((a,b)=>a+(parseFloat(b.monto)||0), 0);
+        const ganancia = ingresos - egresos;
+        const mesLbl = (()=>{ try { return new Date(mes+'-15T12:00:00').toLocaleDateString('es-MX',{month:'long',year:'numeric'}); } catch(e){ return mes; } })();
+        const cfg = (typeof sfClinicaActiva==='function') ? sfClinicaActiva() : (db.cfg||{});
+        const porCat = {};
+        egresosArr.forEach(e => { porCat[e.categoria] = (porCat[e.categoria]||0) + (parseFloat(e.monto)||0); });
+        let msg = `*${cfg.cli || 'Consultorio'}*\n📊 Reporte financiero — ${mesLbl}\n\n`;
+        msg += `💵 Ingresos (cobrado): $${ingresos.toLocaleString('es-MX')}\n`;
+        msg += `📉 Egresos (gastos): $${egresos.toLocaleString('es-MX')}\n`;
+        msg += `${ganancia>=0?'📈 Ganancia':'⚠️ Pérdida'}: $${Math.abs(ganancia).toLocaleString('es-MX')}\n`;
+        if(Object.keys(porCat).length){
+            msg += `\n*Egresos por categoría:*\n`;
+            Object.entries(porCat).sort((a,b)=>b[1]-a[1]).forEach(([c,v])=>{ msg += `• ${c}: $${v.toLocaleString('es-MX')}\n`; });
+        }
+        if(typeof sfWhatsApp === 'function') sfWhatsApp('', msg);
+        else if(navigator.clipboard) navigator.clipboard.writeText(msg).then(()=>alert('Reporte copiado.'));
+    }
+
+    function sfFinHoyBtn(){
+        const el = $('finMes'); if(el){ el.value = sfMesISO(); sfFinRender(); }
+    }
+
     function ingRecolectar(){
         const out = [];
         Object.entries(db.pats || {}).forEach(([pid, p]) => {
             (p.abonos || []).forEach(a => {
                 const m = parseFloat(a.monto) || 0;
                 if(!m) return;
-                out.push({ pid: pid, paciente: p.name || 'Sin nombre', fecha: (a.fecha || '').substring(0,10), monto: m, concepto: a.concepto || '' });
+                out.push({ pid: pid, paciente: p.name || 'Sin nombre', fecha: (a.fecha || ''), monto: m, concepto: a.concepto || '' });
+            });
+            (p.tratamientosExtra || []).forEach(t => {
+                const m = parseFloat(t.costo) || 0;
+                if(!m) return;
+                out.push({ pid: pid, paciente: p.name || 'Sin nombre', fecha: (t.fecha || ''), monto: m, concepto: (t.concepto || 'Tratamiento') + ' (aparte)' });
             });
         });
-        return out.sort((x,y) => (y.fecha || '').localeCompare(x.fecha || ''));
+        return out.sort((x,y) => sfDiaDeFecha(y.fecha).localeCompare(sfDiaDeFecha(x.fecha)));
     }
     function ingFmt(n){ return '$' + (n||0).toLocaleString('es-MX', {maximumFractionDigits:2}); }
 
@@ -4210,10 +4405,10 @@ No hay forma de recuperarlo: el cifrado es real y ni nosotros podemos abrirlo. G
         const hoyISO = sfHoyISO();
         const mesSel = ($('ingMes') && $('ingMes').value) ? $('ingMes').value : hoyISO.substring(0,7);
 
-        const totHoy = datos.filter(d => d.fecha === hoyISO).reduce((a,b)=>a+b.monto, 0);
-        const totMes = datos.filter(d => (d.fecha||'').substring(0,7) === mesSel).reduce((a,b)=>a+b.monto, 0);
-        const delMes = datos.filter(d => (d.fecha||'').substring(0,7) === mesSel);
-        const dias = new Set(delMes.map(d=>d.fecha)).size;
+        const totHoy = datos.filter(d => sfDiaDeFecha(d.fecha) === hoyISO).reduce((a,b)=>a+b.monto, 0);
+        const totMes = datos.filter(d => sfMesDeFecha(d.fecha) === mesSel).reduce((a,b)=>a+b.monto, 0);
+        const delMes = datos.filter(d => sfMesDeFecha(d.fecha) === mesSel);
+        const dias = new Set(delMes.map(d=>sfDiaDeFecha(d.fecha))).size;
         const prom = dias ? totMes / dias : 0;
 
         const caja = (lbl, val, col, bg) => '<div style="background:' + bg + '; border:1px solid ' + col + '33; border-radius:12px; padding:0.9rem; text-align:center;">'
@@ -4232,7 +4427,7 @@ No hay forma de recuperarlo: el cifrado es real y ni nosotros podemos abrirlo. G
         }
         // Agrupado por día, del más reciente al más antiguo
         const porDia = {};
-        delMes.forEach(d => { if(!porDia[d.fecha]) porDia[d.fecha] = []; porDia[d.fecha].push(d); });
+        delMes.forEach(d => { const k = sfDiaDeFecha(d.fecha); if(!porDia[k]) porDia[k] = []; porDia[k].push(d); });
         const fechas = Object.keys(porDia).sort().reverse();
         let h = '<div style="font-weight:800; color:#334155; font-size:0.9rem; margin-bottom:0.6rem;">Detalle por día</div>';
         fechas.forEach(f => {
@@ -4258,7 +4453,7 @@ No hay forma de recuperarlo: el cifrado es real y ni nosotros podemos abrirlo. G
             const datos = ingRecolectar();
             if(!datos.length) return alert('No hay ingresos registrados todavía.');
             const esc = t => '"' + String(t == null ? '' : t).replace(/"/g,'""') + '"';
-            const filas = [['Fecha','Paciente','Concepto','Monto']].concat(datos.map(d => [d.fecha, d.paciente, d.concepto, d.monto]));
+            const filas = [['Fecha','Paciente','Concepto','Monto']].concat(datos.map(d => [sfDiaDeFecha(d.fecha), d.paciente, d.concepto, d.monto]));
             const csv = '\ufeff' + filas.map(f => f.map(esc).join(',')).join('\r\n');
             const a = document.createElement('a');
             a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
@@ -5045,7 +5240,7 @@ No hay forma de recuperarlo: el cifrado es real y ni nosotros podemos abrirlo. G
         if(targetId === 's-black') { try{ renderBlack(); }catch(e){console.error('black',e);} }
         if(targetId === 's-nolla') { try{ renderNolla(); }catch(e){console.error('nolla',e);} }
         if(targetId === 's-patologias') { try{ renderPatologias(''); }catch(e){console.error('pato',e);} }
-        if(targetId === 's-admin-fin') { try{ if($('ingMes') && !$('ingMes').value) $('ingMes').value = sfMesISO(); ingRender(); }catch(e){console.error('ingresos',e);} }
+        if(targetId === 's-admin-fin') { try{ if($('ingMes') && !$('ingMes').value) $('ingMes').value = sfMesISO(); ingRender(); }catch(e){console.error('ingresos',e);} try{ if($('finMes') && !$('finMes').value) $('finMes').value = sfMesISO(); sfFinRender(); }catch(e){console.error('ganancia',e);} }
         if(targetId === 's-nota-removible') { try{ remInit(); }catch(e){console.error('removible',e);} }
         if(targetId === 's-manuales') { try{ renderResina(); renderBlanqueamiento(); renderStepByDent(); }catch(e){console.error('manuales',e);} }
         if(targetId === 's-asistencia') { try{ renderAsistencia(); }catch(e){console.error('asist',e);} }
@@ -5312,6 +5507,7 @@ db = {
     };
 
     // MIGRACIONES BLINDADAS
+    if(!Array.isArray(db.egresos)) db.egresos = [];
     if (db.cfg.astName === undefined) db.cfg.astName = '';
     if (!db.cfg.astPhoto || db.cfg.astPhoto === '') db.cfg.astPhoto = 'avatar.png';
     if (!db.cfg.act) db.cfg.act = {};
