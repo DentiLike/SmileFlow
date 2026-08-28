@@ -590,7 +590,7 @@ window._pdfReady=true;
         <h2 style="margin: 0 !important; font-size: 1.5rem !important; color: white !important;">SmileFlow</h2>
         <a href="https://www.dentilike.com.mx" target="_blank" style="color: #bae6fd; font-size: 0.75rem; text-decoration: none; font-weight: 600; cursor: pointer; transition: color 0.2s;" onmouseover="this.style.color='white'" onmouseout="this.style.color='#bae6fd'">www.dentilike.com.mx</a>
         <a href="mailto:soporte@dentilike.com.mx" style="color: #bae6fd; font-size: 0.75rem; text-decoration: none; font-weight: 600; cursor: pointer; transition: color 0.2s;" onmouseover="this.style.color='white'" onmouseout="this.style.color='#bae6fd'">soporte@dentilike.com.mx</a>
-<span style="color:#7dd3fc; font-size:0.62rem; opacity:0.8; margin-top:2px;">© 2026 Dentilike · Todos los derechos reservados · <b id="sfVersion">v142</b></span>
+<span style="color:#7dd3fc; font-size:0.62rem; opacity:0.8; margin-top:2px;">© 2026 Dentilike · Todos los derechos reservados · <b id="sfVersion">v146</b></span>
     </div></div>
 <!-- Doctor en sesion: informativo, lleva a Configuracion para cambiarlo -->
 <div id="sideDocBox" onclick="openSection('s-admin-id', document.querySelector('.nav-item[onclick*=&quot;s-admin-id&quot;]'))" title="Doctor en sesion. Toca para cambiarlo o editar el perfil." style="margin:0 12px 10px; padding:0.7rem 0.85rem; background:rgba(255,255,255,0.07); border:1px solid rgba(125,211,252,0.28); border-left:3px solid #5DC1BF; border-radius:10px; cursor:pointer; display:flex; align-items:center; gap:0.6rem;">
@@ -3627,6 +3627,7 @@ Se tomaron signos vitales
 <h3 style="color:#1d4ed8; font-size:1.3rem; margin-bottom:1.5rem; font-weight:800; display:flex; align-items:center; gap:0.7rem;"><span style="background:linear-gradient(135deg, #3b82f6, #1d4ed8); color:white; width:36px; height:36px; border-radius:10px; display:inline-flex; align-items:center; justify-content:center; font-size:0.95rem; box-shadow:0 4px 8px rgba(29,78,216,0.3);"><i class="fa-solid fa-server"></i></span> Sistema, Privacidad y Nube</h3>
 
 <div id="sfSaludDatos" style="margin-bottom:1.5rem;"></div>
+<div style="border:1px solid #fde68a; border-left:4px solid #d97706; border-radius:10px; padding:0.85rem 1.1rem; margin-bottom:1.5rem; background:#fffbeb; font-size:0.85rem; color:#92400e; line-height:1.6;"><b><i class="fa-solid fa-triangle-exclamation"></i> Tu respaldo, tu responsabilidad.</b> Estas herramientas te ayudan a evitar pérdidas de datos, pero mantener copias al día es responsabilidad del usuario. Dentilike no se hace responsable por pérdida de datos por fallas del equipo, del navegador, de servicios de terceros o por falta de respaldos. <span onclick="openSection('s-ayuda', document.querySelector('#sidebar [onclick*=\'s-ayuda\']'))" style="text-decoration:underline; cursor:pointer; font-weight:700;">Ver aviso completo</span></div>
 <div class="card" style="border-top-color: #3b82f6;">
 <h4 style="font-size:1.1rem; margin-bottom:1rem; color:#1e40af;"><i class="fa-brands fa-google-drive"></i> Sincronización Segura en Tiempo Real</h4>
 <p style="font-size:0.95rem; color:var(--text-muted); margin-bottom:1.5rem; line-height:1.6;">Conecta tu cuenta para guardar y descargar tus pacientes automáticamente. Por tu privacidad y la de tus pacientes (Zero-Knowledge), <b>tus datos vivirán únicamente en un archivo encriptado dentro de tu propio Google Drive personal</b>, nunca en servidores externos.</p>
@@ -3851,12 +3852,50 @@ SmileFlow <b>no es un Expediente Clínico Electrónico certificado</b> conforme 
 </div>
 
 <div style="border:1px solid var(--border); border-left:4px solid #b45309; border-radius:10px; padding:1rem 1.2rem; margin-bottom:0.8rem;">
-<div style="font-weight:800; color:#b45309; margin-bottom:0.4rem;">3. Google Drive (sincronización) <span style="background:#fef3c7; color:#92400e; font-size:0.7rem; padding:2px 8px; border-radius:6px; margin-left:4px;">EN DESARROLLO</span></div>
-<div style="font-size:0.9rem; color:#475569; line-height:1.7;">Conecta tu cuenta de Google y la app sube tu información a <b>tu propio Drive</b> (no a un servidor de Dentilike).
-<div style="background:#fffbeb; border:1px solid #fde68a; border-radius:8px; padding:0.8rem 1rem; margin:0.7rem 0; color:#92400e;"><b><i class="fa-solid fa-envelope"></i> Importante — solicita el acceso primero:</b> esta función está en fase de desarrollo y el acceso se habilita cuenta por cuenta. <b>Antes de intentar conectarte</b>, escribe a <b>soporte@dentilike.com.mx</b> para recibir las instrucciones y que autoricemos tu correo. Si intentas conectar sin ese paso, Google mostrará una pantalla de advertencia y no funcionará.</div>
-Una vez autorizado tu correo: ve a <b>Configuración → Sistema y Nube</b>, toca <b>"Conectar Cuenta de Google"</b> y acepta los permisos. A partir de ahí sube copias solo, cuando hay internet.</div>
-<a href="mailto:soporte@dentilike.com.mx?subject=Solicito%20acceso%20a%20sincronizaci%C3%B3n%20con%20Google%20Drive%20(SmileFlow)" class="btn" style="display:inline-block; background:#b45309; color:white; font-weight:800; padding:0.6rem 1rem; margin-top:0.5rem; text-decoration:none;"><i class="fa-solid fa-envelope"></i> Solicitar acceso por correo</a>
+<div style="font-weight:800; color:#b45309; margin-bottom:0.4rem;">3. Google Drive (sincronización automática) <span style="background:#dcfce7; color:#166534; font-size:0.7rem; padding:2px 8px; border-radius:6px; margin-left:4px;">RECOMENDADA</span></div>
+<div style="font-size:0.9rem; color:#475569; line-height:1.7;">Conecta tu cuenta de Google y la app sube tu información a <b>tu propio Drive</b> (no a un servidor de Dentilike). Es la forma más cómoda: te olvidas de descargar archivos y siempre tienes una copia a salvo en la nube.
+<div style="background:#f0fdf4; border:1px solid #bbf7d0; border-radius:8px; padding:0.8rem 1rem; margin:0.7rem 0; color:#166534;"><b><i class="fa-solid fa-star"></i> Beneficios:</b>
+<ul style="margin:0.4rem 0 0 1.1rem; padding:0;">
+<li>Respaldo automático: sube tus copias solo, sin que hagas nada.</li>
+<li>Tus datos quedan en <b>tu propio Google Drive</b>, bajo tu control.</li>
+<li>Si cambias de equipo o se daña, recuperas todo desde tu cuenta.</li>
+<li>Puedes cifrar la información con contraseña: ni Google ni Dentilike la pueden leer.</li>
+</ul></div>
+<b>Cómo activarla (una sola vez):</b>
+<ol style="margin:0.4rem 0 0.4rem 1.1rem;"><li>Ve a <b>Configuración → Sistema y Nube</b>.</li><li>Toca <b>"Conectar Cuenta de Google"</b>.</li><li>Elige tu cuenta y acepta los permisos que pide Google.</li></ol>
+Listo. A partir de ahí SmileFlow sube copias solo, cuando hay internet. Solo tienes que conectarte esta vez; no hay que reconectar cada semana.
+<div style="font-size:0.82rem; color:#94a3b8; margin-top:0.6rem;"><i class="fa-solid fa-shield-halved"></i> SmileFlow solo puede ver los archivos que él mismo crea en tu Drive (permiso <b>drive.file</b>); no accede al resto de tus documentos ni fotos.</div></div>
+<button class="btn" onclick="handleAuthClick()" style="display:inline-block; background:#b45309; color:white; font-weight:800; padding:0.6rem 1rem; margin-top:0.6rem; border:none;"><i class="fa-brands fa-google"></i> Conectar Cuenta de Google</button>
 <button class="btn btn-outline" onclick="openSection('s-admin-sys')" style="border-color:#b45309; color:#b45309; font-weight:800; padding:0.6rem 1rem; margin-top:0.5rem;"><i class="fa-solid fa-gear"></i> Ir a Sistema y Nube</button>
+</div>
+
+<div style="border:1px solid var(--border); border-radius:12px; padding:1.1rem 1.3rem; margin:1rem 0; background:#f8fafc;">
+<div style="font-weight:800; color:#1d4ed8; font-size:1.02rem; margin-bottom:0.8rem;"><i class="fa-solid fa-cloud"></i> Preguntas frecuentes sobre la nube</div>
+
+<details style="margin-bottom:0.6rem; border-bottom:1px solid var(--border); padding-bottom:0.6rem;"><summary style="cursor:pointer; font-weight:700; color:#334155;">¿Cómo conecto mi Google Drive?</summary>
+<div style="font-size:0.9rem; color:#475569; line-height:1.7; margin-top:0.5rem;">Ve a <b>Configuración → Sistema y Nube</b>, toca <b>"Conectar Cuenta de Google"</b>, elige tu cuenta y acepta los permisos. Es una sola vez; después la app sube tus copias sola cuando hay internet.</div></details>
+
+<details style="margin-bottom:0.6rem; border-bottom:1px solid var(--border); padding-bottom:0.6rem;"><summary style="cursor:pointer; font-weight:700; color:#334155;">¿Mis datos se van a un servidor de Dentilike?</summary>
+<div style="font-size:0.9rem; color:#475569; line-height:1.7; margin-top:0.5rem;">No. Tu información se guarda en <b>tu propio Google Drive</b>. Dentilike no tiene un servidor con tus expedientes ni puede verlos. SmileFlow solo accede a los archivos que él mismo crea (permiso <b>drive.file</b>); no ve el resto de tu Drive.</div></details>
+
+<details style="margin-bottom:0.6rem; border-bottom:1px solid var(--border); padding-bottom:0.6rem;"><summary style="cursor:pointer; font-weight:700; color:#334155;">¿Cómo sincronizo la compu con el celular?</summary>
+<div style="font-size:0.9rem; color:#475569; line-height:1.7; margin-top:0.5rem;">Conecta la <b>misma cuenta de Google</b> en los dos equipos. Cuando terminas de trabajar en uno, la app sube un guardado con la fecha; al abrir el otro, te avisa <i>"hay un guardado más reciente, ¿lo traigo?"</i>. Aceptas y sigues donde te quedaste. <b>Nunca se borra nada sin tu permiso</b>, y antes de traer un punto se guarda una copia de lo que tenías.</div></details>
+
+<details style="margin-bottom:0.6rem; border-bottom:1px solid var(--border); padding-bottom:0.6rem;"><summary style="cursor:pointer; font-weight:700; color:#334155;">¿Tengo que reconectarme cada semana?</summary>
+<div style="font-size:0.9rem; color:#475569; line-height:1.7; margin-top:0.5rem;">No. Conectas una sola vez y la sesión se mantiene. Solo tendrías que volver a conectar si tú mismo desconectas la cuenta o cierras sesión.</div></details>
+
+<details style="margin-bottom:0.6rem; border-bottom:1px solid var(--border); padding-bottom:0.6rem;"><summary style="cursor:pointer; font-weight:700; color:#334155;">¿Qué diferencia hay entre "carpeta de respaldo" y "la nube"?</summary>
+<div style="font-size:0.9rem; color:#475569; line-height:1.7; margin-top:0.5rem;">📁 La <b>carpeta de respaldo</b> guarda copias de <b>ese</b> equipo, pero no pasa los datos a otro dispositivo. ☁️ La <b>nube (Google Drive)</b> sí conecta tus equipos entre sí: es la que usas para trabajar en la compu y seguir en el celular.</div></details>
+
+<details><summary style="cursor:pointer; font-weight:700; color:#334155;">¿Puedo proteger mis respaldos con contraseña?</summary>
+<div style="font-size:0.9rem; color:#475569; line-height:1.7; margin-top:0.5rem;">Sí. Al descargar una copia puedes cifrarla con contraseña. Con ella, ni Google ni Dentilike pueden leer el contenido. <b>Guarda bien esa contraseña</b>: sin ella el archivo no se puede recuperar.</div></details>
+</div>
+
+<div style="border:1px solid #fecaca; border-left:4px solid #dc2626; border-radius:10px; padding:1rem 1.2rem; margin:1rem 0; background:#fef2f2;">
+<div style="font-weight:800; color:#b91c1c; margin-bottom:0.5rem;"><i class="fa-solid fa-triangle-exclamation"></i> Aviso de responsabilidad</div>
+<div style="font-size:0.88rem; color:#7f1d1d; line-height:1.7;">SmileFlow pone a tu disposición herramientas de respaldo y sincronización para <b>ayudarte a evitar la pérdida de información</b>. Sin embargo, <b>la responsabilidad de mantener copias de seguridad de los datos de tus pacientes es del usuario</b>.<br><br>
+Dentilike y el desarrollador <b>no se hacen responsables</b> por pérdida, daño, corrupción o filtración de datos que puedan derivarse de: fallas del dispositivo o del navegador, borrado accidental, fallas o cambios en servicios de terceros (como Google Drive), pérdida de la contraseña de cifrado, o de <b>no mantener respaldos periódicos</b>.<br><br>
+Al usar SmileFlow aceptas que es una herramienta de apoyo y que la custodia final del expediente clínico corresponde al profesional tratante, conforme a la normatividad aplicable. <b>Recomendación:</b> mantén al menos dos formas de respaldo activas y descarga una copia con regularidad.</div>
 </div>
 
 <div style="background:#f5f3ff; border:1px solid #ddd6fe; border-radius:8px; padding:0.9rem 1.1rem; font-size:0.88rem; color:#4c1d95; line-height:1.7;">
@@ -4509,9 +4548,9 @@ No hay forma de recuperarlo: el cifrado es real y ni nosotros podemos abrirlo. G
             + '☁️ <b>Guardados en la nube</b> = <b>esto sí</b> conecta tus dispositivos.</div>'
             + '<div style="font-size:0.9rem; color:#475569; line-height:1.7; margin-bottom:1rem;">Así funciona: terminas de trabajar en la computadora y la app <b>sube un punto con la fecha</b>. Llegas al celular, abres SmileFlow y te avisa <i>"hay un guardado más reciente, ¿lo traigo?"</i>. Aceptas y sigues donde te quedaste.<br><br>'
             + '<b>Nunca se borra nada sin tu permiso</b>, y antes de traer un punto se guarda una copia de lo que tenías.</div>'
-            + '<div style="background:#f5f3ff; border:1px solid #ddd6fe; border-radius:10px; padding:0.8rem 1rem; margin-bottom:1rem; font-size:0.84rem; color:#4c1d95; line-height:1.55;">La sincronización está en <b>fase de desarrollo</b>: el acceso se habilita cuenta por cuenta. Escribe a <b>soporte@dentilike.com.mx</b> para que autoricemos tu correo.</div>'
-            + sfOnbBtn('<i class="fa-solid fa-envelope"></i> Solicitar acceso a la nube', "sfOnbCerrar(this); window.location.href='mailto:soporte@dentilike.com.mx?subject=Solicito%20acceso%20a%20sincronizaci%C3%B3n%20(SmileFlow)';", true)
-            + sfOnbBtn('<i class="fa-solid fa-download"></i> Mientras tanto, descargar una copia', "sfOnbCerrar(this); backupDB();", false)
+            + '<div style="background:#f0fdf4; border:1px solid #bbf7d0; border-radius:10px; padding:0.8rem 1rem; margin-bottom:1rem; font-size:0.84rem; color:#166534; line-height:1.55;">✅ <b>Ya disponible.</b> Para activarla: entra a <b>Configuración → Sistema y Nube</b> y toca <b>"Conectar Cuenta de Google"</b>. Es una sola vez; después sube tus copias solo.</div>'
+            + sfOnbBtn('<i class="fa-brands fa-google"></i> Conectar la nube ahora', "sfOnbCerrar(this); openSection('s-admin-sys', document.querySelector('#sidebar [onclick*=\\'s-admin-sys\\']')); if(typeof handleAuthClick==='function') setTimeout(handleAuthClick, 400);", true)
+            + sfOnbBtn('<i class="fa-solid fa-download"></i> O descargar una copia manual', "sfOnbCerrar(this); backupDB();", false)
             + sfOnbBtn('<i class="fa-solid fa-circle-question"></i> Ver la guía completa en Ayuda', "sfOnbCerrar(this); openSection('s-ayuda', document.querySelector('#sidebar [onclick*=\\'s-ayuda\\']'));", false)
             + '<div style="text-align:center; margin-top:0.4rem;"><span onclick="sfOnbPaso(1)" style="font-size:0.82rem; color:#94a3b8; cursor:pointer; text-decoration:underline;">← Volver</span></div>';
         }
@@ -4877,8 +4916,8 @@ No hay forma de recuperarlo: el cifrado es real y ni nosotros podemos abrirlo. G
         const t = sfTokenDrive();
         if(!t){
             body.innerHTML = '<div style="background:#fffbeb; border:1px solid #fde68a; color:#92400e; border-radius:10px; padding:1rem;">'
-                + 'Tu cuenta de Google no está conectada en este dispositivo. Ve a <b>Configuración → Sistema y Nube</b> y conéctala.<br><br>'
-                + '<i style="font-size:0.85rem;">Recuerda que la sincronización está en fase de desarrollo: escribe a soporte@dentilike.com.mx para habilitar tu correo.</i></div>';
+                + 'Tu cuenta de Google no está conectada en este dispositivo. Ve a <b>Configuración → Sistema y Nube</b> y toca <b>"Conectar Cuenta de Google"</b>.<br><br>'
+                + '<i style="font-size:0.85rem;">Solo necesitas conectarte una vez; después la sincronización trabaja sola.</i></div>';
             return;
         }
         try {
@@ -5167,9 +5206,9 @@ No hay forma de recuperarlo: el cifrado es real y ni nosotros podemos abrirlo. G
                   : (pq.n + ' imagen(es), ~' + pq.mb.toFixed(1) + ' MB.' + (okPeso ? ' Peso saludable.' : ' Ya es considerable: para tomografías y estudios muy pesados usa <b>enlace</b> en vez de subir el archivo.')), '');
         } catch(e){}
 
-        h += sfFila(false, 'Google Drive <span style="background:#fef3c7; color:#92400e; font-size:0.65rem; padding:1px 6px; border-radius:5px;">EN DESARROLLO</span>',
-              'El acceso se habilita cuenta por cuenta. Escribe a soporte@dentilike.com.mx antes de intentar conectarte.',
-              '<a href="mailto:soporte@dentilike.com.mx?subject=Solicito%20acceso%20a%20Google%20Drive%20(SmileFlow)" style="' + bs + ' background:#b45309; color:white; text-decoration:none; display:inline-block;"><i class="fa-solid fa-envelope"></i> Solicitar acceso</a>'
+        h += sfFila(!!sfTokenDrive(), 'Google Drive <span style="background:#dcfce7; color:#166534; font-size:0.65rem; padding:1px 6px; border-radius:5px;">DISPONIBLE</span>',
+              (sfTokenDrive() ? 'Conectado. Tus copias suben solas a tu propio Drive.' : 'Conecta tu cuenta de Google para respaldar automáticamente en tu propio Drive.'),
+              (sfTokenDrive() ? '' : '<button onclick="if(typeof handleAuthClick===\'function\')handleAuthClick()" style="' + bs + ' background:#b45309; color:white; border:none;"><i class="fa-brands fa-google"></i> Conectar</button>')
             + '<button onclick="sfNubePanel()" style="' + bs + ' background:#1d4ed8; color:white;"><i class="fa-solid fa-clock-rotate-left"></i> Guardados en la nube</button>');
 
         h += '<div style="border-top:1px solid var(--border); margin-top:1rem; padding-top:1rem;">'
@@ -8879,6 +8918,8 @@ ${base}`;
           r:'🏥 Consultorios:\nCon el selector "Todos los consultorios" (arriba) filtras los pacientes por consultorio. Cada paciente queda asignado a uno.' },
         { keys:['version','que version','actualizacion','v137'],
           r:'ℹ️ Estás en SmileFlow v137. La versión aparece abajo a la izquierda, junto al logo Dentilike.' },
+        { keys:['privacidad','aviso de privacidad','responsabilidad','deslinde','datos seguros','legal'],
+          r:'🔒 Aviso de Privacidad y responsabilidad:\nTus datos se guardan en tu equipo y en tu propio Google Drive; Dentilike no los ve ni los vende. Las herramientas de respaldo ayudan a evitar perdidas, pero mantener copias al dia es responsabilidad del usuario, y Dentilike no se hace responsable por perdidas por fallas del equipo, del navegador o de terceros. Puedes leer el aviso completo en la seccion Ayuda.' },
         { keys:['datos de otro paciente','se mezclan','fuga','aparece otro paciente','datos cruzados'],
           r:'🔒 Si ves datos de otro paciente: en v137 se reforzó la limpieza al cambiar de paciente (todas las secciones se refrescan solas). Si te pasó con un expediente viejo, revisa el historial de ambos pacientes y borra manualmente la nota que haya quedado cruzada.' },
 
@@ -18241,7 +18282,7 @@ Reglas: español de México; terminología dental correcta; máximo 6 líneas; u
             + '<div style="font-size:0.87rem; color:#475569; line-height:1.6; margin-top:3px;">Se descarga un archivo con toda tu información. Guárdalo en tu Google Drive o en una USB. Repítelo cada semana.</div></div>'
             + '<div style="border:1px solid var(--border); border-left:4px solid #2563eb; border-radius:10px; padding:0.9rem 1.1rem; margin-bottom:1rem;">'
             + '<div style="font-weight:800; color:#1d4ed8;">Opción automática: carpeta o Google Drive</div>'
-            + '<div style="font-size:0.87rem; color:#475569; line-height:1.6; margin-top:3px;">En <b>Configuración → Sistema y Nube</b> puedes elegir una carpeta y se respalda solo. <i>La sincronización con Google Drive está en desarrollo: solicita el acceso a soporte@dentilike.com.mx.</i></div></div>'
+            + '<div style="font-size:0.87rem; color:#475569; line-height:1.6; margin-top:3px;">En <b>Configuración → Sistema y Nube</b> puedes elegir una carpeta y se respalda solo, o conectar <b>Google Drive</b> para que suba tus copias a tu propia nube automáticamente.</div></div>'
             + '<div style="display:flex; gap:0.5rem; flex-wrap:wrap;">'
             + '<button class="btn" onclick="localStorage.setItem(\'sf_guia_resp\',\'1\'); backupDB();" style="background:#059669; color:white; font-weight:800; padding:0.7rem 1rem; flex:1;"><i class="fa-solid fa-download"></i> Descargar copia ahora</button>'
             + '<button class="btn btn-outline" onclick="localStorage.setItem(\'sf_guia_resp\',\'1\'); this.closest(\'[data-sf-overlay]\').remove(); openSection(\'s-ayuda\');" style="border-color:#475569; color:#475569; font-weight:800; padding:0.7rem 1rem;">Ver la guía completa</button>'
@@ -18398,6 +18439,10 @@ Reglas: español de México; terminología dental correcta; máximo 6 líneas; u
             if((b.dataset.action || '') === 'cloud'){
                 const nav = document.querySelector('#sidebar [onclick*="s-admin-sys"]');
                 if(typeof openSection === 'function') openSection('s-admin-sys', nav);
+            }
+            if((b.dataset.action || '') === 'privacidad'){
+                const nav = document.querySelector('#sidebar [onclick*="s-ayuda"]');
+                if(typeof openSection === 'function') openSection('s-ayuda', nav);
             }
             b.classList.remove('show');
         } catch(e){}
@@ -19021,6 +19066,16 @@ function saveDB() {
                 }
             }
         }, 16000);
+
+        // 4. Invitacion a leer el aviso de privacidad (a los 30 s, una sola vez).
+        setTimeout(() => {
+            if(typeof daniSpeak === 'function') {
+                if(!localStorage.getItem('sf_daniPriv_visto')) {
+                    localStorage.setItem('sf_daniPriv_visto', '1');
+                    daniSpeak("Te recomiendo leer el Aviso de Privacidad y responsabilidad de datos de la app. Clic para verlo.", 11000, 'info', 'privacidad');
+                }
+            }
+        }, 30000);
         
         
         if(localStorage.getItem('sf_tablet') === 'true') {
