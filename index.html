@@ -603,7 +603,7 @@ window._pdfReady=true;
         <h2 style="margin: 0 !important; font-size: 1.5rem !important; color: white !important;">SmileFlow</h2>
         <a href="https://www.dentilike.com.mx" target="_blank" style="color: #bae6fd; font-size: 0.75rem; text-decoration: none; font-weight: 600; cursor: pointer; transition: color 0.2s;" onmouseover="this.style.color='white'" onmouseout="this.style.color='#bae6fd'">www.dentilike.com.mx</a>
         <a href="mailto:soporte@dentilike.com.mx" style="color: #bae6fd; font-size: 0.75rem; text-decoration: none; font-weight: 600; cursor: pointer; transition: color 0.2s;" onmouseover="this.style.color='white'" onmouseout="this.style.color='#bae6fd'">soporte@dentilike.com.mx</a>
-<span style="color:#7dd3fc; font-size:0.62rem; opacity:0.8; margin-top:2px;">© 2026 Dentilike · Todos los derechos reservados · <b id="sfVersion">v150</b></span>
+<span style="color:#7dd3fc; font-size:0.62rem; opacity:0.8; margin-top:2px;">© 2026 Dentilike · Todos los derechos reservados · <b id="sfVersion">v151</b></span>
     </div></div>
 <!-- Doctor en sesion: informativo, lleva a Configuracion para cambiarlo -->
 <div id="sideDocBox" onclick="openSection('s-admin-id', document.querySelector('.nav-item[onclick*=&quot;s-admin-id&quot;]'))" title="Doctor en sesion. Toca para cambiarlo o editar el perfil." style="margin:0 12px 10px; padding:0.7rem 0.85rem; background:rgba(255,255,255,0.07); border:1px solid rgba(125,211,252,0.28); border-left:3px solid #5DC1BF; border-radius:10px; cursor:pointer; display:flex; align-items:center; gap:0.6rem;">
@@ -3673,7 +3673,7 @@ Se tomaron signos vitales
 <p style="font-size:0.95rem; color:var(--text-muted); margin-bottom:1.5rem; line-height:1.6;">Conecta tu cuenta para guardar y descargar tus pacientes automáticamente. Por tu privacidad y la de tus pacientes (Zero-Knowledge), <b>tus datos vivirán únicamente en un archivo encriptado dentro de tu propio Google Drive personal</b>, nunca en servidores externos.</p>
 <div style="display:flex; gap:1rem; flex-wrap:wrap; background:#eff6ff; padding:1.5rem; border-radius:var(--radius-md); border:1px solid #bfdbfe;">
 <button class="btn" id="btnAuthAdmin" onclick="handleAuthClick()" style="background:#2563eb; color:white; font-size:1.1rem; padding:1.2rem; flex-grow:1; display:none; font-weight:800;"><i class="fa-brands fa-google"></i> Conectar Cuenta de Google</button>
-<button class="btn" id="btnSyncNow" onclick="checkDriveFile()" style="background:#10b981; color:white; font-size:1.1rem; padding:1.2rem; flex-grow:1; display:none; font-weight:800;"><i class="fa-solid fa-cloud-arrow-down"></i> Forzar Descarga (Sincronizar)</button>
+<button class="btn" id="btnSyncNow" onclick="checkDriveFile()" style="background:#10b981; color:white; font-size:1.1rem; padding:1.2rem; flex-grow:1; display:none; font-weight:800;"><i class="fa-solid fa-cloud-arrow-down"></i> Sincronizar con Nube</button>
 <button class="btn" id="btnSignout" onclick="handleSignoutClick()" style="background:#ef4444; color:white; font-size:1.1rem; padding:1.2rem; display:none; font-weight:800;"><i class="fa-solid fa-right-from-bracket"></i> Desconectar Nube</button>
 </div>
 </div>
@@ -18702,7 +18702,15 @@ Reglas: español de México; terminología dental correcta; máximo 6 líneas; u
         } tokenClient.callback=async(r)=>{if(r.error)return; showConnectedUI(); await checkDriveFile();}; let t=null; try{t=gapi.client.getToken();}catch(e){} if(t===null) tokenClient.requestAccessToken({prompt:'consent'}); else tokenClient.requestAccessToken({prompt:''}); }
     function handleSignoutClick() { try{const t=gapi.client.getToken(); if(t!==null){google.accounts.oauth2.revoke(t.access_token); gapi.client.setToken('');}}catch(e){} if($('btnAuthAdmin')) $('btnAuthAdmin').style.display='block'; if($('btnSyncNow')) $('btnSyncNow').style.display='none'; if($('btnSignout')) $('btnSignout').style.display='none'; updateGlobalSyncStatus('offline'); alert("Desconectado."); }
     
-    async function checkDriveFile() {
+    function sfEsErrorDeAuth(e) {
+        try {
+            const cod = e && (e.status || (e.result && e.result.error && e.result.error.code));
+            if(cod === 401 || cod === 403) return true;
+            const txt = JSON.stringify(e || '').toLowerCase();
+            return /invalid_grant|invalid_token|unauthorized|unauthenticated|token.*expir/.test(txt);
+        } catch(_) { return false; }
+    }
+    async function checkDriveFile(esReintento) {
         // No comparar contra la nube hasta tener la base local en memoria.
         if(!window.sfDatosListos){
             if(!window._sfEsperaSync) window._sfEsperaSync = 0;
@@ -18714,7 +18722,23 @@ Reglas: español de México; terminología dental correcta; máximo 6 líneas; u
         updateGlobalSyncStatus('syncing');
         const okT = await ensureDriveToken();
         if(!okT) { updateGlobalSyncStatus('offline'); daniSpeak('🔌 La sesión de Google expiró. Pulsa "Conectar" para volver a entrar.', 8000, 'warn'); return; }
-        try { if(typeof gapi!=='undefined'&&gapi.client&&!gapi.client.drive) await gapi.client.load('drive','v3'); sfSyncInicialPendiente = true; let r=await gapi.client.drive.files.list({q:"name='SmileFlow_Database.json' and trashed=false",fields:'files(id,modifiedTime)',spaces:'drive'}); let f=r.result.files; if(f&&f.length>0){driveFileId=f[0].id; localStorage.setItem('sf_drive_file_id',driveFileId); await downloadFromDrive(driveFileId, f[0].modifiedTime); updateGlobalSyncStatus('online');}else{if(Object.keys(db.pats).length>0) await uploadToDrive(true); else updateGlobalSyncStatus('online');} sfSyncInicialPendiente = false; try{ setTimeout(sfNubeRevisarNuevo, 2500); }catch(e){} }catch(e){ sfSyncInicialPendiente = false; updateGlobalSyncStatus('offline'); daniSpeak("❌ No pude sincronizar con Drive. Reintenta; si persiste, desconecta y vuelve a conectar la nube.",9000,'error'); console.error('Drive:', e);} }
+        try { if(typeof gapi!=='undefined'&&gapi.client&&!gapi.client.drive) await gapi.client.load('drive','v3'); sfSyncInicialPendiente = true; let r=await gapi.client.drive.files.list({q:"name='SmileFlow_Database.json' and trashed=false",fields:'files(id,modifiedTime)',spaces:'drive'}); let f=r.result.files; if(f&&f.length>0){driveFileId=f[0].id; localStorage.setItem('sf_drive_file_id',driveFileId); await downloadFromDrive(driveFileId, f[0].modifiedTime); updateGlobalSyncStatus('online');}else{if(Object.keys(db.pats).length>0) await uploadToDrive(true); else updateGlobalSyncStatus('online');} sfSyncInicialPendiente = false; try{ setTimeout(sfNubeRevisarNuevo, 2500); }catch(e){} }
+        catch(e){
+            sfSyncInicialPendiente = false;
+            const esAuth = sfEsErrorDeAuth(e);
+            // Si fue por token caducado (lo más común tras horas sin usar la app) y aun no reintentamos:
+            // pedimos un token fresco en silencio y reintentamos UNA vez antes de avisar al doctor.
+            if(esAuth && !esReintento){
+                try{ gapi.client.setToken(''); }catch(_){}
+                const okT2 = await ensureDriveToken();
+                if(okT2){ return checkDriveFile(true); }
+            }
+            updateGlobalSyncStatus('offline');
+            if(esAuth) daniSpeak('🔌 Tu sesión de Google caducó y no pude renovarla sola. Pulsa "Desconectar" y vuelve a conectar la nube.', 9000, 'warn');
+            else daniSpeak('❌ No pude sincronizar con Drive (posible problema de red o de Google). Reintenta en un momento; si persiste, desconecta y vuelve a conectar la nube.', 9000, 'error');
+            console.error('Drive:', e);
+        }
+    }
     async function downloadFromDrive(fid, mtimeServidor) { try { let r=await gapi.client.drive.files.get({fileId:fid, alt:'media'}); let rDb=r.result; if(typeof rDb==='string'){ try{rDb=JSON.parse(rDb);}catch(e){} } if(rDb&&rDb.sf_enc){ let cp=localStorage.getItem('sf_cloud_pass') || prompt('🔐 Tu nube está protegida. Contraseña de nube:'); if(!cp) return; try{ rDb=JSON.parse(await sfDecrypt(rDb, cp.trim())); localStorage.setItem('sf_cloud_pass', cp.trim()); }catch(e){ alert('❌ Contraseña de nube incorrecta.'); return; } }
         if(!(rDb&&rDb.cfg)) return;
 
