@@ -603,7 +603,7 @@ window._pdfReady=true;
         <h2 style="margin: 0 !important; font-size: 1.5rem !important; color: white !important;">SmileFlow</h2>
         <a href="https://www.dentilike.com.mx" target="_blank" style="color: #bae6fd; font-size: 0.75rem; text-decoration: none; font-weight: 600; cursor: pointer; transition: color 0.2s;" onmouseover="this.style.color='white'" onmouseout="this.style.color='#bae6fd'">www.dentilike.com.mx</a>
         <a href="mailto:soporte@dentilike.com.mx" style="color: #bae6fd; font-size: 0.75rem; text-decoration: none; font-weight: 600; cursor: pointer; transition: color 0.2s;" onmouseover="this.style.color='white'" onmouseout="this.style.color='#bae6fd'">soporte@dentilike.com.mx</a>
-<span style="color:#7dd3fc; font-size:0.62rem; opacity:0.8; margin-top:2px;">© 2026 Dentilike · Todos los derechos reservados · <b id="sfVersion">v151</b></span>
+<span style="color:#7dd3fc; font-size:0.62rem; opacity:0.8; margin-top:2px;">© 2026 Dentilike · Todos los derechos reservados · <b id="sfVersion">v152</b></span>
     </div></div>
 <!-- Doctor en sesion: informativo, lleva a Configuracion para cambiarlo -->
 <div id="sideDocBox" onclick="openSection('s-admin-id', document.querySelector('.nav-item[onclick*=&quot;s-admin-id&quot;]'))" title="Doctor en sesion. Toca para cambiarlo o editar el perfil." style="margin:0 12px 10px; padding:0.7rem 0.85rem; background:rgba(255,255,255,0.07); border:1px solid rgba(125,211,252,0.28); border-left:3px solid #5DC1BF; border-radius:10px; cursor:pointer; display:flex; align-items:center; gap:0.6rem;">
@@ -1793,6 +1793,22 @@ AVISO PRÓX. CITA (Recordatorio local):
 </div>
 </div>
 </div>
+
+<!-- ZONA DE PELIGRO: eliminar paciente por completo -->
+<div class="card" style="border:2px solid #fca5a5; border-top:4px solid #dc2626; background:#fef2f2; margin-top:1.5rem;">
+<h3 style="color:#b91c1c; font-size:1.05rem; margin:0 0 0.6rem 0; display:flex; align-items:center; gap:0.6rem;"><i class="fa-solid fa-triangle-exclamation"></i> Zona de Peligro</h3>
+<p style="color:#7f1d1d; font-size:0.85rem; margin:0 0 1rem 0; line-height:1.5;">Elimina permanentemente a este paciente: expediente, odontograma, estudios, notas, cobros, recetas y documentos. <b>No se puede deshacer.</b></p>
+<button class="btn" onclick="sfPedirEliminarPaciente()" style="background:#dc2626; color:white; font-weight:800;"><i class="fa-solid fa-trash-can"></i> Eliminar este paciente</button>
+<div id="sfEliminarPacBox" class="hidden" style="margin-top:1rem; background:white; border:1px dashed #dc2626; border-radius:10px; padding:1rem;">
+<p style="font-size:0.85rem; color:#7f1d1d; margin:0 0 0.6rem 0;">Para confirmar, escribe el nombre completo del paciente tal como aparece: <b id="sfEliminarPacNombre"></b></p>
+<input class="input-field" id="sfEliminarPacInput" type="text" placeholder="Escribe el nombre exacto..." style="margin-bottom:0.7rem;"/>
+<div style="display:flex; gap:0.6rem;">
+<button class="btn" onclick="sfConfirmarEliminarPaciente()" style="background:#dc2626; color:white; font-weight:800; flex:1;"><i class="fa-solid fa-trash-can"></i> Eliminar definitivamente</button>
+<button class="btn btn-outline" onclick="sfCancelarEliminarPaciente()" style="flex:1;">Cancelar</button>
+</div>
+</div>
+</div>
+
 <div class="app-section" id="s-cobros">
 <div class="card" style="border-top-color: var(--secondary-dark);">
 <h3 style="color:var(--secondary-dark); font-size:1.15rem; border-bottom:2px solid #cffafe; padding-bottom:0.7rem; margin-bottom:1.2rem; display:flex; align-items:center; gap:0.7rem; flex-wrap:wrap;">
@@ -15474,6 +15490,41 @@ Reglas: español de México; terminología dental correcta; máximo 6 líneas; u
 
     function renderTimeline() { if(!db.curr||!db.pats[db.curr].notas || db.pats[db.curr].notas.length===0) { if($('tlRender')) $('tlRender').innerHTML='<p style="text-align:center; color:#94a3b8; padding:2rem;">Sin notas.</p>'; return; } let h=''; db.pats[db.curr].notas.forEach(n=>{ let l=({gen:'Odontología',orto:'Ortodoncia',ali:'Alineadores',endo:'Endodoncia',prot:'Prótesis Fija',protrem:'Prótesis Removible',implante:'Implantología'})[n.type]||'Nota'; let tlBg=({endo:'#ede9fe',prot:'#fef3c7',protrem:'#cffafe'})[n.type]||'#e2e8f0'; h+=`<div class="tl-item"><div class="tl-date">${n.f} <span class="tl-tag" style="background:${tlBg};">${l}</span> <button onclick="deleteNota(${n.id})" style="background:none;border:none;color:red;cursor:pointer;"><i class="fa-solid fa-trash-can"></i></button></div><div class="tl-card" style="white-space:pre-wrap;">${n.obs}</div></div>`; }); if($('tlRender')) $('tlRender').innerHTML=h; }
     function deleteNota(id) { if(confirm("¿Eliminar permanentemente?")) { db.pats[db.curr].notas=db.pats[db.curr].notas.filter(n=>n.id!==id); saveDB(); renderTimeline(); } }
+
+    // ===== ELIMINAR PACIENTE (irreversible) =====
+    function sfPedirEliminarPaciente() {
+        if(!db.curr || !db.pats[db.curr]) { alert('Primero selecciona o guarda un paciente.'); return; }
+        const p = db.pats[db.curr];
+        $('sfEliminarPacNombre').textContent = p.name || '(sin nombre)';
+        $('sfEliminarPacInput').value = '';
+        $('sfEliminarPacBox').classList.remove('hidden');
+        $('sfEliminarPacInput').focus();
+    }
+    function sfCancelarEliminarPaciente() {
+        $('sfEliminarPacBox').classList.add('hidden');
+        $('sfEliminarPacInput').value = '';
+    }
+    function sfConfirmarEliminarPaciente() {
+        if(!db.curr || !db.pats[db.curr]) return;
+        const p = db.pats[db.curr];
+        const esperado = (p.name || '').trim().toLowerCase();
+        const escrito = ($('sfEliminarPacInput').value || '').trim().toLowerCase();
+        if(!esperado || escrito !== esperado) {
+            alert('El nombre no coincide. Escríbelo exactamente igual para confirmar la eliminación.');
+            return;
+        }
+        if(!confirm('Última confirmación: se eliminará a "' + p.name + '" y TODO su expediente de forma permanente. ¿Continuar?')) return;
+        delete db.pats[db.curr];
+        db.curr = null;
+        saveDB();
+        sfCancelarEliminarPaciente();
+        if($('pSelect')) $('pSelect').value = '';
+        if($('searchInput')) $('searchInput').value = '';
+        try { renderPatSelect(); } catch(e) { console.error('renderPatSelect tras eliminar', e); }
+        newPatient();
+        openSection('s-inicio', document.querySelector('.nav-item[onclick*="s-inicio"]'));
+        if(typeof daniSpeak === 'function') daniSpeak('🗑️ Paciente eliminado. Recuerda sincronizar con la nube para que el borrado también se refleje ahí.', 8000, 'warn');
+    }
     function triggerAlertUpdate(fut) { if(fut) { $('pAlert').value=fut; db.pats[db.curr].alert=fut; db.pats[db.curr].alertDate=sfHoyISO(); setAlertLabel(db.pats[db.curr].alertDate); } }
 
     // ===== SIGNOS VITALES (compartido por las 7 notas clinicas) =====
