@@ -603,7 +603,7 @@ window._pdfReady=true;
         <h2 style="margin: 0 !important; font-size: 1.5rem !important; color: white !important;">SmileFlow</h2>
         <a href="https://www.dentilike.com.mx" target="_blank" style="color: #bae6fd; font-size: 0.75rem; text-decoration: none; font-weight: 600; cursor: pointer; transition: color 0.2s;" onmouseover="this.style.color='white'" onmouseout="this.style.color='#bae6fd'">www.dentilike.com.mx</a>
         <a href="mailto:soporte@dentilike.com.mx" style="color: #bae6fd; font-size: 0.75rem; text-decoration: none; font-weight: 600; cursor: pointer; transition: color 0.2s;" onmouseover="this.style.color='white'" onmouseout="this.style.color='#bae6fd'">soporte@dentilike.com.mx</a>
-<span style="color:#7dd3fc; font-size:0.62rem; opacity:0.8; margin-top:2px;">© 2026 Dentilike · Todos los derechos reservados · <b id="sfVersion">v152</b></span>
+<span style="color:#7dd3fc; font-size:0.62rem; opacity:0.8; margin-top:2px;">© 2026 Dentilike · Todos los derechos reservados · <b id="sfVersion">v153</b></span>
     </div></div>
 <!-- Doctor en sesion: informativo, lleva a Configuracion para cambiarlo -->
 <div id="sideDocBox" onclick="openSection('s-admin-id', document.querySelector('.nav-item[onclick*=&quot;s-admin-id&quot;]'))" title="Doctor en sesion. Toca para cambiarlo o editar el perfil." style="margin:0 12px 10px; padding:0.7rem 0.85rem; background:rgba(255,255,255,0.07); border:1px solid rgba(125,211,252,0.28); border-left:3px solid #5DC1BF; border-radius:10px; cursor:pointer; display:flex; align-items:center; gap:0.6rem;">
@@ -18725,18 +18725,31 @@ Reglas: español de México; terminología dental correcta; máximo 6 líneas; u
         if(localStorage.getItem('sf_drive_file_id') && !window._sfSilentTried) { window._sfSilentTried = true; setTimeout(() => { ensureDriveToken().then(ok => { if(ok) checkDriveFile(); }); }, 1500); }
     } else showConnectedUI(); }
     
-    function ensureDriveToken() {
-        return new Promise((resolve) => {
-            let done=false; const fin=v=>{ if(done) return; done=true; window._sfTokenResolve=null; resolve(v); };
-            let t=null; try{ t=gapi.client.getToken(); }catch(e){}
-            if(t && t.access_token) return fin(true);
+    // Único punto de entrada para pedir un token a Google. Si ya hay una solicitud
+    // en curso (por ejemplo la reconexión silenciosa automática al abrir la app),
+    // cualquier otra llamada se "monta" en esa misma en vez de abrir un segundo popup.
+    function sfSolicitarTokenGoogle(promptMode) {
+        if(window._sfTokenEnVuelo) return window._sfTokenEnVuelo;
+        window._sfTokenEnVuelo = new Promise((resolve) => {
+            let done = false;
+            const fin = v => { if(done) return; done = true; window._sfTokenEnVuelo = null; window._sfTokenResolve = null; resolve(v); };
             if(!tokenClient) return fin(false);
             window._sfTokenResolve = fin;
             try {
                 tokenClient.callback = (r) => { if(r && !r.error) { showConnectedUI(); fin(true); } else fin(false); };
-                tokenClient.requestAccessToken({prompt:''});
+                tokenClient.requestAccessToken({prompt: promptMode});
             } catch(e) { fin(false); }
             setTimeout(() => fin(false), 8000); // límite: 8s y libera el estado
+        });
+        return window._sfTokenEnVuelo;
+    }
+
+    function ensureDriveToken() {
+        return new Promise(async (resolve) => {
+            let t=null; try{ t=gapi.client.getToken(); }catch(e){}
+            if(t && t.access_token) return resolve(true);
+            if(!tokenClient) return resolve(false);
+            resolve(await sfSolicitarTokenGoogle(''));
         });
     }
 
@@ -18750,7 +18763,16 @@ Reglas: español de México; terminología dental correcta; máximo 6 líneas; u
                 if(!sessionStorage.getItem('sf_cache_purga')) { sessionStorage.setItem('sf_cache_purga','1'); if(typeof limpiarCacheYRecargar === 'function') limpiarCacheYRecargar(true); }
                 return;
             }
-        } tokenClient.callback=async(r)=>{if(r.error)return; showConnectedUI(); await checkDriveFile();}; let t=null; try{t=gapi.client.getToken();}catch(e){} if(t===null) tokenClient.requestAccessToken({prompt:'consent'}); else tokenClient.requestAccessToken({prompt:''}); }
+        }
+        // Si ya hay una reconexión silenciosa en curso, espera ESA misma respuesta primero.
+        if(window._sfTokenEnVuelo) {
+            const okSilencioso = await window._sfTokenEnVuelo;
+            if(okSilencioso) { await checkDriveFile(); return; }
+        }
+        let t=null; try{t=gapi.client.getToken();}catch(e){}
+        const ok = await sfSolicitarTokenGoogle(t===null ? 'consent' : '');
+        if(ok) await checkDriveFile();
+    }
     function handleSignoutClick() { try{const t=gapi.client.getToken(); if(t!==null){google.accounts.oauth2.revoke(t.access_token); gapi.client.setToken('');}}catch(e){} if($('btnAuthAdmin')) $('btnAuthAdmin').style.display='block'; if($('btnSyncNow')) $('btnSyncNow').style.display='none'; if($('btnSignout')) $('btnSignout').style.display='none'; updateGlobalSyncStatus('offline'); alert("Desconectado."); }
     
     function sfEsErrorDeAuth(e) {
