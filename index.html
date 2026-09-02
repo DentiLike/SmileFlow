@@ -97,9 +97,6 @@
         .menu-toggle { font-size: 1.5rem; cursor: pointer; color: var(--text-muted); display: none; padding: 0.5rem; }
         .menu-toggle:hover { color: var(--primary); }
 
-        .search-area { display: flex; align-items: center; gap: 0.8rem; flex-grow: 1; max-width: 600px; background: #f1f5f9; padding: 0.4rem 0.8rem; border-radius: var(--radius-md); border: 1px solid var(--border); }
-        .search-area i { color: var(--text-muted); }
-        .search-input { border: none; background: transparent; outline: none; width: 100%; font-size: 0.95rem; font-weight: 500; color: var(--text); }
         .search-select { border: none; background: white; padding: 0.4rem; border-radius: 4px; font-weight: 700; color: var(--primary-dark); outline: none; cursor: pointer; flex-shrink: 0; max-width: 200px; box-shadow: var(--shadow-sm); }
         
         .topbar-actions { display: flex; align-items: center; gap: 1rem; }
@@ -260,8 +257,6 @@
         body.dark-mode { background: #0f172a !important; color: #cbd5e1 !important; }
         body.dark-mode .main-wrapper { background: #0f172a !important; }
         body.dark-mode .topbar { background: #1e293b !important; border-bottom-color: #334155 !important; }
-        body.dark-mode .search-area { background: #334155 !important; border-color: #475569 !important; }
-        body.dark-mode .search-input { color: #f8fafc !important; }
         body.dark-mode .search-select { background: #0f172a !important; color: #38bdf8 !important; }
         body.dark-mode .card { background: #1e293b !important; border-color: #334155 !important; color: #cbd5e1 !important; }
         body.dark-mode .input-field { background: #0f172a !important; border-color: #475569 !important; color: #f8fafc !important; }
@@ -487,11 +482,9 @@
     @media(max-width: 768px) {
         .topbar-appearance { display:none !important; }
         .agenda-btn-txt { display:none; }
-        /* Reparto de espacio: el buscador cede, los botones no. */
+        /* Reparto de espacio: el botón de buscar cede, los demás no. */
         .topbar { gap:0.45rem !important; padding:0 0.6rem !important; }
         .topbar > div:first-child { min-width:0 !important; }
-        .search-area { min-width:0 !important; max-width:none !important; padding:0.35rem 0.5rem !important; gap:0.4rem !important; }
-        .search-select { max-width:96px !important; font-size:0.78rem !important; }
         .topbar-actions { flex-shrink:0 !important; gap:0.4rem !important; }
         /* En telefono manda el boton flotante; el del topbar estorba. */
         #tbGuardar { display:none !important; }
@@ -603,7 +596,7 @@ window._pdfReady=true;
         <h2 style="margin: 0 !important; font-size: 1.5rem !important; color: white !important;">SmileFlow</h2>
         <a href="https://www.dentilike.com.mx" target="_blank" style="color: #bae6fd; font-size: 0.75rem; text-decoration: none; font-weight: 600; cursor: pointer; transition: color 0.2s;" onmouseover="this.style.color='white'" onmouseout="this.style.color='#bae6fd'">www.dentilike.com.mx</a>
         <a href="mailto:soporte@dentilike.com.mx" style="color: #bae6fd; font-size: 0.75rem; text-decoration: none; font-weight: 600; cursor: pointer; transition: color 0.2s;" onmouseover="this.style.color='white'" onmouseout="this.style.color='#bae6fd'">soporte@dentilike.com.mx</a>
-<span style="color:#7dd3fc; font-size:0.62rem; opacity:0.8; margin-top:2px;">© 2026 Dentilike · Todos los derechos reservados · <b id="sfVersion">v156</b></span>
+<span style="color:#7dd3fc; font-size:0.62rem; opacity:0.8; margin-top:2px;">© 2026 Dentilike · Todos los derechos reservados · <b id="sfVersion">v158</b></span>
     </div></div>
 <!-- Doctor en sesion: informativo, lleva a Configuracion para cambiarlo -->
 <div id="sideDocBox" onclick="openSection('s-admin-id', document.querySelector('.nav-item[onclick*=&quot;s-admin-id&quot;]'))" title="Doctor en sesion. Toca para cambiarlo o editar el perfil." style="margin:0 12px 10px; padding:0.7rem 0.85rem; background:rgba(255,255,255,0.07); border:1px solid rgba(125,211,252,0.28); border-left:3px solid #5DC1BF; border-radius:10px; cursor:pointer; display:flex; align-items:center; gap:0.6rem;">
@@ -731,11 +724,22 @@ window._pdfReady=true;
 <header class="topbar">
 <div style="display:flex; align-items:center; gap:1rem; flex-grow:1;">
 <div class="menu-toggle" onclick="toggleSidebar()"><i class="fa-solid fa-bars"></i></div>
-<div class="search-area">
-<i class="fa-solid fa-magnifying-glass"></i>
-<input class="search-input" id="searchInput" onkeyup="filterPatients()" placeholder="Buscar paciente por nombre..." type="text"/>
-<select class="search-select" id="pSelect" onchange="loadPatient()"></select>
-<select class="search-select" id="filtroConsultorio" onchange="sfCambiarFiltroConsultorio(this.value)" style="max-width:150px;" title="Filtrar por consultorio"></select>
+<button class="btn" onclick="sfBuscarPacienteAbrir()" style="padding:0.6rem 1rem; background:white; border:1.5px solid #cbd5e1; color:#334155; font-weight:700; display:flex; align-items:center; gap:0.5rem; flex-grow:1; min-width:0; max-width:280px; justify-content:flex-start;" title="Buscar paciente"><i class="fa-solid fa-magnifying-glass" style="color:#64748b;"></i> <span id="sfBuscarBtnTxt" style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">Buscar paciente...</span></button>
+<select class="search-select" id="pSelect" onchange="loadPatient()" style="display:none;"></select>
+
+<!-- PANEL DE BÚSQUEDA (se abre al tocar el botón de arriba) -->
+<div id="sfBuscarOverlay" class="hidden" style="position:fixed; inset:0; z-index:99990; background:rgba(15,23,42,0.55); display:flex; align-items:flex-start; justify-content:center; padding:4vh 1rem;" onclick="if(event.target===this) sfBuscarPacienteCerrar()">
+<div style="background:white; border-radius:16px; width:100%; max-width:520px; max-height:88vh; display:flex; flex-direction:column; overflow:hidden; box-shadow:0 20px 50px rgba(0,0,0,0.35);">
+<div style="padding:1.1rem 1.2rem 0.8rem; border-bottom:1px solid var(--border); display:flex; align-items:center; gap:0.7rem;">
+<i class="fa-solid fa-magnifying-glass" style="color:#1f5b9e; font-size:1.1rem;"></i>
+<input class="input-field" id="searchInput" onkeyup="filterPatients(); sfBuscarPacienteRender();" placeholder="Escribe el nombre del paciente..." style="border:none; font-size:1.05rem; font-weight:700; padding:0.3rem 0;" type="text"/>
+<button onclick="sfBuscarPacienteCerrar()" style="background:none; border:none; color:#94a3b8; cursor:pointer; font-size:1.2rem; flex-shrink:0;"><i class="fa-solid fa-xmark"></i></button>
+</div>
+<div style="padding:0.6rem 1.2rem; border-bottom:1px solid var(--border);">
+<select class="search-select" id="filtroConsultorio" onchange="sfCambiarFiltroConsultorio(this.value); sfBuscarPacienteRender();" style="width:100%;" title="Filtrar por consultorio"></select>
+</div>
+<div id="sfBuscarResultados" style="overflow-y:auto; padding:0.6rem;"></div>
+</div>
 </div>
 <button class="btn btn-warning" onclick="newPatient(); openSection('s-perfil', document.querySelector('.nav-item[onclick*=\'s-perfil\']'))" style="padding: 0.5rem 0.8rem;" title="Crear Nuevo Paciente"><i class="fa-solid fa-user-plus"></i></button>
 <button class="btn" onclick="irAgendaHoy()" style="padding: 0.5rem 0.9rem; background:#1f5b9e; color:white; white-space:nowrap;" title="Ver las citas de hoy"><i class="fa-solid fa-calendar-day"></i> <span class="agenda-btn-txt">Hoy</span></button>
@@ -5807,6 +5811,48 @@ db = {
         if(db.curr && db.pats[db.curr] && !f) $('pSelect').value = db.curr; 
     }
     function filterPatients() { renderPatSelect($('searchInput').value); }
+
+    // ===== PANEL DE BÚSQUEDA DE PACIENTE (overlay con resultados en vivo) =====
+    function sfBuscarPacienteAbrir() {
+        const ov = $('sfBuscarOverlay'); if(!ov) return;
+        ov.classList.remove('hidden');
+        const inp = $('searchInput');
+        if(inp) { inp.value = ''; setTimeout(() => inp.focus(), 60); }
+        sfBuscarPacienteRender();
+    }
+    function sfBuscarPacienteCerrar() {
+        const ov = $('sfBuscarOverlay'); if(ov) ov.classList.add('hidden');
+    }
+    function sfBuscarPacienteRender() {
+        const cont = $('sfBuscarResultados'); if(!cont) return;
+        const q = ($('searchInput') && $('searchInput').value || '').trim();
+        if(!q) {
+            cont.innerHTML = '<p style="text-align:center; color:#94a3b8; font-size:0.88rem; padding:1.5rem 1rem;">Escribe el nombre del paciente para buscar...</p>';
+            return;
+        }
+        const opts = Array.from($('pSelect').options).filter(o => o.value);
+        if(!opts.length) {
+            cont.innerHTML = '<p style="text-align:center; color:#94a3b8; font-size:0.88rem; padding:1.5rem 1rem;">Sin resultados para "'+q+'".</p>';
+            return;
+        }
+        cont.innerHTML = opts.slice(0, 40).map(o => {
+            const p = db.pats[o.value] || {};
+            let edad = '';
+            if(p.birth) { try { const b = new Date(p.birth); const hoy = new Date(); edad = hoy.getFullYear() - b.getFullYear() - ((hoy.getMonth()<b.getMonth()||(hoy.getMonth()===b.getMonth()&&hoy.getDate()<b.getDate()))?1:0); } catch(e){ edad=''; } }
+            return '<div onclick="sfBuscarPacienteSeleccionar(\''+o.value+'\')" style="display:flex; align-items:center; gap:0.7rem; padding:0.75rem 0.8rem; border-radius:10px; cursor:pointer; margin-bottom:0.3rem;" onmouseover="this.style.background=\'#f1f5f9\'" onmouseout="this.style.background=\'transparent\'">'
+                +'<div style="width:38px; height:38px; border-radius:50%; background:#dbeafe; color:#1d4ed8; display:flex; align-items:center; justify-content:center; font-weight:800; flex-shrink:0;"><i class="fa-solid fa-user"></i></div>'
+                +'<div style="min-width:0;"><div style="font-weight:700; color:#1e293b; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">'+(p.name||'Sin nombre')+'</div>'
+                +'<div style="font-size:0.78rem; color:#94a3b8;">'+(p.displayId||'')+(edad?' · '+edad+' años':'')+'</div></div>'
+                +'</div>';
+        }).join('');
+    }
+    function sfBuscarPacienteSeleccionar(id) {
+        $('pSelect').value = id;
+        loadPatient();
+        const p = db.pats[id];
+        if($('sfBuscarBtnTxt') && p) $('sfBuscarBtnTxt').textContent = p.name;
+        sfBuscarPacienteCerrar();
+    }
 
     // Va directo a la agenda de hoy desde el topbar
     function irAgendaHoy() {
@@ -18687,10 +18733,21 @@ Reglas: español de México; terminología dental correcta; máximo 6 líneas; u
             b.dataset.action = '';
             msg.innerHTML =
                 '<div style="font-weight:700; color:#334155; margin-bottom:0.6rem; font-size:0.9rem;">¿En qué te ayudo?</div>'
+              + '<button type="button" onclick="event.stopPropagation(); daniNuevoPaciente();" style="display:block; width:100%; text-align:left; background:#b45309; color:#fff; border:none; border-radius:10px; padding:0.6rem 0.8rem; font-size:0.85rem; font-weight:700; cursor:pointer; margin-bottom:0.5rem;"><i class="fa-solid fa-user-plus"></i> Nuevo paciente</button>'
+              + '<button type="button" onclick="event.stopPropagation(); daniBuscarPaciente();" style="display:block; width:100%; text-align:left; background:#1f5b9e; color:#fff; border:none; border-radius:10px; padding:0.6rem 0.8rem; font-size:0.85rem; font-weight:700; cursor:pointer; margin-bottom:0.5rem;"><i class="fa-solid fa-magnifying-glass"></i> Buscar paciente</button>'
               + '<button type="button" onclick="event.stopPropagation(); daniIrAlChat();" style="display:block; width:100%; text-align:left; background:#0e7490; color:#fff; border:none; border-radius:10px; padding:0.6rem 0.8rem; font-size:0.85rem; font-weight:700; cursor:pointer; margin-bottom:0.5rem;"><i class="fa-solid fa-comments"></i> Abrir el chat</button>'
               + '<button type="button" onclick="event.stopPropagation(); daniIrAlTutorial();" style="display:block; width:100%; text-align:left; background:#ede9fe; color:#6d28d9; border:1px solid #ddd6fe; border-radius:10px; padding:0.6rem 0.8rem; font-size:0.85rem; font-weight:700; cursor:pointer;"><i class="fa-solid fa-route"></i> Cómo se usa (tour guiado)</button>';
             b.classList.add('show');
         } catch(e){}
+    }
+    function daniNuevoPaciente() {
+        try { const b = $('dani-bubble'); if(b) b.classList.remove('show'); } catch(e){}
+        newPatient();
+        openSection('s-perfil', document.querySelector('.nav-item[onclick*="s-perfil"]'));
+    }
+    function daniBuscarPaciente() {
+        try { const b = $('dani-bubble'); if(b) b.classList.remove('show'); } catch(e){}
+        sfBuscarPacienteAbrir();
     }
     function daniIrAlChat(){
         try {
@@ -18865,7 +18922,10 @@ Reglas: español de México; terminología dental correcta; máximo 6 líneas; u
                 tokenClient.callback = (r) => { if(r && !r.error) { showConnectedUI(); fin(true); } else fin(false); };
                 tokenClient.requestAccessToken({prompt: promptMode});
             } catch(e) { fin(false); }
-            setTimeout(() => fin(false), 8000); // límite: 8s y libera el estado
+            // Silencioso (reconexión automática): debe fallar rápido, no hay UI que esperar.
+            // Explícito (el usuario ya está viendo la pantalla de Google): darle tiempo real
+            // para elegir cuenta y pasar las pantallas de "app no verificada" en el celular.
+            setTimeout(() => fin(false), promptMode === 'consent' ? 90000 : 8000);
         });
         return window._sfTokenEnVuelo;
     }
