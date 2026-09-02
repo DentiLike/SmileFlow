@@ -597,7 +597,7 @@ window._pdfReady=true;
         <h2 style="margin: 0 !important; font-size: 1.5rem !important; color: white !important;">SmileFlow</h2>
         <a href="https://www.dentilike.com.mx" target="_blank" style="color: #bae6fd; font-size: 0.75rem; text-decoration: none; font-weight: 600; cursor: pointer; transition: color 0.2s;" onmouseover="this.style.color='white'" onmouseout="this.style.color='#bae6fd'">www.dentilike.com.mx</a>
         <a href="mailto:soporte@dentilike.com.mx" style="color: #bae6fd; font-size: 0.75rem; text-decoration: none; font-weight: 600; cursor: pointer; transition: color 0.2s;" onmouseover="this.style.color='white'" onmouseout="this.style.color='#bae6fd'">soporte@dentilike.com.mx</a>
-<span style="color:#7dd3fc; font-size:0.62rem; opacity:0.8; margin-top:2px;">© 2026 Dentilike · Todos los derechos reservados · <b id="sfVersion">v166</b></span>
+<span style="color:#7dd3fc; font-size:0.62rem; opacity:0.8; margin-top:2px;">© 2026 Dentilike · Todos los derechos reservados · <b id="sfVersion">v170</b></span>
     </div></div>
 <!-- Doctor en sesion: informativo, lleva a Configuracion para cambiarlo -->
 <div id="sideDocBox" onclick="openSection('s-admin-id', document.querySelector('.nav-item[onclick*=&quot;s-admin-id&quot;]'))" title="Doctor en sesion. Toca para cambiarlo o editar el perfil." style="margin:0 12px 10px; padding:0.7rem 0.85rem; background:rgba(255,255,255,0.07); border:1px solid rgba(125,211,252,0.28); border-left:3px solid #5DC1BF; border-radius:10px; cursor:pointer; display:flex; align-items:center; gap:0.6rem;">
@@ -793,7 +793,7 @@ window._pdfReady=true;
 <div id="sfNCResumen" style="color:#64748b; font-size:0.9rem; margin-bottom:1.2rem;"></div>
 <div style="display:flex; flex-direction:column; gap:0.6rem;">
 <button id="sfNCBtnCalendar" style="background:#0d9488; color:white; border:none; border-radius:8px; padding:0.8rem; font-weight:800; cursor:pointer;"><i class="fa-solid fa-calendar-check"></i> Agregar a mi calendario Google</button>
-<button id="sfNCBtnWA" style="background:#25d366; color:white; border:none; border-radius:8px; padding:0.8rem; font-weight:800; cursor:pointer;"><i class="fa-brands fa-whatsapp"></i> Enviar confirmación por WhatsApp</button>
+<button id="sfNCBtnWA" style="background:#25d366; color:white; border:none; border-radius:8px; padding:0.8rem; font-weight:800; cursor:pointer;"><i class="fa-brands fa-whatsapp"></i> Avisar por WhatsApp (cita agendada)</button>
 <button onclick="sfNuevaCitaCerrar()" style="background:none; color:#94a3b8; border:none; padding:0.5rem; font-weight:700; cursor:pointer;">Cerrar</button>
 </div>
 </div>
@@ -867,11 +867,18 @@ window._pdfReady=true;
 <button onclick="sfMCSincronizarAhora()" style="border:none; background:#1f5b9e; color:white; border-radius:10px; padding:0.6rem 0.9rem; font-weight:800; font-size:0.8rem; cursor:pointer; white-space:nowrap;"><i class="fa-solid fa-arrows-rotate"></i> Sincronizar</button>
 </div>
 </div>
+<div id="mcAgendaCard" onclick="sfMCIr('s-agenda')" style="background:linear-gradient(135deg, #b45309, #92400e); border-radius:14px; padding:1.1rem 1.2rem; margin-bottom:1.2rem; max-width:480px; margin-left:auto; margin-right:auto; cursor:pointer; box-shadow:0 4px 14px rgba(180,83,9,0.35); display:flex; align-items:center; gap:0.9rem;">
+<div style="width:48px; height:48px; border-radius:50%; background:rgba(255,255,255,0.2); display:flex; align-items:center; justify-content:center; flex-shrink:0;"><i class="fa-solid fa-calendar-day" style="font-size:1.4rem; color:white;"></i></div>
+<div style="flex-grow:1; color:white;">
+<div id="mcAgendaTxt" style="font-weight:800; font-size:1.05rem;">Agenda de hoy</div>
+<div id="mcAgendaSub" style="font-size:0.8rem; opacity:0.9;">Cargando...</div>
+</div>
+<i class="fa-solid fa-chevron-right" style="color:white; opacity:0.8;"></i>
+</div>
 <div class="mc-grid">
 <button class="mc-btn" style="background:#1f5b9e;" onclick="sfMCBuscar()"><i class="fa-solid fa-magnifying-glass"></i> Buscar paciente</button>
 <button class="mc-btn" style="background:#0891b2;" onclick="sfMCIr('s-perfil')"><i class="fa-solid fa-address-card"></i> Expediente</button>
 <button class="mc-btn" style="background:#7c3aed;" onclick="sfMenuNota(event)"><i class="fa-solid fa-notes-medical"></i> Nota de evolución</button>
-<button class="mc-btn" style="background:#b45309;" onclick="sfMCIr('s-agenda')"><i class="fa-solid fa-calendar-check"></i> Agenda</button>
 <button class="mc-btn" style="background:#059669;" onclick="sfMCIr('s-cobros')"><i class="fa-solid fa-cash-register"></i> Cobro</button>
 <button class="mc-btn" style="background:#c026d3;" onclick="sfMCIr('s-receta')"><i class="fa-solid fa-prescription"></i> Receta</button>
 <button class="mc-btn" style="background:#0e7490; grid-column: 1 / -1;" onclick="sfMCIr('s-labs')"><i class="fa-solid fa-flask-vial"></i> Orden de laboratorio</button>
@@ -1754,6 +1761,7 @@ window._pdfReady=true;
 <div class="input-group" style="margin:0;">
 <label><i class="fa-solid fa-user"></i> Nombre Completo <span id="pCakeIcon" style="display:none; font-size:1.2rem; margin-left:8px;">🎂</span></label>
 <input class="input-field" id="pName" oninput="triggerUnsavedWarning()" placeholder="Ej. Juan Perez" style="font-weight:800; font-size:1.1rem; color:var(--primary-dark);" type="text"/>
+<input class="input-field" id="pApodo" oninput="triggerUnsavedWarning()" placeholder="¿Cómo le gusta que le digan? (opcional, para WhatsApp)" style="margin-top:0.5rem; font-size:0.85rem;" type="text"/>
 </div>
 <div style="display:flex; gap:1rem;">
 <div class="input-group" style="margin:0; flex:2;">
@@ -1882,7 +1890,8 @@ AVISO PRÓX. CITA (Recordatorio local):
 <button class="btn" onclick="abrirAgendaNuevaCita()" style="background:#0d9488; color:white; font-size:0.95rem; padding:0.8rem;" title="Agregar esta cita a tu Google Calendar"><i class="fa-solid fa-calendar-check"></i> Agregar a mi calendario</button>
 <input class="input-field" id="waDate" onchange="if(db.curr){ db.pats[db.curr].nextAppt = this.value; saveDB(); renderAgendaList(); if(typeof renderInicio==='function') renderInicio(); }" style="flex:1; background: white; border-color:#fcd34d;" type="date"/>
 <input class="input-field" id="waTime" onchange="if(db.curr){ db.pats[db.curr].nextApptTime = this.value; saveDB(); renderAgendaList(); if(typeof renderInicio==='function') renderInicio(); }" style="width: 130px; background: white; border-color:#fcd34d;" type="time"/>
-<button class="btn btn-wa" onclick="sendApptWA()" style="flex-grow:1; font-size:1rem; padding:0.8rem;"><i class="fa-brands fa-whatsapp fa-lg"></i> Enviar Confirmación por WA</button>
+<button class="btn btn-wa" onclick="sendApptWA()" style="flex-grow:1; font-size:0.95rem; padding:0.8rem;" title="Mensaje corto, se manda al agendar"><i class="fa-brands fa-whatsapp fa-lg"></i> Cita Agendada</button>
+<button class="btn" onclick="if(db.curr) sfEnviarWACita(db.curr)" style="flex-grow:1; font-size:0.95rem; padding:0.8rem; background:#1f5b9e; color:white;" title="Mensaje detallado, para recordar cerca de la fecha"><i class="fa-solid fa-bell"></i> Recordar Cita</button>
 </div>
 </div>
 </div>
@@ -3973,6 +3982,19 @@ SmileFlow <b>no es un Expediente Clínico Electrónico certificado</b> conforme 
 <div class="card" style="border-top-color:#475569;">
 <h3 style="color:#334155; font-size:1.3rem; margin-bottom:1.5rem; font-weight:800; display:flex; align-items:center; gap:0.7rem;"><span style="background:linear-gradient(135deg, #64748b, #334155); color:white; width:36px; height:36px; border-radius:10px; display:inline-flex; align-items:center; justify-content:center; font-size:0.95rem; box-shadow:0 4px 8px rgba(51,65,85,0.3);"><i class="fa-solid fa-book-open"></i></span> Manual de Usuario</h3>
 <div style="margin-bottom: 2rem;">
+<h4 style="color:#0f172a; font-size:1.1rem; border-bottom:2px solid #e2e8f0; padding-bottom:0.5rem; margin-bottom:1rem;"><i class="fa-solid fa-sparkles" style="color:#f59e0b;"></i> Novedades v3.0 (revisar antes de subir)</h4>
+<div style="background:#fffbeb; border:1px solid #fde68a; border-radius:8px; padding:1rem 1.2rem; font-size:0.9rem; color:#78350f; line-height:1.7;">
+<b>Modo Smartphone:</b> pantalla de inicio simplificada con botones grandes para celular (Buscar, Expediente, Nota, Agenda, Cobro, Receta, Orden de lab). Se activa solo en pantallas chicas o con el botón amarillo flotante; también sirve en escritorio si lo prefieres.<br>
+<b>Buscador rediseñado:</b> ahora es un botón redondo (lupa) en el topbar — al tocarlo abre un panel con resultados en vivo conforme escribes, y muestra el nombre del paciente actual junto al botón.<br>
+<b>Odontograma con diagrama visual al imprimir:</b> el PDF ahora puede incluir un diagrama de 5 caras por pieza (V/M/O/D/L) con punto rojo en caries y tacha en ausentes, además de (o en vez de) la lista de texto. Elige el modo junto al botón Imprimir.<br>
+<b>Agenda mejorada:</b> vistas rápidas Hoy/Mañana/Semana/Mes, calendario visual del mes dentro de la app, tipo de cita (Control, Profilaxis, Extracción, etc.), y el asistente "Agendar Nueva Cita" ahora busca o crea al paciente, deja elegir día/hora tocando un calendario, y ofrece compartir a Google Calendar o WhatsApp al terminar.<br>
+<b>Dos mensajes de WhatsApp para citas:</b> "Cita Agendada" (corto, con el nombre que prefiera el paciente, y un link para que agregue el evento a su propio calendario) al momento de agendar; "Recordar Cita" (el mensaje detallado con día/hora/motivo) para mandar más cerca de la fecha. Agrega el campo "¿Cómo le gusta que le digan?" en el perfil para personalizar el nombre corto.<br>
+<b>Sincronización con Google Drive más estable:</b> se corrigió que pidiera iniciar sesión dos veces seguidas; ahora, una vez conectado, se mantiene la sesión sola mientras la app siga abierta (se refresca cada 45 min sin pedir nada). Al cerrar y reabrir la app si hace falta, solo avisa — ya no intenta reconectar sola de forma invisible.<br>
+<b>Carga más ligera:</b> la app ahora abre desde el caché local casi al instante en vez de descargar el archivo completo cada vez; solo baja de nuevo cuando de verdad hay una versión nueva.<br>
+<b>Eliminar paciente:</b> nueva "Zona de Peligro" al final del perfil, con confirmación escribiendo el nombre completo — pensada para quitar pacientes de prueba sin arriesgar borrar algo por accidente.
+</div>
+</div>
+<div style="margin-bottom: 2rem;">
 <h4 style="color:#0f172a; font-size:1.1rem; border-bottom:2px solid #e2e8f0; padding-bottom:0.5rem; margin-bottom:1rem;"><i class="fa-solid fa-star" style="color:#f59e0b;"></i> Novedades v2.0</h4>
 <div style="background:#f5f3ff; border:1px solid #ddd6fe; border-radius:8px; padding:1rem 1.2rem; font-size:0.9rem; color:#4c1d95; line-height:1.7;">
 <b>Menú por zonas:</b> todo se agrupa en Paciente, Clínica, Herramientas y Configuración, para encontrar todo más rápido.<br>
@@ -5465,7 +5487,18 @@ No hay forma de recuperarlo: el cifrado es real y ni nosotros podemos abrirlo. G
         if(activo) { sfMCDesactivar(true); openSection('s-inicio', document.querySelector('.nav-item[onclick*="s-inicio"]')); }
         else { sfMCActivar(true); sfMCIrInicio(); }
     }
-    function sfMCIrInicio() { openSection('s-mc-home', null); try{ sfMCActualizarSync(); }catch(e){} }
+    function sfMCIrInicio() { openSection('s-mc-home', null); try{ sfMCActualizarSync(); }catch(e){} try{ sfMCActualizarAgenda(); }catch(e){} }
+    function sfMCActualizarAgenda() {
+        const sub = $('mcAgendaSub'); if(!sub) return;
+        const hoy = new Date();
+        const hoyISO = hoy.getFullYear()+'-'+String(hoy.getMonth()+1).padStart(2,'0')+'-'+String(hoy.getDate()).padStart(2,'0');
+        const lista = Object.values(db.pats).filter(p => p.nextAppt === hoyISO && (!sfFiltroConsultorio || p.consultorioId === sfFiltroConsultorio));
+        lista.sort((a,b) => (a.nextApptTime||'99').localeCompare(b.nextApptTime||'99'));
+        if(!lista.length) { sub.textContent = 'Sin pacientes programados para hoy'; return; }
+        const fmtH = t => { if(!t) return ''; let [hh,mm]=t.split(':'); let H=parseInt(hh), ap=H>=12?'PM':'AM'; H=H%12||12; return H+':'+mm+' '+ap; };
+        const proximo = lista[0];
+        sub.textContent = lista.length + (lista.length===1?' paciente hoy':' pacientes hoy') + (proximo.nextApptTime ? ' · próximo: '+fmtH(proximo.nextApptTime) : '');
+    }
     function sfMCIr(id) { openSection(id, document.querySelector('.nav-item[onclick*="' + id + '"], .sub-item[onclick*="' + id + '"]')); }
     function sfMCBuscar() {
         const inp = $('mcBuscarInput');
@@ -6038,7 +6071,7 @@ db = {
         const dStr = dObj.toLocaleDateString('es-MX', {weekday:'long', day:'numeric', month:'long'});
         $('sfNCResumen').innerHTML = `<b>${p.name}</b><br>${dStr} a las ${p.nextApptTime}${p.nextApptTipo?' · '+p.nextApptTipo:''}`;
         $('sfNCBtnCalendar').onclick = () => abrirAgendaNuevaCita(id);
-        $('sfNCBtnWA').onclick = () => { if(!p.phone) { alert('Este paciente no tiene teléfono registrado. Agrégalo en su perfil para poder enviarle WhatsApp.'); return; } sfEnviarWACita(id); };
+        $('sfNCBtnWA').onclick = () => { if(!p.phone) { alert('Este paciente no tiene teléfono registrado. Agrégalo en su perfil para poder enviarle WhatsApp.'); return; } sfEnviarWACitaAgendada(id); };
         $('sfNCPaso2').classList.add('hidden');
         $('sfNCPaso3').classList.remove('hidden');
     }
@@ -6475,6 +6508,7 @@ db = {
     }
     function renderAgendaList() {
         const d = $('agendaSearchDate').value; if(!d) return; let h = '';
+        try{ sfMCActualizarAgenda(); }catch(e){}
         const fmtH = t => { if(!t) return ''; let [hh,mm]=t.split(':'); let H=parseInt(hh), ap=H>=12?'PM':'AM'; H=H%12||12; return H+':'+mm+' '+ap; };
         const lista = [];
         Object.values(db.pats).forEach(p => { if(p.nextAppt === d && (!sfFiltroConsultorio || p.consultorioId === sfFiltroConsultorio)) lista.push(p); });
@@ -13132,7 +13166,7 @@ ${patientText}`;
     // --- GESTIÓN DE PACIENTES ---
     function checkAge() { const a=$('pAge').value; if($('divGuardian')) $('divGuardian').classList.toggle('hidden', a===''||a>=18); }
     
-    function newPatient() { db.curr=null; saveDB(); $('pSelect').value=''; if($('sfBuscarBtnTxt')) $('sfBuscarBtnTxt').textContent = 'Ningún paciente seleccionado'; $('lblId').innerHTML='<i class="fa-solid fa-address-card"></i> Nuevo Px'; ['pName','pBirth','pAge','pGuardian','pPhone','pEmail','pAddress','pAddrCalle','pAddrCol','pAddrCiudad','pSum','pAlert','pBrackets','pSexo'].forEach(id=>{if($(id))$(id).value='';}); if($('pConsultorio')) $('pConsultorio').value=db.consultorioActivo||''; ['pRetra','pFactReq','pHasAl','pAlPen','pAlAin','pAlLat','pAlSulfa'].forEach(id=>{if($(id))$(id).checked=false;}); if($('pAlOther')) $('pAlOther').value=''; if($('pCostoTotal'))$('pCostoTotal').value='';if($('pNotaPago'))$('pNotaPago').value=''; if($('listaAbonos'))$('listaAbonos').innerHTML=''; recalcSaldo(); clearMedHistory(); sfLimpiarCamposNota(); if($('pCakeIcon')) $('pCakeIcon').style.display='none'; autoLoadWaDate(); checkAge(); toggleAllergies(); loadTreats({}); sfResetOdontoState(); renderOdonto(); renderTimeline(); setAlertLabel(null); if($('txtReceta')) $('txtReceta').value=''; if($('chkAntibiotico')) $('chkAntibiotico').checked=false; loadFacturacion({}); renderMedsList(); try{ sfQuickBar(); }catch(e){} try{ sfLimpiarImagenesPaciente(); sfRefrescarVistasPaciente(); }catch(e){} try{ sfRefrescarTodoPaciente(); }catch(e){} }
+    function newPatient() { db.curr=null; saveDB(); $('pSelect').value=''; if($('sfBuscarBtnTxt')) $('sfBuscarBtnTxt').textContent = 'Ningún paciente seleccionado'; $('lblId').innerHTML='<i class="fa-solid fa-address-card"></i> Nuevo Px'; ['pName','pApodo','pBirth','pAge','pGuardian','pPhone','pEmail','pAddress','pAddrCalle','pAddrCol','pAddrCiudad','pSum','pAlert','pBrackets','pSexo'].forEach(id=>{if($(id))$(id).value='';}); if($('pConsultorio')) $('pConsultorio').value=db.consultorioActivo||''; ['pRetra','pFactReq','pHasAl','pAlPen','pAlAin','pAlLat','pAlSulfa'].forEach(id=>{if($(id))$(id).checked=false;}); if($('pAlOther')) $('pAlOther').value=''; if($('pCostoTotal'))$('pCostoTotal').value='';if($('pNotaPago'))$('pNotaPago').value=''; if($('listaAbonos'))$('listaAbonos').innerHTML=''; recalcSaldo(); clearMedHistory(); sfLimpiarCamposNota(); if($('pCakeIcon')) $('pCakeIcon').style.display='none'; autoLoadWaDate(); checkAge(); toggleAllergies(); loadTreats({}); sfResetOdontoState(); renderOdonto(); renderTimeline(); setAlertLabel(null); if($('txtReceta')) $('txtReceta').value=''; if($('chkAntibiotico')) $('chkAntibiotico').checked=false; loadFacturacion({}); renderMedsList(); try{ sfQuickBar(); }catch(e){} try{ sfLimpiarImagenesPaciente(); sfRefrescarVistasPaciente(); }catch(e){} try{ sfRefrescarTodoPaciente(); }catch(e){} }
     
     function savePatientAlert() { if(!db.curr) return; db.pats[db.curr].alert=$('pAlert').value; db.pats[db.curr].alertDate=sfHoyISO(); saveDB(); setAlertLabel(db.pats[db.curr].alertDate); }
 
@@ -15330,9 +15364,9 @@ Reglas: español de México; terminología dental correcta; máximo 6 líneas; u
         if(typeof daniSpeak === 'function') daniSpeak('🧪 Paciente de Prueba creado con datos en todos los módulos: odontograma, alertas médicas, endodoncia, prótesis, Smile Plan, laboratorio dental y abonos. ¡Explóralos!', 9000, 'info');
     }
 
-    function savePatient() { const n=$('pName').value.trim(); if(!n) return alert("Falta Nombre."); const dId='Px-'+n; if(!db.curr){ db.curr='p_'+Date.now(); db.pats[db.curr]={id:db.curr,displayId:dId,notas:[],treats:{},alertDate:sfHoyISO(),factReq:false,factData:{},odonto:{}}; }else db.pats[db.curr].displayId=dId; let p=db.pats[db.curr]; p.name=n;p.birth=sfBirthToISO($('pBirth').value);p.age=$('pAge').value;p.guardian=$('pGuardian').value;p.phone=$('pPhone').value;p.email=$('pEmail').value; p.sex=$('pSexo')?$('pSexo').value:''; p.consultorioId=$('pConsultorio')?($('pConsultorio').value||db.consultorioActivo):db.consultorioActivo; sfSyncDireccion(); p.address=$('pAddress').value; p.addr={ calle:($('pAddrCalle')?$('pAddrCalle').value:''), col:($('pAddrCol')?$('pAddrCol').value:''), ciudad:($('pAddrCiudad')?$('pAddrCiudad').value:'') };p.sum=$('pSum').value;p.brackets=$('pBrackets').value;p.retra=$('pRetra').checked;p.factReq=$('pFactReq').checked;p.hasAl=$('pHasAl').checked;p.alPen=$('pAlPen').checked;p.alAin=$('pAlAin').checked;p.alLat=$('pAlLat').checked;p.alSulfa=$('pAlSulfa').checked;p.alOther=$('pAlOther').value; p.notaPago=$('pNotaPago')?$('pNotaPago').value:''; saveMedHistory(p); saveTreats(p); saveDB(); renderPatSelect(); $('lblId').innerHTML=`<i class="fa-solid fa-address-card"></i> ${dId}`; renderPendingTreatsMain(p); renderMedsList(); renderAgendaList(); if(typeof daniSpeak === 'function') daniSpeak("💾 Px guardado."); try{ sfQuickBar(); }catch(e){} }
+    function savePatient() { const n=$('pName').value.trim(); if(!n) return alert("Falta Nombre."); const dId='Px-'+n; if(!db.curr){ db.curr='p_'+Date.now(); db.pats[db.curr]={id:db.curr,displayId:dId,notas:[],treats:{},alertDate:sfHoyISO(),factReq:false,factData:{},odonto:{}}; }else db.pats[db.curr].displayId=dId; let p=db.pats[db.curr]; p.name=n; p.apodo=($('pApodo')?$('pApodo').value.trim():'');p.birth=sfBirthToISO($('pBirth').value);p.age=$('pAge').value;p.guardian=$('pGuardian').value;p.phone=$('pPhone').value;p.email=$('pEmail').value; p.sex=$('pSexo')?$('pSexo').value:''; p.consultorioId=$('pConsultorio')?($('pConsultorio').value||db.consultorioActivo):db.consultorioActivo; sfSyncDireccion(); p.address=$('pAddress').value; p.addr={ calle:($('pAddrCalle')?$('pAddrCalle').value:''), col:($('pAddrCol')?$('pAddrCol').value:''), ciudad:($('pAddrCiudad')?$('pAddrCiudad').value:'') };p.sum=$('pSum').value;p.brackets=$('pBrackets').value;p.retra=$('pRetra').checked;p.factReq=$('pFactReq').checked;p.hasAl=$('pHasAl').checked;p.alPen=$('pAlPen').checked;p.alAin=$('pAlAin').checked;p.alLat=$('pAlLat').checked;p.alSulfa=$('pAlSulfa').checked;p.alOther=$('pAlOther').value; p.notaPago=$('pNotaPago')?$('pNotaPago').value:''; saveMedHistory(p); saveTreats(p); saveDB(); renderPatSelect(); $('lblId').innerHTML=`<i class="fa-solid fa-address-card"></i> ${dId}`; renderPendingTreatsMain(p); renderMedsList(); renderAgendaList(); if(typeof daniSpeak === 'function') daniSpeak("💾 Px guardado."); try{ sfQuickBar(); }catch(e){} }
     
-    function loadPatient() { const v=$('pSelect').value; if(!v) return newPatient(); db.curr=v; saveDB(); try{ sfLimpiarImagenesPaciente(); }catch(e){} const p=db.pats[v]; if($('sfBuscarBtnTxt')) $('sfBuscarBtnTxt').textContent = p.name || 'Sin nombre'; $('lblId').innerHTML=`<i class="fa-solid fa-address-card"></i> ${p.displayId}`; $('pName').value=p.name||'';$('pBirth').value=sfISOToBirth(p.birth||'');try{sfBirthConfirm($('pBirth').value);}catch(e){}$('pGuardian').value=p.guardian||'';$('pPhone').value=p.phone||'';$('pEmail').value=p.email||''; if($('pSexo')) $('pSexo').value=p.sex||''; if($('pConsultorio')) $('pConsultorio').value=p.consultorioId||db.consultorioActivo||''; sfCargarDireccion(p);$('pSum').value=p.sum||'';$('pAlert').value=p.alert||'';$('pBrackets').value=p.brackets||'';$('pRetra').checked=p.retra||false;$('pFactReq').checked=p.factReq||false;$('pHasAl').checked=p.hasAl||false;$('pAlPen').checked=p.alPen||false;$('pAlAin').checked=p.alAin||false;$('pAlLat').checked=p.alLat||false;$('pAlSulfa').checked=p.alSulfa||false;$('pAlOther').value=p.alOther||''; if($('pCostoTotal'))$('pCostoTotal').value=p.costoTotal||'';if($('pNotaPago'))$('pNotaPago').value=p.notaPago||''; renderAbonos(); loadMedHistory(p); sfLimpiarCamposNota(); calcPatientAge(); autoLoadWaDate(); toggleAllergies(); loadTreats(p); sfResetOdontoState(); renderOdonto(); renderTimeline(); setAlertLabel(p.alertDate); if($('txtReceta'))$('txtReceta').value=''; if($('chkAntibiotico'))$('chkAntibiotico').checked=false; loadFacturacion(p); renderMedsList(); openSection('s-perfil', document.querySelector('.nav-item.active')); autoAbrirAbonosSiDeuda(); window._resenaSug=false; try{ checkResenaSugerencia(); }catch(e){} try{ sfQuickBar(); }catch(e){} try{ sfRefrescarVistasPaciente(); }catch(e){} try{ sfRefrescarTodoPaciente(); }catch(e){} }
+    function loadPatient() { const v=$('pSelect').value; if(!v) return newPatient(); db.curr=v; saveDB(); try{ sfLimpiarImagenesPaciente(); }catch(e){} const p=db.pats[v]; if($('sfBuscarBtnTxt')) $('sfBuscarBtnTxt').textContent = p.name || 'Sin nombre'; $('lblId').innerHTML=`<i class="fa-solid fa-address-card"></i> ${p.displayId}`; $('pName').value=p.name||''; if($('pApodo')) $('pApodo').value=p.apodo||'';$('pBirth').value=sfISOToBirth(p.birth||'');try{sfBirthConfirm($('pBirth').value);}catch(e){}$('pGuardian').value=p.guardian||'';$('pPhone').value=p.phone||'';$('pEmail').value=p.email||''; if($('pSexo')) $('pSexo').value=p.sex||''; if($('pConsultorio')) $('pConsultorio').value=p.consultorioId||db.consultorioActivo||''; sfCargarDireccion(p);$('pSum').value=p.sum||'';$('pAlert').value=p.alert||'';$('pBrackets').value=p.brackets||'';$('pRetra').checked=p.retra||false;$('pFactReq').checked=p.factReq||false;$('pHasAl').checked=p.hasAl||false;$('pAlPen').checked=p.alPen||false;$('pAlAin').checked=p.alAin||false;$('pAlLat').checked=p.alLat||false;$('pAlSulfa').checked=p.alSulfa||false;$('pAlOther').value=p.alOther||''; if($('pCostoTotal'))$('pCostoTotal').value=p.costoTotal||'';if($('pNotaPago'))$('pNotaPago').value=p.notaPago||''; renderAbonos(); loadMedHistory(p); sfLimpiarCamposNota(); calcPatientAge(); autoLoadWaDate(); toggleAllergies(); loadTreats(p); sfResetOdontoState(); renderOdonto(); renderTimeline(); setAlertLabel(p.alertDate); if($('txtReceta'))$('txtReceta').value=''; if($('chkAntibiotico'))$('chkAntibiotico').checked=false; loadFacturacion(p); renderMedsList(); openSection('s-perfil', document.querySelector('.nav-item.active')); autoAbrirAbonosSiDeuda(); window._resenaSug=false; try{ checkResenaSugerencia(); }catch(e){} try{ sfQuickBar(); }catch(e){} try{ sfRefrescarVistasPaciente(); }catch(e){} try{ sfRefrescarTodoPaciente(); }catch(e){} }
 
     // La seccion de Cobros ya vive en su propio menu (no comparte espacio con
     // lo clinico), y cada plan ahora se despliega solo por su cuenta — ya no
@@ -19213,7 +19247,26 @@ Reglas: español de México; terminología dental correcta; máximo 6 líneas; u
         if(!t || !t.access_token) { await handleAuthClick(); } else { await checkDriveFile(); }
         sfMCActualizarSync();
     }
-    function showConnectedUI() { if($('btnAuthAdmin')) $('btnAuthAdmin').style.display='none'; if($('btnSyncNow')) $('btnSyncNow').style.display='block'; if($('btnSignout')) $('btnSignout').style.display='inline-block'; updateGlobalSyncStatus('online'); }
+    function showConnectedUI() {
+        if($('btnAuthAdmin')) $('btnAuthAdmin').style.display='none';
+        if($('btnSyncNow')) $('btnSyncNow').style.display='block';
+        if($('btnSignout')) $('btnSignout').style.display='inline-block';
+        updateGlobalSyncStatus('online');
+        sfMantenerSesionViva();
+    }
+    // Mientras la app sigue ABIERTA (no después de cerrarla y reabrirla), refresca el
+    // token de Google cada 45 minutos, ANTES de que caduque (~1h). Como se hace dentro
+    // de la misma sesión activa del navegador, el refresco silencioso sí funciona sin
+    // mostrar pantalla — así no vuelve a pedir login mientras no cierres SmileFlow.
+    function sfMantenerSesionViva() {
+        if(window._sfKeepAliveId) return; // ya está corriendo, no duplicar
+        window._sfKeepAliveId = setInterval(() => {
+            let t=null; try{ t=gapi.client.getToken(); }catch(e){}
+            if(!t) return; // ya no hay sesión activa; no insistir en segundo plano
+            sfSolicitarTokenGoogle('').then(ok => { if(ok) updateGlobalSyncStatus('online'); });
+        }, 45 * 60 * 1000);
+    }
+    function sfDetenerSesionViva() { if(window._sfKeepAliveId) { clearInterval(window._sfKeepAliveId); window._sfKeepAliveId = null; } }
     
     const CLIENT_ID = localStorage.getItem('sf_gclient') || '798639911007-sv5lg6p0qbmfkqj35uvdi8s8dmhfp8jg.apps.googleusercontent.com'; const SCOPES = 'https://www.googleapis.com/auth/drive.file'; let tokenClient; let gisInited = false; let driveFileId = localStorage.getItem('sf_drive_file_id') || null;
     function sfGapiInit() { try { gapi.load('client', async () => { try { await gapi.client.init({ discoveryDocs: ['https://www.googleapis.com/discovery/v1/apis/drive/v3/rest'] }); } catch(e){} finally { checkReady(); } }); } catch(e) { console.warn('gapiInit:', e); } }
@@ -19246,8 +19299,18 @@ Reglas: español de México; terminología dental correcta; máximo 6 líneas; u
         });
     }
     function checkReady() { if(!gisInited) return; let t=null; try{t=gapi.client.getToken();}catch(e){} if(t===null) { if($('btnAuthAdmin')) $('btnAuthAdmin').style.display='block';
-        // Si ya se habia conectado antes (hay archivo de Drive recordado), reconectar en silencio
-        if(localStorage.getItem('sf_drive_file_id') && !window._sfSilentTried) { window._sfSilentTried = true; setTimeout(() => { ensureDriveToken().then(ok => { if(ok) checkDriveFile(); }); }, 1500); }
+        // Nota: antes se intentaba reconectar "en silencio" 1.5s después de abrir la app.
+        // En celular, ese intento "silencioso" con frecuencia SÍ mostraba la pantalla completa
+        // de elegir cuenta (Chrome/Android no siempre mantiene sesión disponible para reconexión
+        // invisible) — eso producía dos ciclos de inicio de sesión seguidos: el automático y
+        // luego el que el doctor disparaba manualmente. Se quitó a propósito: ahora solo se pide
+        // login cuando el doctor toca "Conectar" o "Sincronizar", garantizando un único ciclo.
+        // En su lugar, solo se muestra un recordatorio (sin abrir nada de Google solo) si ya
+        // había conectado la nube antes, para que no se le olvide tocar "Conectar" una vez al día.
+        if(localStorage.getItem('sf_drive_file_id') && !window._sfRecordatorioNube) {
+            window._sfRecordatorioNube = true;
+            setTimeout(() => { if(typeof daniSpeak === 'function') daniSpeak('☁️ No olvides tocar "Sincronizar con Nube" para conectar tu Drive de hoy.', 8000, 'info'); }, 1800);
+        }
     } else showConnectedUI(); }
     
     // Único punto de entrada para pedir un token a Google. Si ya hay una solicitud
@@ -19301,7 +19364,7 @@ Reglas: español de México; terminología dental correcta; máximo 6 líneas; u
         const ok = await sfSolicitarTokenGoogle(t===null ? 'consent' : '');
         if(ok) await checkDriveFile();
     }
-    function handleSignoutClick() { try{const t=gapi.client.getToken(); if(t!==null){google.accounts.oauth2.revoke(t.access_token); gapi.client.setToken('');}}catch(e){} if($('btnAuthAdmin')) $('btnAuthAdmin').style.display='block'; if($('btnSyncNow')) $('btnSyncNow').style.display='none'; if($('btnSignout')) $('btnSignout').style.display='none'; updateGlobalSyncStatus('offline'); alert("Desconectado."); }
+    function handleSignoutClick() { try{const t=gapi.client.getToken(); if(t!==null){google.accounts.oauth2.revoke(t.access_token); gapi.client.setToken('');}}catch(e){} sfDetenerSesionViva(); if($('btnAuthAdmin')) $('btnAuthAdmin').style.display='block'; if($('btnSyncNow')) $('btnSyncNow').style.display='none'; if($('btnSignout')) $('btnSignout').style.display='none'; updateGlobalSyncStatus('offline'); alert("Desconectado."); }
     
     function sfEsErrorDeAuth(e) {
         try {
@@ -19696,19 +19759,52 @@ function saveDB() {
     function copiarRutaLocal(r) { if(!r) return; navigator.clipboard.writeText(r).then(()=>alert("Ruta local copiada al portapapeles.")); }
     function autoLoadWaDate() { const p = db.curr ? db.pats[db.curr] : null; if($('waTipo')) $('waTipo').value = (p && p.nextApptTipo) || ''; if(p && p.nextAppt){ $('waDate').value = p.nextAppt; $('waTime').value = p.nextApptTime || "16:00"; return; } let d = new Date(); d.setDate(d.getDate() + 30); $('waDate').value = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; $('waTime').value = "16:00"; }
     function setAlertLabel(d) { const t = sfHoyISO(), l = $('lblAlertTitle'); if (!d || d === t) { l.innerHTML = "<i class='fa-solid fa-thumbtack'></i> AVISO PRÓX. CITA:"; l.style.color = "var(--warning-text)"; $('pAlert').style.color = "var(--text)"; $('pAlert').style.borderColor = "#fde047"; } else { l.innerHTML = "<i class='fa-solid fa-triangle-exclamation'></i> AVISO PARA HOY:"; l.style.color = "var(--danger-text)"; $('pAlert').style.color = "var(--danger-text)"; $('pAlert').style.borderColor = "#fca5a5"; } }
-    // Envía el WhatsApp de confirmación de cita para CUALQUIER paciente por id (no depende
-    // de que esté cargado en el perfil). sendApptWA() (perfil) y el flujo de Nueva Cita
-    // comparten esta misma función para no duplicar el texto del mensaje.
+    // Nombre corto para mensajes: usa el apodo/como-le-gusta-que-le-digan si existe,
+    // si no, el primer nombre de pila.
+    function sfNombreCorto(p) {
+        if(p.apodo && p.apodo.trim()) return p.apodo.trim();
+        return (p.name || '').trim().split(/\s+/)[0] || p.name || '';
+    }
+    // Link de "Agregar a mi calendario" para que EL PACIENTE lo toque y se agregue solo
+    // a su propio calendario personal — no depende de estar conectados a Drive/Calendar
+    // de Dentilike, es un link público de Google que cualquiera puede usar.
+    function sfLinkCalendarioPaciente(p) {
+        const fecha = p.nextAppt.replace(/-/g, '');
+        const hIni = parseInt((p.nextApptTime || '10:00').split(':')[0], 10);
+        const mIni = (p.nextApptTime || '10:00').split(':')[1];
+        const hFin = String((hIni + 1) % 24).padStart(2, '0') + mIni + '00';
+        const params = new URLSearchParams();
+        params.set('action', 'TEMPLATE');
+        params.set('text', 'Cita Dentilike');
+        params.set('dates', fecha + 'T' + String(hIni).padStart(2,'0') + mIni + '00/' + fecha + 'T' + hFin);
+        params.set('details', 'Cita dental en ' + sfClinicaActiva(p).cli);
+        return 'https://calendar.google.com/calendar/render?' + params.toString();
+    }
+    // MENSAJE 1 — "Cita agendada": corto, con nombre corto/apodo, tono amigable, se manda
+    // el mismo día que se agenda la cita. Incluye el link para que el paciente agregue el
+    // evento a SU calendario con un solo toque.
+    function sfEnviarWACitaAgendada(id) {
+        const p = db.pats[id]; if(!p || !p.phone || !p.nextAppt) return false;
+        const d = p.nextAppt, t = p.nextApptTime || '10:00';
+        let dp=d.split('-'), do_ = new Date(dp[0],dp[1]-1,dp[2]), dStr = do_.toLocaleDateString('es-ES',{weekday:'long',day:'numeric',month:'long'});
+        let tp=t.split(':'), h=parseInt(tp[0]), am=h>=12?'PM':'AM'; h=h%12; h=h?h:12; let tStr=h+':'+tp[1]+' '+am;
+        const link = sfLinkCalendarioPaciente(p);
+        let m = `¡Hola ${sfNombreCorto(p)}! 😊🦷\n\nTu cita en *${sfClinicaActiva(p).cli}* ya quedó agendada para el *${dStr}* a las *${tStr}*.\n\n¡Prepara esa sonrisa, te esperamos! ✨\n\n📲 Toca aquí para agregarla a tu calendario:\n${link}`;
+        window.open(`https://wa.me/52${p.phone.replace(/\D/g,'')}?text=${encodeURIComponent(m)}`, '_blank');
+        return true;
+    }
+    // MENSAJE 2 — "Recordar cita": el mensaje detallado de siempre (día, hora, motivo,
+    // especialista), pensado para mandarse más cerca de la fecha como recordatorio.
     function sfEnviarWACita(id) {
         const p = db.pats[id]; if(!p || !p.phone || !p.nextAppt) return false;
         const d = p.nextAppt, t = p.nextApptTime || '10:00', tipo = p.nextApptTipo || '';
         let dp=d.split('-'), do_ = new Date(dp[0],dp[1]-1,dp[2]), dStr = do_.toLocaleDateString('es-ES',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
         let tp=t.split(':'), h=parseInt(tp[0]), am=h>=12?'PM':'AM'; h=h%12; h=h?h:12; let tStr=h+':'+tp[1]+' '+am;
-        let m = `✨ ¡Hola *${p.name}*!\n\nSu próxima cita en *${sfClinicaActiva(p).cli}* ha sido confirmada.\n\n📅 *Día:* ${dStr}\n⏰ *Hora:* ${tStr}${tipo?`\n🦷 *Motivo:* ${tipo}`:''}\n👨‍⚕️ *Especialista:* ${db.docs[db.activeDoc]?.name}\n\n🙏 ¡Nos vemos pronto!`;
+        let m = `✨ ¡Hola *${sfNombreCorto(p)}*!\n\nTe recordamos tu próxima cita en *${sfClinicaActiva(p).cli}*.\n\n📅 *Día:* ${dStr}\n⏰ *Hora:* ${tStr}${tipo?`\n🦷 *Motivo:* ${tipo}`:''}\n👨‍⚕️ *Especialista:* ${db.docs[db.activeDoc]?.name}\n\n🙏 ¡Nos vemos pronto!`;
         window.open(`https://wa.me/52${p.phone.replace(/\D/g,'')}?text=${encodeURIComponent(m)}`, '_blank');
         return true;
     }
-    function sendApptWA() { if(!db.curr) return; let p = db.pats[db.curr]; if(!p.phone) return; let d=$('waDate').value, t=$('waTime').value; if(!d||!t) return; p.nextAppt = d; p.nextApptTime = t; const tipo = ($('waTipo') && $('waTipo').value) || ''; p.nextApptTipo = tipo; saveDB(); renderAgendaList(); sfEnviarWACita(db.curr); }
+    function sendApptWA() { if(!db.curr) return; let p = db.pats[db.curr]; if(!p.phone) return; let d=$('waDate').value, t=$('waTime').value; if(!d||!t) return; p.nextAppt = d; p.nextApptTime = t; const tipo = ($('waTipo') && $('waTipo').value) || ''; p.nextApptTipo = tipo; saveDB(); renderAgendaList(); sfEnviarWACitaAgendada(db.curr); }
 
     // --- NUEVAS FUNCIONES VISUALES ---
     
