@@ -54,7 +54,7 @@
         body.modo-consulta .sidebar { display: none !important; }
         body.modo-consulta .menu-toggle { display: none !important; }
         body.modo-consulta #pSelect, body.modo-consulta #filtroConsultorio { display: none !important; }
-        #mcToggleBtn { position: fixed; bottom: 14px; left: 14px; z-index: 999; background: #16365c; color: #fff; border: none; border-radius: 999px; padding: 0.55rem 0.95rem; font-weight: 800; font-size: 0.78rem; box-shadow: 0 4px 14px rgba(0,0,0,0.28); cursor: pointer; display: inline-flex; align-items: center; gap: 0.4rem; }
+        #mcToggleBtn { position: fixed; bottom: 14px; left: 14px; z-index: 999; background: #fbbf24; color: #1e293b; border: 2px solid #f59e0b; border-radius: 999px; padding: 0.55rem 0.95rem; font-weight: 800; font-size: 0.78rem; box-shadow: 0 4px 14px rgba(0,0,0,0.35); cursor: pointer; display: inline-flex; align-items: center; gap: 0.4rem; }
         #mcBackBtn { position: fixed; bottom: 14px; left: 14px; z-index: 999; background: #1f5b9e; color: #fff; border: none; border-radius: 999px; padding: 0.6rem 1rem; font-weight: 800; font-size: 0.8rem; box-shadow: 0 4px 14px rgba(0,0,0,0.28); cursor: pointer; display: none; align-items: center; gap: 0.4rem; }
         #s-mc-home .mc-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.8rem; max-width: 480px; margin: 0 auto; }
         #s-mc-home .mc-btn { border: none; border-radius: 16px; padding: 1.4rem 0.8rem; font-weight: 800; font-size: 0.95rem; color: #fff; display: flex; flex-direction: column; align-items: center; gap: 0.5rem; cursor: pointer; box-shadow: 0 3px 10px rgba(0,0,0,0.12); min-height: 96px; }
@@ -596,7 +596,7 @@ window._pdfReady=true;
         <h2 style="margin: 0 !important; font-size: 1.5rem !important; color: white !important;">SmileFlow</h2>
         <a href="https://www.dentilike.com.mx" target="_blank" style="color: #bae6fd; font-size: 0.75rem; text-decoration: none; font-weight: 600; cursor: pointer; transition: color 0.2s;" onmouseover="this.style.color='white'" onmouseout="this.style.color='#bae6fd'">www.dentilike.com.mx</a>
         <a href="mailto:soporte@dentilike.com.mx" style="color: #bae6fd; font-size: 0.75rem; text-decoration: none; font-weight: 600; cursor: pointer; transition: color 0.2s;" onmouseover="this.style.color='white'" onmouseout="this.style.color='#bae6fd'">soporte@dentilike.com.mx</a>
-<span style="color:#7dd3fc; font-size:0.62rem; opacity:0.8; margin-top:2px;">© 2026 Dentilike · Todos los derechos reservados · <b id="sfVersion">v158</b></span>
+<span style="color:#7dd3fc; font-size:0.62rem; opacity:0.8; margin-top:2px;">© 2026 Dentilike · Todos los derechos reservados · <b id="sfVersion">v159</b></span>
     </div></div>
 <!-- Doctor en sesion: informativo, lleva a Configuracion para cambiarlo -->
 <div id="sideDocBox" onclick="openSection('s-admin-id', document.querySelector('.nav-item[onclick*=&quot;s-admin-id&quot;]'))" title="Doctor en sesion. Toca para cambiarlo o editar el perfil." style="margin:0 12px 10px; padding:0.7rem 0.85rem; background:rgba(255,255,255,0.07); border:1px solid rgba(125,211,252,0.28); border-left:3px solid #5DC1BF; border-radius:10px; cursor:pointer; display:flex; align-items:center; gap:0.6rem;">
@@ -724,7 +724,7 @@ window._pdfReady=true;
 <header class="topbar">
 <div style="display:flex; align-items:center; gap:1rem; flex-grow:1;">
 <div class="menu-toggle" onclick="toggleSidebar()"><i class="fa-solid fa-bars"></i></div>
-<button class="btn" onclick="sfBuscarPacienteAbrir()" style="padding:0.6rem 1rem; background:white; border:1.5px solid #cbd5e1; color:#334155; font-weight:700; display:flex; align-items:center; gap:0.5rem; flex-grow:1; min-width:0; max-width:280px; justify-content:flex-start;" title="Buscar paciente"><i class="fa-solid fa-magnifying-glass" style="color:#64748b;"></i> <span id="sfBuscarBtnTxt" style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">Buscar paciente...</span></button>
+<button onclick="sfBuscarPacienteAbrir()" style="width:44px; height:44px; flex-shrink:0; border-radius:50%; background:#0d9488; border:none; color:white; display:flex; align-items:center; justify-content:center; font-size:1.1rem; box-shadow:0 2px 8px rgba(13,148,136,0.45); cursor:pointer;" title="Buscar paciente"><i class="fa-solid fa-magnifying-glass"></i></button>
 <select class="search-select" id="pSelect" onchange="loadPatient()" style="display:none;"></select>
 
 <!-- PANEL DE BÚSQUEDA (se abre al tocar el botón de arriba) -->
@@ -5368,14 +5368,14 @@ No hay forma de recuperarlo: el cifrado es real y ni nosotros podemos abrirlo. G
     function sfMCActivar(guardarPref) {
         document.body.classList.add('modo-consulta');
         const btn = $('mcToggleBtn'); const txt = $('mcToggleTxt');
-        if(btn) btn.style.background = '#059669';
+        if(btn) { btn.style.background = '#059669'; btn.style.color = '#fff'; }
         if(txt) txt.textContent = 'Vista completa';
         if(guardarPref) localStorage.setItem('sf_modoConsulta', '1');
     }
     function sfMCDesactivar(guardarPref) {
         document.body.classList.remove('modo-consulta');
         const btn = $('mcToggleBtn'); const txt = $('mcToggleTxt');
-        if(btn) btn.style.background = '#16365c';
+        if(btn) { btn.style.background = '#fbbf24'; btn.style.color = '#1e293b'; }
         if(txt) txt.textContent = 'Modo Smartphone';
         const mcBack = $('mcBackBtn'); if(mcBack) mcBack.style.display = 'none';
         if(guardarPref) localStorage.setItem('sf_modoConsulta', '0');
