@@ -597,7 +597,7 @@ window._pdfReady=true;
         <h2 style="margin: 0 !important; font-size: 1.5rem !important; color: white !important;">SmileFlow</h2>
         <a href="https://www.dentilike.com.mx" target="_blank" style="color: #bae6fd; font-size: 0.75rem; text-decoration: none; font-weight: 600; cursor: pointer; transition: color 0.2s;" onmouseover="this.style.color='white'" onmouseout="this.style.color='#bae6fd'">www.dentilike.com.mx</a>
         <a href="mailto:soporte@dentilike.com.mx" style="color: #bae6fd; font-size: 0.75rem; text-decoration: none; font-weight: 600; cursor: pointer; transition: color 0.2s;" onmouseover="this.style.color='white'" onmouseout="this.style.color='#bae6fd'">soporte@dentilike.com.mx</a>
-<span style="color:#7dd3fc; font-size:0.62rem; opacity:0.8; margin-top:2px;">© 2026 Dentilike · Todos los derechos reservados · <b id="sfVersion">v172</b></span>
+<span style="color:#7dd3fc; font-size:0.62rem; opacity:0.8; margin-top:2px;">© 2026 Dentilike · Todos los derechos reservados · <b id="sfVersion">v173</b></span>
     </div></div>
 <!-- Doctor en sesion: informativo, lleva a Configuracion para cambiarlo -->
 <div id="sideDocBox" onclick="openSection('s-admin-id', document.querySelector('.nav-item[onclick*=&quot;s-admin-id&quot;]'))" title="Doctor en sesion. Toca para cambiarlo o editar el perfil." style="margin:0 12px 10px; padding:0.7rem 0.85rem; background:rgba(255,255,255,0.07); border:1px solid rgba(125,211,252,0.28); border-left:3px solid #5DC1BF; border-radius:10px; cursor:pointer; display:flex; align-items:center; gap:0.6rem;">
@@ -4082,6 +4082,18 @@ Listo. A partir de ahí SmileFlow sube copias solo, cuando hay internet. Solo ti
 <tr><td style="padding:0.5rem 0.6rem; border:1px solid #bfdbfe;">Avisa "conflicto" al sincronizar</td><td style="padding:0.5rem 0.6rem; border:1px solid #bfdbfe;">Dos equipos guardaron casi al mismo tiempo: sigue las instrucciones del diálogo</td></tr>
 </table>
 </div>
+</div>
+
+<div id="help-segundo-plano" style="border:2px solid #86efac; border-radius:12px; padding:1.1rem 1.3rem; margin:1.2rem 0; background:#f0fdf4;">
+<div style="font-weight:800; color:#166534; font-size:1.05rem; margin-bottom:0.8rem;"><i class="fa-solid fa-battery-half"></i> Evitar que el celular cierre SmileFlow en segundo plano</div>
+<p style="font-size:0.9rem; color:#475569; line-height:1.6; margin:0 0 0.8rem 0;">Esto ya no depende de SmileFlow — es Android quien decide "matar" apps abiertas para ahorrar batería. Estos ajustes, hechos una sola vez desde tu celular, ayudan a que se mantenga viva más tiempo:</p>
+<ol style="margin:0 0 0.4rem 1.1rem; color:#475569; line-height:1.8; font-size:0.9rem;">
+<li><b>Instálala como app:</b> en Chrome, menú (⋮) → "Instalar aplicación" o "Agregar a pantalla de inicio". Corre más parecido a una app nativa que una simple pestaña.</li>
+<li><b>Quítale la restricción de batería:</b> Ajustes → Aplicaciones → Chrome (o el ícono de SmileFlow si la instalaste) → Batería → cambia a <b>"Sin restricciones"</b>. Esto es lo que más ayuda.</li>
+<li><b>Si tu celular es Xiaomi, Huawei, Oppo u otra marca con capa extra de ahorro:</b> busca "Inicio automático" o "Apps protegidas" en Ajustes → Batería, y agrega ahí a Chrome/SmileFlow.</li>
+<li><b>Nunca la cierres deslizando</b> en el selector de apps recientes — eso sí la mata al instante siempre. Solo minimízala con el botón de inicio.</li>
+</ol>
+<p style="font-size:0.82rem; color:#64748b; margin:0.6rem 0 0 0; font-style:italic;">Con esto, muchos celulares la mantienen viva varias horas seguidas — pero no es 100% garantizado en todos los modelos, Android es inconsistente entre marcas justo en este punto.</p>
 </div>
 
 <div style="border:1px solid var(--border); border-radius:12px; padding:1.1rem 1.3rem; margin:1rem 0; background:#f8fafc;">
@@ -9480,6 +9492,8 @@ ${base}`;
           r:'🧾 Factura al contador:\nEntra a los datos fiscales del paciente y usa "Solicitar factura". El mensaje al contador incluye RFC, régimen, monto y el correo del paciente (fiscal o el general del expediente).' },
         { keys:['nube','drive','sincronizar','respaldo','backup','google drive','sincronizacion'],
           r:'☁️ Nube / respaldo:\nSmileFlow sincroniza con Google Drive. El botón "Nube" arriba muestra si hay cambios por subir. Los respaldos van cifrados. Recuerda que los datos viven primero en este equipo (offline).' },
+        { keys:['segundo plano','se cierra sola','mata la app','se cierra la app','bateria','ahorro de bateria','background','no me deja abierto'],
+          r:'🔋 Evitar que el celular cierre SmileFlow:\n1) Instálala como app (Chrome → menú → "Instalar aplicación").\n2) Ajustes → Aplicaciones → Chrome → Batería → "Sin restricciones".\n3) Si es Xiaomi/Huawei/Oppo: busca "Inicio automático" o "Apps protegidas" y agrégala ahí.\n4) Nunca la cierres deslizando en el multitareas, solo minimízala.\nDetalle completo en Ayuda → "Evitar que el celular cierre SmileFlow en segundo plano".' },
         { keys:['consentimiento','consentimientos','indicaciones'],
           r:'📄 Consentimientos e indicaciones:\nEntra a "Recetas y documentos" → sección "Consentimientos e Indicaciones". Cumplen NOM-004.' },
         { keys:['signos vitales','presion','glucosa','vitales'],
