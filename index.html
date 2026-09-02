@@ -489,6 +489,7 @@
         .topbar-actions { flex-shrink:0 !important; gap:0.4rem !important; }
         /* En telefono manda el boton flotante; el del topbar estorba. */
         #tbGuardar { display:none !important; }
+        #tbSincronizar { display:none !important; }
         #sfEstadoUno .bdg-txt { display:none; }
         #sfEstadoUno { padding:0.4rem 0.55rem; }
     }
@@ -597,7 +598,7 @@ window._pdfReady=true;
         <h2 style="margin: 0 !important; font-size: 1.5rem !important; color: white !important;">SmileFlow</h2>
         <a href="https://www.dentilike.com.mx" target="_blank" style="color: #bae6fd; font-size: 0.75rem; text-decoration: none; font-weight: 600; cursor: pointer; transition: color 0.2s;" onmouseover="this.style.color='white'" onmouseout="this.style.color='#bae6fd'">www.dentilike.com.mx</a>
         <a href="mailto:soporte@dentilike.com.mx" style="color: #bae6fd; font-size: 0.75rem; text-decoration: none; font-weight: 600; cursor: pointer; transition: color 0.2s;" onmouseover="this.style.color='white'" onmouseout="this.style.color='#bae6fd'">soporte@dentilike.com.mx</a>
-<span style="color:#7dd3fc; font-size:0.62rem; opacity:0.8; margin-top:2px;">© 2026 Dentilike · Todos los derechos reservados · <b id="sfVersion">v173</b></span>
+<span style="color:#7dd3fc; font-size:0.62rem; opacity:0.8; margin-top:2px;">© 2026 Dentilike · Todos los derechos reservados · <b id="sfVersion">v174</b></span>
     </div></div>
 <!-- Doctor en sesion: informativo, lleva a Configuracion para cambiarlo -->
 <div id="sideDocBox" onclick="openSection('s-admin-id', document.querySelector('.nav-item[onclick*=&quot;s-admin-id&quot;]'))" title="Doctor en sesion. Toca para cambiarlo o editar el perfil." style="margin:0 12px 10px; padding:0.7rem 0.85rem; background:rgba(255,255,255,0.07); border:1px solid rgba(125,211,252,0.28); border-left:3px solid #5DC1BF; border-radius:10px; cursor:pointer; display:flex; align-items:center; gap:0.6rem;">
@@ -811,6 +812,10 @@ window._pdfReady=true;
 <div class="sync-badge online" id="sfEstadoUno" onclick="sfPanelEstado()" title="Estado del sistema. Toca para ver el detalle.">
 <i class="fa-solid fa-circle-check"></i> <span class="bdg-txt" id="sfEstadoUnoTxt">En orden</span>
 </div>
+<!-- BOTON DIRECTO DE NUBE: un solo toque, sin pasar por el panel de estado -->
+<button id="tbSincronizar" onclick="sfSincronizarDirecto()" title="Conectar o sincronizar con Google Drive ahora mismo" style="border:none; background:#0d9488; color:white; border-radius:8px; cursor:pointer; font-weight:800; font-size:0.8rem; padding:0.5rem 0.85rem; display:inline-flex; align-items:center; gap:0.4rem; white-space:nowrap; flex-shrink:0;">
+<i class="fa-solid fa-cloud-arrow-up"></i><span id="tbSincronizarTxt">Nube</span>
+</button>
 <!-- Fuentes ocultas: las alimentan las funciones existentes; no borrar. -->
 <div class="sync-badge offline sf-fuente-oculta" id="globalSyncStatus" title="Nube de Google Drive">
 <i class="fa-solid fa-cloud-xmark"></i> <span class="bdg-txt">Offline</span>
@@ -5324,6 +5329,19 @@ No hay forma de recuperarlo: el cifrado es real y ni nosotros podemos abrirlo. G
     }
 
     // Panel de detalle: una fila por indicador, con su color y su atajo.
+    // Botón directo del topbar: un solo toque, sin pasar por el panel de diagnóstico.
+    async function sfSincronizarDirecto() {
+        const btn = $('tbSincronizar'), txt = $('tbSincronizarTxt');
+        if(txt) txt.textContent = 'Conectando...';
+        if(btn) btn.disabled = true;
+        try {
+            let t=null; try{ t=gapi.client.getToken(); }catch(e){}
+            if(!t || !t.access_token) { await handleAuthClick(); } else { await checkDriveFile(); }
+        } finally {
+            if(btn) btn.disabled = false;
+            if(txt) txt.textContent = 'Nube';
+        }
+    }
     function sfPanelEstado(){
         const fs = sfLeerFuentes();
         const peor = fs.filter(f=>f.hay).reduce((a,f)=>Math.max(a,f.nivel),0);
