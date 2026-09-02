@@ -597,7 +597,7 @@ window._pdfReady=true;
         <h2 style="margin: 0 !important; font-size: 1.5rem !important; color: white !important;">SmileFlow</h2>
         <a href="https://www.dentilike.com.mx" target="_blank" style="color: #bae6fd; font-size: 0.75rem; text-decoration: none; font-weight: 600; cursor: pointer; transition: color 0.2s;" onmouseover="this.style.color='white'" onmouseout="this.style.color='#bae6fd'">www.dentilike.com.mx</a>
         <a href="mailto:soporte@dentilike.com.mx" style="color: #bae6fd; font-size: 0.75rem; text-decoration: none; font-weight: 600; cursor: pointer; transition: color 0.2s;" onmouseover="this.style.color='white'" onmouseout="this.style.color='#bae6fd'">soporte@dentilike.com.mx</a>
-<span style="color:#7dd3fc; font-size:0.62rem; opacity:0.8; margin-top:2px;">© 2026 Dentilike · Todos los derechos reservados · <b id="sfVersion">v162</b></span>
+<span style="color:#7dd3fc; font-size:0.62rem; opacity:0.8; margin-top:2px;">© 2026 Dentilike · Todos los derechos reservados · <b id="sfVersion">v163</b></span>
     </div></div>
 <!-- Doctor en sesion: informativo, lleva a Configuracion para cambiarlo -->
 <div id="sideDocBox" onclick="openSection('s-admin-id', document.querySelector('.nav-item[onclick*=&quot;s-admin-id&quot;]'))" title="Doctor en sesion. Toca para cambiarlo o editar el perfil." style="margin:0 12px 10px; padding:0.7rem 0.85rem; background:rgba(255,255,255,0.07); border:1px solid rgba(125,211,252,0.28); border-left:3px solid #5DC1BF; border-radius:10px; cursor:pointer; display:flex; align-items:center; gap:0.6rem;">
@@ -1674,6 +1674,8 @@ window._pdfReady=true;
 <button class="btn sf-agenda-rapida-btn" onclick="sfAgendaRapida('semana', this)" style="background:#fef3c7; color:#92400e; font-weight:800; font-size:0.85rem; padding:0.6rem;">Esta semana</button>
 <button class="btn sf-agenda-rapida-btn" onclick="sfAgendaRapida('mes', this)" style="background:#fef3c7; color:#92400e; font-weight:800; font-size:0.85rem; padding:0.6rem;">Este mes</button>
 </div>
+<button class="btn" onclick="sfToggleCalendarioMes()" id="sfCalToggleBtn" style="width:100%; background:#0d9488; color:white; font-weight:700; margin-bottom:0.7rem;"><i class="fa-solid fa-calendar-days"></i> Ver calendario del mes</button>
+<div id="sfCalendarioMes" class="hidden" style="margin-bottom:0.8rem;"></div>
 <button class="btn btn-warning" onclick="document.getElementById('agendaSearchDate').valueAsDate = new Date(); renderAgendaList();" style="width:100%; color:white;"><i class="fa-solid fa-calendar-day"></i> Ver Citas de Hoy</button>
 </div>
 <div class="card" style="border-top-color: #f59e0b; margin-bottom:0; display:flex; flex-direction:column;">
@@ -6247,6 +6249,64 @@ db = {
         loadPatient();
     }
 
+    // ===== CALENDARIO VISUAL DEL MES (dentro de la plataforma, con los datos locales) =====
+    function sfToggleCalendarioMes() {
+        const cont = $('sfCalendarioMes'); if(!cont) return;
+        const abrir = cont.classList.contains('hidden');
+        cont.classList.toggle('hidden');
+        $('sfCalToggleBtn').innerHTML = abrir ? '<i class="fa-solid fa-calendar-days"></i> Ocultar calendario' : '<i class="fa-solid fa-calendar-days"></i> Ver calendario del mes';
+        if(abrir) {
+            const hoy = new Date();
+            if(window._sfCalAnio === undefined) { window._sfCalAnio = hoy.getFullYear(); window._sfCalMes = hoy.getMonth(); }
+            sfRenderCalendarioMes();
+        }
+    }
+    function sfCalNav(delta) {
+        window._sfCalMes += delta;
+        if(window._sfCalMes < 0) { window._sfCalMes = 11; window._sfCalAnio--; }
+        if(window._sfCalMes > 11) { window._sfCalMes = 0; window._sfCalAnio++; }
+        sfRenderCalendarioMes();
+    }
+    function sfRenderCalendarioMes() {
+        const cont = $('sfCalendarioMes'); if(!cont) return;
+        const anio = window._sfCalAnio, mes = window._sfCalMes;
+        const hoy = new Date(); const hoyISO = hoy.getFullYear()+'-'+String(hoy.getMonth()+1).padStart(2,'0')+'-'+String(hoy.getDate()).padStart(2,'0');
+        const seleccionada = $('agendaSearchDate') ? $('agendaSearchDate').value : '';
+        // Conteo de pacientes por día en este mes
+        const conteo = {};
+        Object.values(db.pats).forEach(p => {
+            if(!p.nextAppt || (sfFiltroConsultorio && p.consultorioId !== sfFiltroConsultorio)) return;
+            const [ay,am] = p.nextAppt.split('-');
+            if(parseInt(ay,10) === anio && parseInt(am,10) === mes+1) conteo[p.nextAppt] = (conteo[p.nextAppt]||0) + 1;
+        });
+        const primerDia = new Date(anio, mes, 1).getDay();
+        const diasEnMes = new Date(anio, mes+1, 0).getDate();
+        const nombreMes = new Date(anio, mes, 1).toLocaleDateString('es-MX', {month:'long', year:'numeric'});
+        let h = `<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.6rem;">
+            <button onclick="sfCalNav(-1)" style="background:none; border:none; color:#0d9488; font-size:1.1rem; cursor:pointer; padding:0.3rem 0.6rem;"><i class="fa-solid fa-chevron-left"></i></button>
+            <span style="font-weight:800; color:#0f172a; text-transform:capitalize; font-size:0.95rem;">${nombreMes}</span>
+            <button onclick="sfCalNav(1)" style="background:none; border:none; color:#0d9488; font-size:1.1rem; cursor:pointer; padding:0.3rem 0.6rem;"><i class="fa-solid fa-chevron-right"></i></button>
+        </div>
+        <div style="display:grid; grid-template-columns:repeat(7,1fr); gap:2px; font-size:0.68rem; font-weight:800; color:#94a3b8; text-align:center; margin-bottom:2px;">
+            <div>D</div><div>L</div><div>M</div><div>M</div><div>J</div><div>V</div><div>S</div>
+        </div>
+        <div style="display:grid; grid-template-columns:repeat(7,1fr); gap:2px;">`;
+        for(let i=0; i<primerDia; i++) h += '<div></div>';
+        for(let d=1; d<=diasEnMes; d++) {
+            const iso = anio+'-'+String(mes+1).padStart(2,'0')+'-'+String(d).padStart(2,'0');
+            const n = conteo[iso] || 0;
+            const esHoy = iso === hoyISO, esSel = iso === seleccionada;
+            h += `<button onclick="sfCalSeleccionarDia('${iso}')" style="aspect-ratio:1; border-radius:8px; border:${esSel?'2px solid #0d9488':(esHoy?'2px solid #fbbf24':'1px solid #e2e8f0')}; background:${n>0?'#ccfbf1':'white'}; color:#0f172a; font-size:0.75rem; font-weight:${esHoy?'800':'600'}; cursor:pointer; position:relative; padding:0;">${d}${n>0?`<div style="position:absolute; bottom:2px; left:50%; transform:translateX(-50%); width:5px; height:5px; border-radius:50%; background:#0d9488;"></div>`:''}</button>`;
+        }
+        h += '</div>';
+        cont.innerHTML = h;
+    }
+    function sfCalSeleccionarDia(iso) {
+        document.querySelectorAll('.sf-agenda-rapida-btn').forEach(b => b.classList.remove('active-range'));
+        $('agendaSearchDate').value = iso;
+        renderAgendaList();
+        sfRenderCalendarioMes();
+    }
     function renderAgendaList() {
         const d = $('agendaSearchDate').value; if(!d) return; let h = '';
         const fmtH = t => { if(!t) return ''; let [hh,mm]=t.split(':'); let H=parseInt(hh), ap=H>=12?'PM':'AM'; H=H%12||12; return H+':'+mm+' '+ap; };
@@ -6256,7 +6316,10 @@ db = {
         lista.forEach(p => {
                 h += `<div style="display:flex; justify-content:space-between; align-items:center; background:#f8fafc; padding:1.2rem; border:1px solid #e2e8f0; border-radius:8px; margin-bottom:0.8rem; box-shadow:var(--shadow-sm);">
                     <div><h4 style="margin:0 0 0.4rem 0; color:#0f172a; font-size:1.05rem;">${p.nextApptTime?`<span style="background:#1f5b9e; color:white; font-size:0.78rem; padding:2px 8px; border-radius:6px; margin-right:8px;">${fmtH(p.nextApptTime)}</span>`:''}${p.name}${p.nextApptTipo?` <span style="background:#fef3c7; color:#92400e; font-size:0.72rem; padding:2px 7px; border-radius:6px; font-weight:700;">${p.nextApptTipo}</span>`:''}</h4><span style="font-size:0.85rem; color:#64748b; font-weight:600;"><i class="fa-solid fa-phone"></i> ${p.phone || 'Sin teléfono'}</span></div>
+                    <div style="display:flex; gap:0.5rem;">
+                    <button class="btn" style="padding:0.8rem 1rem; background:#0d9488; color:white;" onclick="abrirAgendaNuevaCita('${p.id}')" title="Agregar a mi calendario de Google"><i class="fa-solid fa-calendar-check"></i></button>
                     <button class="btn btn-wa" style="padding:0.8rem 1.2rem;" onclick="openWaPatient('${p.id}')"><i class="fa-brands fa-whatsapp fa-lg"></i> Contactar</button>
+                    </div>
                 </div>`;
         });
         $('renderAgenda').innerHTML = h === '' ? '<p style="color:#94a3b8; font-style:italic; font-size:0.95rem; text-align:center; margin-top:2rem;">No hay pacientes programados para este día.</p>' : h;
@@ -6298,15 +6361,18 @@ db = {
             }
             h += `<div style="display:flex; justify-content:space-between; align-items:center; background:#f8fafc; padding:0.85rem 1rem; border:1px solid #e2e8f0; border-radius:8px; margin-bottom:0.5rem;">
                 <div><span style="margin:0; color:#0f172a; font-size:0.92rem; font-weight:700;">${p.nextApptTime?`<span style="background:#1f5b9e; color:white; font-size:0.7rem; padding:2px 7px; border-radius:6px; margin-right:6px;">${fmtH(p.nextApptTime)}</span>`:''}${p.name}${p.nextApptTipo?` <span style="background:#fef3c7; color:#92400e; font-size:0.68rem; padding:2px 6px; border-radius:6px; font-weight:700;">${p.nextApptTipo}</span>`:''}</span></div>
+                <div style="display:flex; gap:0.4rem;">
+                <button class="btn" style="padding:0.45rem 0.7rem; font-size:0.78rem; background:#0d9488; color:white;" onclick="abrirAgendaNuevaCita('${p.id}')" title="Agregar a mi calendario de Google"><i class="fa-solid fa-calendar-check"></i></button>
                 <button class="btn btn-wa" style="padding:0.45rem 0.8rem; font-size:0.78rem;" onclick="openWaPatient('${p.id}')"><i class="fa-brands fa-whatsapp"></i></button>
+                </div>
             </div>`;
         });
         $('renderAgenda').innerHTML = h;
     }
     
     function abrirAgenda() { window.open(db.cfg.agenda || 'https://calendar.google.com', '_blank'); }
-    function abrirAgendaNuevaCita() {
-        const p = db.curr ? db.pats[db.curr] : null;
+    function abrirAgendaNuevaCita(idPaciente) {
+        const p = (idPaciente && db.pats[idPaciente]) ? db.pats[idPaciente] : (db.curr ? db.pats[db.curr] : null);
         if(!p) { window.open('https://calendar.google.com/calendar/r/eventedit', '_blank'); return; }
         const params = new URLSearchParams();
         params.set('action', 'TEMPLATE');
