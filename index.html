@@ -155,6 +155,7 @@
 
         .alert-box { background: #fffbeb; padding: 1.2rem; border-radius: var(--radius-md); border-left: 5px solid var(--warning-text); border: 1px solid #fde047; border-left-width: 5px; margin-top: 1rem; box-shadow: var(--shadow-sm); }
         .hidden { display: none !important; }
+        .sf-agenda-rapida-btn.active-range { background:#f59e0b !important; color:white !important; box-shadow:0 2px 6px rgba(245,158,11,0.4); }
 
         /* ODONTOGRAMA ESTILOS */
         .odonto-wrapper { display: flex; flex-direction: column; gap: 1rem; background: #f8fafc; padding: 1.5rem; border-radius: 12px; border: 1px solid #e2e8f0; overflow-x: auto;}
@@ -596,7 +597,7 @@ window._pdfReady=true;
         <h2 style="margin: 0 !important; font-size: 1.5rem !important; color: white !important;">SmileFlow</h2>
         <a href="https://www.dentilike.com.mx" target="_blank" style="color: #bae6fd; font-size: 0.75rem; text-decoration: none; font-weight: 600; cursor: pointer; transition: color 0.2s;" onmouseover="this.style.color='white'" onmouseout="this.style.color='#bae6fd'">www.dentilike.com.mx</a>
         <a href="mailto:soporte@dentilike.com.mx" style="color: #bae6fd; font-size: 0.75rem; text-decoration: none; font-weight: 600; cursor: pointer; transition: color 0.2s;" onmouseover="this.style.color='white'" onmouseout="this.style.color='#bae6fd'">soporte@dentilike.com.mx</a>
-<span style="color:#7dd3fc; font-size:0.62rem; opacity:0.8; margin-top:2px;">© 2026 Dentilike · Todos los derechos reservados · <b id="sfVersion">v160</b></span>
+<span style="color:#7dd3fc; font-size:0.62rem; opacity:0.8; margin-top:2px;">© 2026 Dentilike · Todos los derechos reservados · <b id="sfVersion">v162</b></span>
     </div></div>
 <!-- Doctor en sesion: informativo, lleva a Configuracion para cambiarlo -->
 <div id="sideDocBox" onclick="openSection('s-admin-id', document.querySelector('.nav-item[onclick*=&quot;s-admin-id&quot;]'))" title="Doctor en sesion. Toca para cambiarlo o editar el perfil." style="margin:0 12px 10px; padding:0.7rem 0.85rem; background:rgba(255,255,255,0.07); border:1px solid rgba(125,211,252,0.28); border-left:3px solid #5DC1BF; border-radius:10px; cursor:pointer; display:flex; align-items:center; gap:0.6rem;">
@@ -1667,6 +1668,12 @@ window._pdfReady=true;
 <label><i class="fa-solid fa-hospital"></i> Consultorio</label>
 <select class="input-select" id="filtroConsultorioAgenda" onchange="sfCambiarFiltroConsultorio(this.value)"></select>
 </div>
+<div style="display:grid; grid-template-columns:1fr 1fr; gap:0.5rem; margin-bottom:0.8rem;">
+<button class="btn sf-agenda-rapida-btn active-range" onclick="sfAgendaRapida('hoy', this)" style="background:#fef3c7; color:#92400e; font-weight:800; font-size:0.85rem; padding:0.6rem;">Hoy</button>
+<button class="btn sf-agenda-rapida-btn" onclick="sfAgendaRapida('manana', this)" style="background:#fef3c7; color:#92400e; font-weight:800; font-size:0.85rem; padding:0.6rem;">Mañana</button>
+<button class="btn sf-agenda-rapida-btn" onclick="sfAgendaRapida('semana', this)" style="background:#fef3c7; color:#92400e; font-weight:800; font-size:0.85rem; padding:0.6rem;">Esta semana</button>
+<button class="btn sf-agenda-rapida-btn" onclick="sfAgendaRapida('mes', this)" style="background:#fef3c7; color:#92400e; font-weight:800; font-size:0.85rem; padding:0.6rem;">Este mes</button>
+</div>
 <button class="btn btn-warning" onclick="document.getElementById('agendaSearchDate').valueAsDate = new Date(); renderAgendaList();" style="width:100%; color:white;"><i class="fa-solid fa-calendar-day"></i> Ver Citas de Hoy</button>
 </div>
 <div class="card" style="border-top-color: #f59e0b; margin-bottom:0; display:flex; flex-direction:column;">
@@ -1797,9 +1804,23 @@ AVISO PRÓX. CITA (Recordatorio local):
 <input id="pAlert" onchange="savePatientAlert()" placeholder="Sin avisos ni pendientes registrados..." style="color: var(--text); background: white; border: 1px solid #fde047; padding: 0.6rem; border-radius: 6px; width: 100%; font-weight: 500;" type="text"/>
 <div style="border-top: 1px dashed rgba(0,0,0,0.1); padding-top: 1.2rem; margin-top: 1.2rem;">
 <label style="font-size:0.85rem; font-weight:800; color:var(--warning-text); display:block; margin-bottom:0.8rem;"><i class="fa-brands fa-whatsapp"></i> AGENDAR Y ENVIAR RECORDATORIO A ESTE PACIENTE:</label>
+<div style="display: flex; gap: 0.5rem; flex-wrap:wrap; align-items:center; margin-bottom:0.6rem;">
+<select class="input-select" id="waTipo" onchange="if(db.curr){ db.pats[db.curr].nextApptTipo = this.value; saveDB(); }" style="flex:1; min-width:180px; background:white; border-color:#fcd34d; font-weight:700;">
+<option value="">Tipo de cita (opcional)</option>
+<option value="Valoración / Consulta inicial">Valoración / Consulta inicial</option>
+<option value="Cementado de brackets">Cementado de brackets</option>
+<option value="Control / Ajuste">Control / Ajuste</option>
+<option value="Retiro de brackets">Retiro de brackets</option>
+<option value="Profilaxis / Limpieza">Profilaxis / Limpieza</option>
+<option value="Extracción / Exodoncia">Extracción / Exodoncia</option>
+<option value="Urgencia">Urgencia</option>
+<option value="Otro">Otro</option>
+</select>
+</div>
 <div style="display: flex; gap: 0.5rem; flex-wrap:wrap; align-items:center;">
 <button class="btn" onclick="pedirResena()" style="background:linear-gradient(135deg,#f59e0b,#d97706); color:white; font-size:0.95rem; padding:0.8rem; font-weight:800;" title="Enviar solicitud de reseña por WhatsApp"><i class="fa-solid fa-star"></i> Pedir reseña</button>
 <button class="btn" onclick="abrirAgenda()" style="background:var(--primary); font-size:0.95rem; padding:0.8rem;" title="Abrir Google Calendar"><i class="fa-regular fa-calendar-plus"></i> Abrir Calendario</button>
+<button class="btn" onclick="abrirAgendaNuevaCita()" style="background:#0d9488; color:white; font-size:0.95rem; padding:0.8rem;" title="Agregar esta cita a tu Google Calendar"><i class="fa-solid fa-calendar-check"></i> Agregar a mi calendario</button>
 <input class="input-field" id="waDate" onchange="if(db.curr){ db.pats[db.curr].nextAppt = this.value; saveDB(); renderAgendaList(); if(typeof renderInicio==='function') renderInicio(); }" style="flex:1; background: white; border-color:#fcd34d;" type="date"/>
 <input class="input-field" id="waTime" onchange="if(db.curr){ db.pats[db.curr].nextApptTime = this.value; saveDB(); renderAgendaList(); if(typeof renderInicio==='function') renderInicio(); }" style="width: 130px; background: white; border-color:#fcd34d;" type="time"/>
 <button class="btn btn-wa" onclick="sendApptWA()" style="flex-grow:1; font-size:1rem; padding:0.8rem;"><i class="fa-brands fa-whatsapp fa-lg"></i> Enviar Confirmación por WA</button>
@@ -6234,15 +6255,73 @@ db = {
         lista.sort((a,b)=>{ const ha=a.nextApptTime||'99', hb=b.nextApptTime||'99'; return ha.localeCompare(hb); });
         lista.forEach(p => {
                 h += `<div style="display:flex; justify-content:space-between; align-items:center; background:#f8fafc; padding:1.2rem; border:1px solid #e2e8f0; border-radius:8px; margin-bottom:0.8rem; box-shadow:var(--shadow-sm);">
-                    <div><h4 style="margin:0 0 0.4rem 0; color:#0f172a; font-size:1.05rem;">${p.nextApptTime?`<span style="background:#1f5b9e; color:white; font-size:0.78rem; padding:2px 8px; border-radius:6px; margin-right:8px;">${fmtH(p.nextApptTime)}</span>`:''}${p.name}</h4><span style="font-size:0.85rem; color:#64748b; font-weight:600;"><i class="fa-solid fa-phone"></i> ${p.phone || 'Sin teléfono'}</span></div>
+                    <div><h4 style="margin:0 0 0.4rem 0; color:#0f172a; font-size:1.05rem;">${p.nextApptTime?`<span style="background:#1f5b9e; color:white; font-size:0.78rem; padding:2px 8px; border-radius:6px; margin-right:8px;">${fmtH(p.nextApptTime)}</span>`:''}${p.name}${p.nextApptTipo?` <span style="background:#fef3c7; color:#92400e; font-size:0.72rem; padding:2px 7px; border-radius:6px; font-weight:700;">${p.nextApptTipo}</span>`:''}</h4><span style="font-size:0.85rem; color:#64748b; font-weight:600;"><i class="fa-solid fa-phone"></i> ${p.phone || 'Sin teléfono'}</span></div>
                     <button class="btn btn-wa" style="padding:0.8rem 1.2rem;" onclick="openWaPatient('${p.id}')"><i class="fa-brands fa-whatsapp fa-lg"></i> Contactar</button>
                 </div>`;
         });
         $('renderAgenda').innerHTML = h === '' ? '<p style="color:#94a3b8; font-style:italic; font-size:0.95rem; text-align:center; margin-top:2rem;">No hay pacientes programados para este día.</p>' : h;
     }
+
+    // ===== VISTAS RÁPIDAS DE AGENDA (Hoy / Mañana / Semana / Mes) =====
+    // Usan el mismo campo "próxima cita" (nextAppt/nextApptTime) que ya vive en cada
+    // paciente — no dependen de Google Calendar, que SmileFlow no puede leer.
+    function sfAgendaRapida(modo, btn) {
+        document.querySelectorAll('.sf-agenda-rapida-btn').forEach(b => b.classList.remove('active-range'));
+        if(btn) btn.classList.add('active-range');
+        const hoy = new Date();
+        const iso = d => d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+        if(modo === 'hoy' || modo === 'manana') {
+            const d = new Date(hoy); if(modo === 'manana') d.setDate(d.getDate()+1);
+            $('agendaSearchDate').value = iso(d);
+            renderAgendaList();
+            return;
+        }
+        const hasta = new Date(hoy);
+        if(modo === 'semana') hasta.setDate(hasta.getDate()+7); else hasta.setMonth(hasta.getMonth()+1);
+        $('agendaSearchDate').value = '';
+        sfRenderAgendaRango(iso(hoy), iso(hasta));
+    }
+    function sfRenderAgendaRango(desde, hasta) {
+        const fmtH = t => { if(!t) return ''; let [hh,mm]=t.split(':'); let H=parseInt(hh), ap=H>=12?'PM':'AM'; H=H%12||12; return H+':'+mm+' '+ap; };
+        const lista = [];
+        Object.values(db.pats).forEach(p => { if(p.nextAppt && p.nextAppt >= desde && p.nextAppt <= hasta && (!sfFiltroConsultorio || p.consultorioId === sfFiltroConsultorio)) lista.push(p); });
+        lista.sort((a,b) => (a.nextAppt+(a.nextApptTime||'99')).localeCompare(b.nextAppt+(b.nextApptTime||'99')));
+        if(!lista.length) { $('renderAgenda').innerHTML = '<p style="color:#94a3b8; font-style:italic; font-size:0.95rem; text-align:center; margin-top:2rem;">No hay pacientes programados en ese rango.</p>'; return; }
+        let h = '', diaAnterior = '';
+        lista.forEach(p => {
+            if(p.nextAppt !== diaAnterior) {
+                diaAnterior = p.nextAppt;
+                const dp = p.nextAppt.split('-');
+                const dObj = new Date(dp[0], dp[1]-1, dp[2]);
+                const dStr = dObj.toLocaleDateString('es-MX', {weekday:'long', day:'numeric', month:'long'});
+                h += `<div style="font-weight:800; color:#b45309; font-size:0.78rem; text-transform:uppercase; margin:0.8rem 0 0.4rem; padding-bottom:0.25rem; border-bottom:1px solid #fde68a;">${dStr}</div>`;
+            }
+            h += `<div style="display:flex; justify-content:space-between; align-items:center; background:#f8fafc; padding:0.85rem 1rem; border:1px solid #e2e8f0; border-radius:8px; margin-bottom:0.5rem;">
+                <div><span style="margin:0; color:#0f172a; font-size:0.92rem; font-weight:700;">${p.nextApptTime?`<span style="background:#1f5b9e; color:white; font-size:0.7rem; padding:2px 7px; border-radius:6px; margin-right:6px;">${fmtH(p.nextApptTime)}</span>`:''}${p.name}${p.nextApptTipo?` <span style="background:#fef3c7; color:#92400e; font-size:0.68rem; padding:2px 6px; border-radius:6px; font-weight:700;">${p.nextApptTipo}</span>`:''}</span></div>
+                <button class="btn btn-wa" style="padding:0.45rem 0.8rem; font-size:0.78rem;" onclick="openWaPatient('${p.id}')"><i class="fa-brands fa-whatsapp"></i></button>
+            </div>`;
+        });
+        $('renderAgenda').innerHTML = h;
+    }
     
     function abrirAgenda() { window.open(db.cfg.agenda || 'https://calendar.google.com', '_blank'); }
-    function abrirAgendaNuevaCita() { window.open('https://calendar.google.com/calendar/r/eventedit', '_blank'); }
+    function abrirAgendaNuevaCita() {
+        const p = db.curr ? db.pats[db.curr] : null;
+        if(!p) { window.open('https://calendar.google.com/calendar/r/eventedit', '_blank'); return; }
+        const params = new URLSearchParams();
+        params.set('action', 'TEMPLATE');
+        params.set('text', (p.nextApptTipo ? p.nextApptTipo + ' — ' : 'Cita — ') + p.name);
+        if(p.phone) params.set('details', 'Paciente: ' + p.name + ' · Tel: ' + p.phone);
+        // Si el paciente ya tiene una "próxima cita" guardada, precarga esa fecha/hora (1h de duración).
+        if(p.nextAppt) {
+            const fecha = p.nextAppt.replace(/-/g, '');
+            const hora = (p.nextApptTime || '10:00').replace(':', '') + '00';
+            const hIni = parseInt((p.nextApptTime || '10:00').split(':')[0], 10);
+            const hFin = String((hIni + 1) % 24).padStart(2, '0') + (p.nextApptTime || '10:00').split(':')[1] + '00';
+            params.set('dates', fecha + 'T' + hora + '/' + fecha + 'T' + hFin);
+        }
+        window.open('https://calendar.google.com/calendar/render?' + params.toString(), '_blank');
+    }
     function openWaPatient(pid) { const p = db.pats[pid]; if(!p || !p.phone) return alert("Paciente sin teléfono."); sfWhatsApp(p.phone, `Hola ${p.name}, excelente día 👋. Te escribimos de ${sfClinicaActiva(p).cli} para confirmar tu cita programada.`); }
 
     // --- CUMPLEAÑOS Y EDAD AUTOMÁTICA ---
@@ -19383,9 +19462,9 @@ function saveDB() {
 // saveDB actualizado localStorage.setItem('sf_db_v10', JSON.stringify(db)); checkTopAlert(); if(typeof gisInited !== 'undefined' && gisInited && tokenClient && typeof gapi !== 'undefined' && gapi.client && gapi.client.getToken() !== null) uploadToDrive(false); }
     
     function copiarRutaLocal(r) { if(!r) return; navigator.clipboard.writeText(r).then(()=>alert("Ruta local copiada al portapapeles.")); }
-    function autoLoadWaDate() { const p = db.curr ? db.pats[db.curr] : null; if(p && p.nextAppt){ $('waDate').value = p.nextAppt; $('waTime').value = p.nextApptTime || "16:00"; return; } let d = new Date(); d.setDate(d.getDate() + 30); $('waDate').value = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; $('waTime').value = "16:00"; }
+    function autoLoadWaDate() { const p = db.curr ? db.pats[db.curr] : null; if($('waTipo')) $('waTipo').value = (p && p.nextApptTipo) || ''; if(p && p.nextAppt){ $('waDate').value = p.nextAppt; $('waTime').value = p.nextApptTime || "16:00"; return; } let d = new Date(); d.setDate(d.getDate() + 30); $('waDate').value = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; $('waTime').value = "16:00"; }
     function setAlertLabel(d) { const t = sfHoyISO(), l = $('lblAlertTitle'); if (!d || d === t) { l.innerHTML = "<i class='fa-solid fa-thumbtack'></i> AVISO PRÓX. CITA:"; l.style.color = "var(--warning-text)"; $('pAlert').style.color = "var(--text)"; $('pAlert').style.borderColor = "#fde047"; } else { l.innerHTML = "<i class='fa-solid fa-triangle-exclamation'></i> AVISO PARA HOY:"; l.style.color = "var(--danger-text)"; $('pAlert').style.color = "var(--danger-text)"; $('pAlert').style.borderColor = "#fca5a5"; } }
-    function sendApptWA() { if(!db.curr) return; let p = db.pats[db.curr]; if(!p.phone) return; let d=$('waDate').value, t=$('waTime').value; if(!d||!t) return; p.nextAppt = d; p.nextApptTime = t; saveDB(); renderAgendaList(); let dp=d.split('-'), do_ = new Date(dp[0],dp[1]-1,dp[2]), dStr = do_.toLocaleDateString('es-ES',{weekday:'long',year:'numeric',month:'long',day:'numeric'}); let tp=t.split(':'), h=parseInt(tp[0]), am=h>=12?'PM':'AM'; h=h%12; h=h?h:12; let tStr=h+':'+tp[1]+' '+am; let m = `✨ ¡Hola *${p.name}*!\n\nSu próxima cita en *${sfClinicaActiva(p).cli}* ha sido confirmada.\n\n📅 *Día:* ${dStr}\n⏰ *Hora:* ${tStr}\n👨‍⚕️ *Especialista:* ${db.docs[db.activeDoc]?.name}\n\n🙏 ¡Nos vemos pronto!`; window.open(`https://wa.me/52${p.phone.replace(/\D/g,'')}?text=${encodeURIComponent(m)}`, '_blank'); }
+    function sendApptWA() { if(!db.curr) return; let p = db.pats[db.curr]; if(!p.phone) return; let d=$('waDate').value, t=$('waTime').value; if(!d||!t) return; p.nextAppt = d; p.nextApptTime = t; const tipo = ($('waTipo') && $('waTipo').value) || ''; p.nextApptTipo = tipo; saveDB(); renderAgendaList(); let dp=d.split('-'), do_ = new Date(dp[0],dp[1]-1,dp[2]), dStr = do_.toLocaleDateString('es-ES',{weekday:'long',year:'numeric',month:'long',day:'numeric'}); let tp=t.split(':'), h=parseInt(tp[0]), am=h>=12?'PM':'AM'; h=h%12; h=h?h:12; let tStr=h+':'+tp[1]+' '+am; let m = `✨ ¡Hola *${p.name}*!\n\nSu próxima cita en *${sfClinicaActiva(p).cli}* ha sido confirmada.\n\n📅 *Día:* ${dStr}\n⏰ *Hora:* ${tStr}${tipo?`\n🦷 *Motivo:* ${tipo}`:''}\n👨‍⚕️ *Especialista:* ${db.docs[db.activeDoc]?.name}\n\n🙏 ¡Nos vemos pronto!`; window.open(`https://wa.me/52${p.phone.replace(/\D/g,'')}?text=${encodeURIComponent(m)}`, '_blank'); }
 
     // --- NUEVAS FUNCIONES VISUALES ---
     
