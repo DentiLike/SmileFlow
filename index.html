@@ -598,7 +598,7 @@ window._pdfReady=true;
         <h2 style="margin: 0 !important; font-size: 1.5rem !important; color: white !important;">SmileFlow</h2>
         <a href="https://www.dentilike.com.mx" target="_blank" style="color: #bae6fd; font-size: 0.75rem; text-decoration: none; font-weight: 600; cursor: pointer; transition: color 0.2s;" onmouseover="this.style.color='white'" onmouseout="this.style.color='#bae6fd'">www.dentilike.com.mx</a>
         <a href="mailto:soporte@dentilike.com.mx" style="color: #bae6fd; font-size: 0.75rem; text-decoration: none; font-weight: 600; cursor: pointer; transition: color 0.2s;" onmouseover="this.style.color='white'" onmouseout="this.style.color='#bae6fd'">soporte@dentilike.com.mx</a>
-<span style="color:#7dd3fc; font-size:0.62rem; opacity:0.8; margin-top:2px;">© 2026 Dentilike · Todos los derechos reservados · <b id="sfVersion">v177</b></span>
+<span style="color:#7dd3fc; font-size:0.62rem; opacity:0.8; margin-top:2px;">© 2026 Dentilike · Todos los derechos reservados · <b id="sfVersion">v178</b></span>
     </div></div>
 <!-- Doctor en sesion: informativo, lleva a Configuracion para cambiarlo -->
 <div id="sideDocBox" onclick="openSection('s-admin-id', document.querySelector('.nav-item[onclick*=&quot;s-admin-id&quot;]'))" title="Doctor en sesion. Toca para cambiarlo o editar el perfil." style="margin:0 12px 10px; padding:0.7rem 0.85rem; background:rgba(255,255,255,0.07); border:1px solid rgba(125,211,252,0.28); border-left:3px solid #5DC1BF; border-radius:10px; cursor:pointer; display:flex; align-items:center; gap:0.6rem;">
@@ -767,6 +767,14 @@ window._pdfReady=true;
 <div style="display:flex; gap:0.6rem; margin-bottom:0.8rem;">
 <input class="input-field" id="sfNCFecha" type="date" style="flex:1; font-weight:700;"/>
 <input class="input-field" id="sfNCHora" type="time" value="10:00" style="width:130px; font-weight:700;"/>
+<select class="input-select" id="sfNCDuracion" style="width:110px; font-weight:700;" title="Duración de esta cita">
+<option value="15">15 min</option>
+<option value="30">30 min</option>
+<option value="45">45 min</option>
+<option value="60" selected>1 hora</option>
+<option value="90">1h 30min</option>
+<option value="120">2 horas</option>
+</select>
 </div>
 <select class="input-select" id="sfNCMotivo" style="width:100%; font-weight:700; margin-bottom:0.9rem;">
 <option value="">Tipo de cita (opcional)</option>
@@ -1918,6 +1926,14 @@ AVISO PRÓX. CITA (Recordatorio local):
 <button class="btn" onclick="abrirAgendaNuevaCita()" style="background:#0d9488; color:white; font-size:0.95rem; padding:0.8rem;" title="Agregar esta cita a tu Google Calendar"><i class="fa-solid fa-calendar-check"></i> Agregar a mi calendario</button>
 <input class="input-field" id="waDate" onchange="if(db.curr){ db.pats[db.curr].nextAppt = this.value; saveDB(); renderAgendaList(); if(typeof renderInicio==='function') renderInicio(); }" style="flex:1; background: white; border-color:#fcd34d;" type="date"/>
 <input class="input-field" id="waTime" onchange="if(db.curr){ db.pats[db.curr].nextApptTime = this.value; saveDB(); renderAgendaList(); if(typeof renderInicio==='function') renderInicio(); }" style="width: 130px; background: white; border-color:#fcd34d;" type="time"/>
+<select class="input-select" id="waDuracion" onchange="if(db.curr){ db.pats[db.curr].nextApptDuracion = parseInt(this.value,10); saveDB(); }" style="width:120px; background:white; border-color:#fcd34d; font-weight:700;" title="Duración de esta cita">
+<option value="15">15 min</option>
+<option value="30">30 min</option>
+<option value="45">45 min</option>
+<option value="60">1 hora</option>
+<option value="90">1h 30min</option>
+<option value="120">2 horas</option>
+</select>
 <button class="btn btn-wa" onclick="sendApptWA()" style="flex-grow:1; font-size:0.95rem; padding:0.8rem;" title="Mensaje corto, se manda al agendar"><i class="fa-brands fa-whatsapp fa-lg"></i> Cita Agendada</button>
 <button class="btn" onclick="if(db.curr) sfEnviarWACita(db.curr)" style="flex-grow:1; font-size:0.95rem; padding:0.8rem; background:#1f5b9e; color:white;" title="Mensaje detallado, para recordar cerca de la fecha"><i class="fa-solid fa-bell"></i> Recordar Cita</button>
 </div>
@@ -6085,6 +6101,7 @@ db = {
         $('sfNCFecha').value = p.nextAppt || sfHoyISO();
         $('sfNCHora').value = p.nextApptTime || '10:00';
         $('sfNCMotivo').value = p.nextApptTipo || '';
+        if($('sfNCDuracion')) $('sfNCDuracion').value = p.nextApptDuracion || sfDuracionCitaMin();
         $('sfNCPaso1').classList.add('hidden');
         $('sfNCPaso2').classList.remove('hidden');
     }
@@ -6145,7 +6162,7 @@ db = {
         const fecha = $('sfNCFecha').value, hora = $('sfNCHora').value;
         if(!fecha) { alert('Falta la fecha de la cita.'); return; }
         const p = db.pats[id];
-        p.nextAppt = fecha; p.nextApptTime = hora || '10:00'; p.nextApptTipo = $('sfNCMotivo').value || ''; p.nextApptEstado = 'pendiente';
+        p.nextAppt = fecha; p.nextApptTime = hora || '10:00'; p.nextApptTipo = $('sfNCMotivo').value || ''; p.nextApptEstado = 'pendiente'; p.nextApptDuracion = parseInt(($('sfNCDuracion') && $('sfNCDuracion').value) || sfDuracionCitaMin(), 10);
         saveDB();
         try { renderAgendaList(); } catch(e){}
         try { sfRenderCalendarioMes(); } catch(e){}
@@ -6756,7 +6773,7 @@ db = {
         if(p.nextAppt) {
             const fecha = p.nextAppt.replace(/-/g, '');
             const hora = (p.nextApptTime || '10:00').replace(':', '') + '00';
-            const { hFin, mFin } = sfHoraFin(p.nextApptTime);
+            const { hFin, mFin } = sfHoraFin(p.nextApptTime, p.nextApptDuracion);
             params.set('dates', fecha + 'T' + hora + '/' + fecha + 'T' + hFin + mFin + '00');
         }
         window.open('https://calendar.google.com/calendar/render?' + params.toString(), '_blank');
@@ -19934,7 +19951,7 @@ function saveDB() {
 // saveDB actualizado localStorage.setItem('sf_db_v10', JSON.stringify(db)); checkTopAlert(); if(typeof gisInited !== 'undefined' && gisInited && tokenClient && typeof gapi !== 'undefined' && gapi.client && gapi.client.getToken() !== null) uploadToDrive(false); }
     
     function copiarRutaLocal(r) { if(!r) return; navigator.clipboard.writeText(r).then(()=>alert("Ruta local copiada al portapapeles.")); }
-    function autoLoadWaDate() { const p = db.curr ? db.pats[db.curr] : null; if($('waTipo')) $('waTipo').value = (p && p.nextApptTipo) || ''; if($('waEstado')) $('waEstado').value = (p && p.nextApptEstado) || 'pendiente'; if(p && p.nextAppt){ $('waDate').value = p.nextAppt; $('waTime').value = p.nextApptTime || "16:00"; return; } let d = new Date(); d.setDate(d.getDate() + 30); $('waDate').value = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; $('waTime').value = "16:00"; }
+    function autoLoadWaDate() { const p = db.curr ? db.pats[db.curr] : null; if($('waTipo')) $('waTipo').value = (p && p.nextApptTipo) || ''; if($('waEstado')) $('waEstado').value = (p && p.nextApptEstado) || 'pendiente'; if($('waDuracion')) $('waDuracion').value = (p && p.nextApptDuracion) || sfDuracionCitaMin(); if(p && p.nextAppt){ $('waDate').value = p.nextAppt; $('waTime').value = p.nextApptTime || "16:00"; return; } let d = new Date(); d.setDate(d.getDate() + 30); $('waDate').value = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; $('waTime').value = "16:00"; }
     function setAlertLabel(d) { const t = sfHoyISO(), l = $('lblAlertTitle'); if (!d || d === t) { l.innerHTML = "<i class='fa-solid fa-thumbtack'></i> AVISO PRÓX. CITA:"; l.style.color = "var(--warning-text)"; $('pAlert').style.color = "var(--text)"; $('pAlert').style.borderColor = "#fde047"; } else { l.innerHTML = "<i class='fa-solid fa-triangle-exclamation'></i> AVISO PARA HOY:"; l.style.color = "var(--danger-text)"; $('pAlert').style.color = "var(--danger-text)"; $('pAlert').style.borderColor = "#fca5a5"; } }
     // Nombre corto para mensajes: usa el apodo/como-le-gusta-que-le-digan si existe,
     // si no, el primer nombre de pila.
@@ -19952,9 +19969,10 @@ function saveDB() {
     }
     // Calcula hora de fin sumando la duración configurada a una hora "HH:MM". Devuelve
     // {hFin, mFin} en formato de 2 dígitos, listo para pegar en un string de fecha.
-    function sfHoraFin(horaInicio) {
+    function sfHoraFin(horaInicio, duracionMinOverride) {
         const [hh, mm] = (horaInicio || '10:00').split(':').map(n => parseInt(n, 10));
-        const totalMin = hh * 60 + mm + sfDuracionCitaMin();
+        const dur = (duracionMinOverride && duracionMinOverride > 0) ? duracionMinOverride : sfDuracionCitaMin();
+        const totalMin = hh * 60 + mm + dur;
         const hFin = Math.floor(totalMin / 60) % 24, mFin = totalMin % 60;
         return { hFin: String(hFin).padStart(2,'0'), mFin: String(mFin).padStart(2,'0') };
     }
@@ -19962,7 +19980,7 @@ function saveDB() {
         const fecha = p.nextAppt.replace(/-/g, '');
         const hIni = String(parseInt((p.nextApptTime || '10:00').split(':')[0], 10)).padStart(2,'0');
         const mIni = (p.nextApptTime || '10:00').split(':')[1];
-        const { hFin, mFin } = sfHoraFin(p.nextApptTime);
+        const { hFin, mFin } = sfHoraFin(p.nextApptTime, p.nextApptDuracion);
         const params = new URLSearchParams();
         params.set('action', 'TEMPLATE');
         params.set('text', 'Cita — ' + (sfClinicaActiva(p).cli || 'Consulta dental'));
@@ -20004,7 +20022,7 @@ function saveDB() {
         window.open(`https://wa.me/52${p.phone.replace(/\D/g,'')}?text=${encodeURIComponent(m)}`, '_blank');
         return true;
     }
-    function sendApptWA() { if(!db.curr) return; let p = db.pats[db.curr]; if(!p.phone) return; let d=$('waDate').value, t=$('waTime').value; if(!d||!t) return; p.nextAppt = d; p.nextApptTime = t; const tipo = ($('waTipo') && $('waTipo').value) || ''; p.nextApptTipo = tipo; p.nextApptEstado = ($('waEstado') && $('waEstado').value) || 'pendiente'; saveDB(); renderAgendaList(); sfEnviarWACitaAgendada(db.curr); }
+    function sendApptWA() { if(!db.curr) return; let p = db.pats[db.curr]; if(!p.phone) return; let d=$('waDate').value, t=$('waTime').value; if(!d||!t) return; p.nextAppt = d; p.nextApptTime = t; const tipo = ($('waTipo') && $('waTipo').value) || ''; p.nextApptTipo = tipo; p.nextApptEstado = ($('waEstado') && $('waEstado').value) || 'pendiente'; p.nextApptDuracion = parseInt(($('waDuracion') && $('waDuracion').value) || sfDuracionCitaMin(), 10); saveDB(); renderAgendaList(); sfEnviarWACitaAgendada(db.curr); }
     // Cancela/quita la cita agendada de un paciente (no borra al paciente, solo su próxima cita).
     function sfEliminarCita(id) {
         const p = db.pats[id]; if(!p) return;
