@@ -598,7 +598,7 @@ window._pdfReady=true;
         <h2 style="margin: 0 !important; font-size: 1.5rem !important; color: white !important;">SmileFlow</h2>
         <a href="https://www.dentilike.com.mx" target="_blank" style="color: #bae6fd; font-size: 0.75rem; text-decoration: none; font-weight: 600; cursor: pointer; transition: color 0.2s;" onmouseover="this.style.color='white'" onmouseout="this.style.color='#bae6fd'">www.dentilike.com.mx</a>
         <a href="mailto:soporte@dentilike.com.mx" style="color: #bae6fd; font-size: 0.75rem; text-decoration: none; font-weight: 600; cursor: pointer; transition: color 0.2s;" onmouseover="this.style.color='white'" onmouseout="this.style.color='#bae6fd'">soporte@dentilike.com.mx</a>
-<span style="color:#7dd3fc; font-size:0.62rem; opacity:0.8; margin-top:2px;">© 2026 Dentilike · Todos los derechos reservados · <b id="sfVersion">v176</b></span>
+<span style="color:#7dd3fc; font-size:0.62rem; opacity:0.8; margin-top:2px;">© 2026 Dentilike · Todos los derechos reservados · <b id="sfVersion">v177</b></span>
     </div></div>
 <!-- Doctor en sesion: informativo, lleva a Configuracion para cambiarlo -->
 <div id="sideDocBox" onclick="openSection('s-admin-id', document.querySelector('.nav-item[onclick*=&quot;s-admin-id&quot;]'))" title="Doctor en sesion. Toca para cambiarlo o editar el perfil." style="margin:0 12px 10px; padding:0.7rem 0.85rem; background:rgba(255,255,255,0.07); border:1px solid rgba(125,211,252,0.28); border-left:3px solid #5DC1BF; border-radius:10px; cursor:pointer; display:flex; align-items:center; gap:0.6rem;">
@@ -3489,6 +3489,26 @@ Se tomaron signos vitales
 <div class="input-group"><label><i class="fa-regular fa-envelope"></i> Correo Electrónico del Contador</label><input class="input-field" id="cContEmail" type="email"/></div>
 </div>
 <button class="btn btn-primary" onclick="saveCfg()" style="margin-top:1.5rem; padding:1.2rem; font-weight:800;"><i class="fa-solid fa-floppy-disk"></i> Guardar Ajustes Generales</button>
+</div>
+<div class="card" style="border-top-color:#25d366;">
+<h4 style="font-size:1.1rem; margin-bottom:1rem; color:#166534; border-bottom:2px solid #dcfce7; padding-bottom:0.5rem;"><i class="fa-brands fa-whatsapp"></i> Mensajes de Citas por WhatsApp</h4>
+<div class="input-group">
+<label><i class="fa-solid fa-clock"></i> Duración estándar de una cita (minutos)</label>
+<input class="input-field" id="cDuracionCita" onchange="saveCfg()" placeholder="60" type="number" min="10" step="5" style="max-width:160px;"/>
+<p style="font-size:0.75rem; color:var(--text-muted); margin:0.3rem 0 0 0;">Se usa para calcular la hora de fin en el link de calendario y en "Agregar a mi calendario Google" — hoy solo se puede poner la hora de inicio, esto define cuánto dura.</p>
+</div>
+<div class="input-group" style="margin-top:1rem;">
+<label><i class="fa-solid fa-message"></i> Mensaje de "Cita Agendada" (el corto, se manda al agendar)</label>
+<textarea class="input-field" id="cMsgCitaAgendada" onchange="saveCfg()" rows="6" style="font-family:inherit; font-size:0.88rem; line-height:1.5;" placeholder="Deja vacío para usar el mensaje por defecto"></textarea>
+<div style="background:#f0fdf4; border:1px solid #bbf7d0; border-radius:8px; padding:0.7rem 0.9rem; margin-top:0.5rem; font-size:0.78rem; color:#166534;">
+<b>Variables disponibles:</b> <code>{nombre}</code> <code>{dia}</code> <code>{hora}</code> <code>{clinica}</code> <code>{link}</code> (link para agregar a su calendario)
+</div>
+<div style="margin-top:0.6rem; display:flex; gap:0.5rem; flex-wrap:wrap;">
+<button type="button" class="btn btn-outline" style="font-size:0.75rem; padding:0.4rem 0.7rem;" onclick="$('cMsgCitaAgendada').value='¡Hola {nombre}! 😊🦷\n\nTu cita en *{clinica}* ya quedó agendada para el *{dia}* a las *{hora}*.\n\n¡Prepara esa sonrisa, te esperamos! ✨\n\n📲 Toca aquí para agregarla a tu calendario:\n{link}'; saveCfg();">Opción 1 (actual)</button>
+<button type="button" class="btn btn-outline" style="font-size:0.75rem; padding:0.4rem 0.7rem;" onclick="$('cMsgCitaAgendada').value='¡Hola {nombre}! 🦷✨\n\nQuedaste agendado(a) en *{clinica}* para el *{dia}* a las *{hora}*.\n\n¡Nos dará mucho gusto verte sonreír pronto! 😄\n\n📲 Agrégala a tu calendario aquí:\n{link}'; saveCfg();">Opción 2</button>
+<button type="button" class="btn btn-outline" style="font-size:0.75rem; padding:0.4rem 0.7rem;" onclick="$('cMsgCitaAgendada').value='¡Hola {nombre}! 😁\n\nYa tienes tu cita con nosotros en *{clinica}*:\n📅 {dia}, {hora}\n\n¡Ese diente ya quiere que lo cuidemos! 🦷💙\n\n📲 Toca para agregarla a tu calendario:\n{link}'; saveCfg();">Opción 3</button>
+</div>
+</div>
 </div>
 <div class="card" style="border-top-color: #2bb3ab;">
 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem; border-bottom:2px solid #e0f2fe; padding-bottom:0.8rem; flex-wrap: wrap; gap: 1rem;">
@@ -6731,13 +6751,13 @@ db = {
         params.set('action', 'TEMPLATE');
         params.set('text', (p.nextApptTipo ? p.nextApptTipo + ' — ' : 'Cita — ') + p.name);
         if(p.phone) params.set('details', 'Paciente: ' + p.name + ' · Tel: ' + p.phone);
-        // Si el paciente ya tiene una "próxima cita" guardada, precarga esa fecha/hora (1h de duración).
+        // Si el paciente ya tiene una "próxima cita" guardada, precarga esa fecha/hora
+        // (duración según lo configurado en Sistema y Nube, por defecto 60 min).
         if(p.nextAppt) {
             const fecha = p.nextAppt.replace(/-/g, '');
             const hora = (p.nextApptTime || '10:00').replace(':', '') + '00';
-            const hIni = parseInt((p.nextApptTime || '10:00').split(':')[0], 10);
-            const hFin = String((hIni + 1) % 24).padStart(2, '0') + (p.nextApptTime || '10:00').split(':')[1] + '00';
-            params.set('dates', fecha + 'T' + hora + '/' + fecha + 'T' + hFin);
+            const { hFin, mFin } = sfHoraFin(p.nextApptTime);
+            params.set('dates', fecha + 'T' + hora + '/' + fecha + 'T' + hFin + mFin + '00');
         }
         window.open('https://calendar.google.com/calendar/render?' + params.toString(), '_blank');
     }
@@ -19675,6 +19695,7 @@ Reglas: español de México; terminología dental correcta; máximo 6 líneas; u
         const setC = (id,val)=>{ const el=$(id); if(el) el.checked = val; };
         setV('cCli', db.cfg.cli||''); setV('cSlogan', db.cfg.slogan||''); setV('cDrive', db.cfg.drive||''); setV('cAgenda', db.cfg.agenda||''); setV('cAddress', db.cfg.address||''); setV('cContact', db.cfg.contact||''); setV('cEmail', db.cfg.email||''); setV('cCofepris', db.cfg.cofepris||''); setV('cGeminiKey', localStorage.getItem('sf_gemini_key') || ''); setC('cDaniEn', db.cfg.daniEn); setV('cContName', db.cfg.contName||''); setV('cContPhone', db.cfg.contPhone||''); setV('cContEmail', db.cfg.contEmail||'');
         setV('cResGoogle', db.cfg.resGoogle||''); setV('cResDoctoralia', db.cfg.resDoctoralia||'');
+        setV('cDuracionCita', db.cfg.duracionCita||60); setV('cMsgCitaAgendada', db.cfg.msgCitaAgendada||'');
         if($('hLogo')) $('hLogo').style.display='block'; /* Sidebar SIEMPRE muestra el logo de Dentilike (de fabrica); db.cfg.logo se usa solo en recetas/PDF */
         if($('cLogoPreviewBox')) { if(db.cfg.logo){ $('cLogoPreviewBox').style.display='flex'; if($('cLogoPreview')) $('cLogoPreview').src = db.cfg.logo; } else { $('cLogoPreviewBox').style.display='none'; } }
         if($('astNameLabel')) $('astNameLabel').innerHTML = '<i class="fa-solid fa-robot"></i> Dr. Mikes Molares'; try{renderAdminDyn();}catch(e){} try{renderClinicaDyn();}catch(e){} try{renderDocSelects();}catch(e){} try{renderConsultorioSelects();}catch(e){} try{renderPatSelect();}catch(e){} try{buildForms();}catch(e){} try{renderAdminMeds();}catch(e){} try{loadFin();}catch(e){}
@@ -19716,6 +19737,7 @@ Reglas: español de México; terminología dental correcta; máximo 6 líneas; u
         const de=gc('cDaniEn'); if(de!==undefined) db.cfg.daniEn=de;
         set('contName',gv('cContName')); set('contPhone',gv('cContPhone')); set('contEmail',gv('cContEmail'));
         set('resGoogle',gv('cResGoogle')); set('resDoctoralia',gv('cResDoctoralia'));
+        set('duracionCita',gv('cDuracionCita')); set('msgCitaAgendada',gv('cMsgCitaAgendada'));
         saveDB(); loadConfigUI(); alert('Ajustes Guardados.'); }
     
 // ============================================================
@@ -19923,28 +19945,51 @@ function saveDB() {
     // Link de "Agregar a mi calendario" para que EL PACIENTE lo toque y se agregue solo
     // a su propio calendario personal — no depende de estar conectados a Drive/Calendar
     // de Dentilike, es un link público de Google que cualquiera puede usar.
+    // Duración estándar de una cita, configurable en Sistema y Nube (por defecto 60 min).
+    function sfDuracionCitaMin() {
+        const n = parseInt(db.cfg && db.cfg.duracionCita, 10);
+        return (n && n > 0) ? n : 60;
+    }
+    // Calcula hora de fin sumando la duración configurada a una hora "HH:MM". Devuelve
+    // {hFin, mFin} en formato de 2 dígitos, listo para pegar en un string de fecha.
+    function sfHoraFin(horaInicio) {
+        const [hh, mm] = (horaInicio || '10:00').split(':').map(n => parseInt(n, 10));
+        const totalMin = hh * 60 + mm + sfDuracionCitaMin();
+        const hFin = Math.floor(totalMin / 60) % 24, mFin = totalMin % 60;
+        return { hFin: String(hFin).padStart(2,'0'), mFin: String(mFin).padStart(2,'0') };
+    }
     function sfLinkCalendarioPaciente(p) {
         const fecha = p.nextAppt.replace(/-/g, '');
-        const hIni = parseInt((p.nextApptTime || '10:00').split(':')[0], 10);
+        const hIni = String(parseInt((p.nextApptTime || '10:00').split(':')[0], 10)).padStart(2,'0');
         const mIni = (p.nextApptTime || '10:00').split(':')[1];
-        const hFin = String((hIni + 1) % 24).padStart(2, '0') + mIni + '00';
+        const { hFin, mFin } = sfHoraFin(p.nextApptTime);
         const params = new URLSearchParams();
         params.set('action', 'TEMPLATE');
         params.set('text', 'Cita — ' + (sfClinicaActiva(p).cli || 'Consulta dental'));
-        params.set('dates', fecha + 'T' + String(hIni).padStart(2,'0') + mIni + '00/' + fecha + 'T' + hFin);
+        params.set('dates', fecha + 'T' + hIni + mIni + '00/' + fecha + 'T' + hFin + mFin + '00');
         params.set('details', 'Cita dental en ' + sfClinicaActiva(p).cli);
         return 'https://calendar.google.com/calendar/render?' + params.toString();
     }
     // MENSAJE 1 — "Cita agendada": corto, con nombre corto/apodo, tono amigable, se manda
     // el mismo día que se agenda la cita. Incluye el link para que el paciente agregue el
-    // evento a SU calendario con un solo toque.
+    // evento a SU calendario con un solo toque. El texto es personalizable desde
+    // Sistema y Nube → Mensajes de Citas por WhatsApp (variables {nombre} {dia} {hora}
+    // {clinica} {link}); si no se configura, usa el mensaje por defecto.
     function sfEnviarWACitaAgendada(id) {
         const p = db.pats[id]; if(!p || !p.phone || !p.nextAppt) return false;
         const d = p.nextAppt, t = p.nextApptTime || '10:00';
         let dp=d.split('-'), do_ = new Date(dp[0],dp[1]-1,dp[2]), dStr = do_.toLocaleDateString('es-ES',{weekday:'long',day:'numeric',month:'long'});
         let tp=t.split(':'), h=parseInt(tp[0]), am=h>=12?'PM':'AM'; h=h%12; h=h?h:12; let tStr=h+':'+tp[1]+' '+am;
         const link = sfLinkCalendarioPaciente(p);
-        let m = `¡Hola ${sfNombreCorto(p)}! 😊🦷\n\nTu cita en *${sfClinicaActiva(p).cli}* ya quedó agendada para el *${dStr}* a las *${tStr}*.\n\n¡Prepara esa sonrisa, te esperamos! ✨\n\n📲 Toca aquí para agregarla a tu calendario:\n${link}`;
+        const plantilla = (db.cfg && db.cfg.msgCitaAgendada && db.cfg.msgCitaAgendada.trim())
+            ? db.cfg.msgCitaAgendada
+            : `¡Hola {nombre}! 😊🦷\n\nTu cita en *{clinica}* ya quedó agendada para el *{dia}* a las *{hora}*.\n\n¡Prepara esa sonrisa, te esperamos! ✨\n\n📲 Toca aquí para agregarla a tu calendario:\n{link}`;
+        const m = plantilla
+            .replace(/\{nombre\}/g, sfNombreCorto(p))
+            .replace(/\{dia\}/g, dStr)
+            .replace(/\{hora\}/g, tStr)
+            .replace(/\{clinica\}/g, sfClinicaActiva(p).cli || 'nuestra clínica')
+            .replace(/\{link\}/g, link);
         window.open(`https://wa.me/52${p.phone.replace(/\D/g,'')}?text=${encodeURIComponent(m)}`, '_blank');
         return true;
     }
