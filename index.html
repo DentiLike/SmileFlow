@@ -598,7 +598,7 @@ window._pdfReady=true;
         <h2 style="margin: 0 !important; font-size: 1.5rem !important; color: white !important;">SmileFlow</h2>
         <a href="https://www.dentilike.com.mx" target="_blank" style="color: #bae6fd; font-size: 0.75rem; text-decoration: none; font-weight: 600; cursor: pointer; transition: color 0.2s;" onmouseover="this.style.color='white'" onmouseout="this.style.color='#bae6fd'">www.dentilike.com.mx</a>
         <a href="mailto:soporte@dentilike.com.mx" style="color: #bae6fd; font-size: 0.75rem; text-decoration: none; font-weight: 600; cursor: pointer; transition: color 0.2s;" onmouseover="this.style.color='white'" onmouseout="this.style.color='#bae6fd'">soporte@dentilike.com.mx</a>
-<span style="color:#7dd3fc; font-size:0.62rem; opacity:0.8; margin-top:2px;">© 2026 Dentilike · Todos los derechos reservados · <b id="sfVersion">v178</b></span>
+<span style="color:#7dd3fc; font-size:0.62rem; opacity:0.8; margin-top:2px;">© 2026 Dentilike · Todos los derechos reservados · <b id="sfVersion">v180</b></span>
     </div></div>
 <!-- Doctor en sesion: informativo, lleva a Configuracion para cambiarlo -->
 <div id="sideDocBox" onclick="openSection('s-admin-id', document.querySelector('.nav-item[onclick*=&quot;s-admin-id&quot;]'))" title="Doctor en sesion. Toca para cambiarlo o editar el perfil." style="margin:0 12px 10px; padding:0.7rem 0.85rem; background:rgba(255,255,255,0.07); border:1px solid rgba(125,211,252,0.28); border-left:3px solid #5DC1BF; border-radius:10px; cursor:pointer; display:flex; align-items:center; gap:0.6rem;">
@@ -19336,8 +19336,7 @@ Reglas: español de México; terminología dental correcta; máximo 6 líneas; u
         try {
             const b = document.getElementById('dani-bubble'); if(!b) return;
             if((b.dataset.action || '') === 'cloud'){
-                const nav = document.querySelector('#sidebar [onclick*="s-admin-sys"]');
-                if(typeof openSection === 'function') openSection('s-admin-sys', nav);
+                if(typeof sfSincronizarDirecto === 'function') sfSincronizarDirecto();
             }
             if((b.dataset.action || '') === 'privacidad'){
                 const nav = document.querySelector('#sidebar [onclick*="s-ayuda"]');
@@ -19501,7 +19500,7 @@ Reglas: español de México; terminología dental correcta; máximo 6 líneas; u
         // había conectado la nube antes, para que no se le olvide tocar "Conectar" una vez al día.
         if(localStorage.getItem('sf_drive_file_id') && !window._sfRecordatorioNube) {
             window._sfRecordatorioNube = true;
-            setTimeout(() => { if(typeof daniSpeak === 'function') daniSpeak('☁️ No olvides tocar "Sincronizar con Nube" para conectar tu Drive de hoy.', 8000, 'info'); }, 1800);
+            setTimeout(() => { if(typeof daniSpeak === 'function') daniSpeak('☁️ Aún no conectas tu nube de hoy.', 10000, 'info', 'cloud'); }, 1800);
         }
     } else showConnectedUI(); }
     
@@ -19522,7 +19521,7 @@ Reglas: español de México; terminología dental correcta; máximo 6 líneas; u
             // Silencioso (reconexión automática): debe fallar rápido, no hay UI que esperar.
             // Explícito (el usuario ya está viendo la pantalla de Google): darle tiempo real
             // para elegir cuenta y pasar las pantallas de "app no verificada" en el celular.
-            setTimeout(() => fin(false), promptMode === 'consent' ? 90000 : 8000);
+            setTimeout(() => fin(false), (promptMode === 'consent' || promptMode === 'select_account') ? 90000 : 8000);
         });
         return window._sfTokenEnVuelo;
     }
@@ -19553,7 +19552,10 @@ Reglas: español de México; terminología dental correcta; máximo 6 líneas; u
             if(okSilencioso) { await checkDriveFile(); return; }
         }
         let t=null; try{t=gapi.client.getToken();}catch(e){}
-        const ok = await sfSolicitarTokenGoogle(t===null ? 'consent' : '');
+        // 'select_account' pide elegir cuenta pero deja que Google se salte la pantalla
+        // extra de confirmación si el permiso ya fue otorgado antes — 'consent' lo forzaba
+        // siempre, aunque ya hubiera acceso concedido.
+        const ok = await sfSolicitarTokenGoogle(t===null ? 'select_account' : '');
         if(ok) await checkDriveFile();
     }
     function handleSignoutClick() { try{const t=gapi.client.getToken(); if(t!==null){google.accounts.oauth2.revoke(t.access_token); gapi.client.setToken('');}}catch(e){} sfDetenerSesionViva(); if($('btnAuthAdmin')) $('btnAuthAdmin').style.display='block'; if($('btnSyncNow')) $('btnSyncNow').style.display='none'; if($('btnSignout')) $('btnSignout').style.display='none'; updateGlobalSyncStatus('offline'); alert("Desconectado."); }
