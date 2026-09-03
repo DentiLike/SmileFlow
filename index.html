@@ -598,7 +598,7 @@ window._pdfReady=true;
         <h2 style="margin: 0 !important; font-size: 1.5rem !important; color: white !important;">SmileFlow</h2>
         <a href="https://www.dentilike.com.mx" target="_blank" style="color: #bae6fd; font-size: 0.75rem; text-decoration: none; font-weight: 600; cursor: pointer; transition: color 0.2s;" onmouseover="this.style.color='white'" onmouseout="this.style.color='#bae6fd'">www.dentilike.com.mx</a>
         <a href="mailto:soporte@dentilike.com.mx" style="color: #bae6fd; font-size: 0.75rem; text-decoration: none; font-weight: 600; cursor: pointer; transition: color 0.2s;" onmouseover="this.style.color='white'" onmouseout="this.style.color='#bae6fd'">soporte@dentilike.com.mx</a>
-<span style="color:#7dd3fc; font-size:0.62rem; opacity:0.8; margin-top:2px;">© 2026 Dentilike · Todos los derechos reservados · <b id="sfVersion">v174</b></span>
+<span style="color:#7dd3fc; font-size:0.62rem; opacity:0.8; margin-top:2px;">© 2026 Dentilike · Todos los derechos reservados · <b id="sfVersion">v176</b></span>
     </div></div>
 <!-- Doctor en sesion: informativo, lleva a Configuracion para cambiarlo -->
 <div id="sideDocBox" onclick="openSection('s-admin-id', document.querySelector('.nav-item[onclick*=&quot;s-admin-id&quot;]'))" title="Doctor en sesion. Toca para cambiarlo o editar el perfil." style="margin:0 12px 10px; padding:0.7rem 0.85rem; background:rgba(255,255,255,0.07); border:1px solid rgba(125,211,252,0.28); border-left:3px solid #5DC1BF; border-radius:10px; cursor:pointer; display:flex; align-items:center; gap:0.6rem;">
@@ -795,6 +795,13 @@ window._pdfReady=true;
 <div style="display:flex; flex-direction:column; gap:0.6rem;">
 <button id="sfNCBtnCalendar" style="background:#0d9488; color:white; border:none; border-radius:8px; padding:0.8rem; font-weight:800; cursor:pointer;"><i class="fa-solid fa-calendar-check"></i> Agregar a mi calendario Google</button>
 <button id="sfNCBtnWA" style="background:#25d366; color:white; border:none; border-radius:8px; padding:0.8rem; font-weight:800; cursor:pointer;"><i class="fa-brands fa-whatsapp"></i> Avisar por WhatsApp (cita agendada)</button>
+<div id="sfNCSinTelBox" class="hidden" style="text-align:left; background:#fffbeb; border:1px solid #fde68a; border-radius:8px; padding:0.8rem 0.9rem;">
+<p style="font-size:0.82rem; color:#92400e; margin:0 0 0.5rem 0;"><i class="fa-solid fa-circle-info"></i> Este paciente no tiene teléfono registrado. Agrégalo aquí para poder enviarle el WhatsApp:</p>
+<div style="display:flex; gap:0.5rem;">
+<input class="input-field" id="sfNCTelInput" type="tel" placeholder="10 dígitos" style="flex:1;"/>
+<button onclick="sfNCGuardarTelYEnviar()" style="background:#25d366; color:white; border:none; border-radius:8px; padding:0.6rem 1rem; font-weight:800; cursor:pointer; white-space:nowrap;"><i class="fa-brands fa-whatsapp"></i> Guardar y enviar</button>
+</div>
+</div>
 <button onclick="sfNuevaCitaCerrar()" style="background:none; color:#94a3b8; border:none; padding:0.5rem; font-weight:700; cursor:pointer;">Cerrar</button>
 </div>
 </div>
@@ -1743,8 +1750,19 @@ window._pdfReady=true;
 <button class="btn sf-agenda-rapida-btn" onclick="sfAgendaRapida('semana', this)" style="background:#fef3c7; color:#92400e; font-weight:800; font-size:0.85rem; padding:0.6rem;">Esta semana</button>
 <button class="btn sf-agenda-rapida-btn" onclick="sfAgendaRapida('mes', this)" style="background:#fef3c7; color:#92400e; font-weight:800; font-size:0.85rem; padding:0.6rem;">Este mes</button>
 </div>
-<button class="btn" onclick="sfToggleCalendarioMes()" id="sfCalToggleBtn" style="width:100%; background:#0d9488; color:white; font-weight:700; margin-bottom:0.7rem;"><i class="fa-solid fa-calendar-days"></i> Ver calendario del mes</button>
-<div id="sfCalendarioMes" class="hidden" style="margin-bottom:0.8rem;"></div>
+<button class="btn" onclick="sfToggleCalendarioMes()" id="sfCalToggleBtn" style="width:100%; background:#0d9488; color:white; font-weight:700; margin-bottom:0.4rem;"><i class="fa-solid fa-calendar-days"></i> Ver calendario</button>
+<div style="display:flex; gap:1rem; justify-content:center; font-size:0.72rem; color:#64748b; margin-bottom:0.7rem;">
+<span><span style="display:inline-block; width:9px; height:9px; border-radius:50%; background:#f59e0b; margin-right:3px;"></span>Pendiente</span>
+<span><span style="display:inline-block; width:9px; height:9px; border-radius:50%; background:#059669; margin-right:3px;"></span>Confirmada</span>
+<span><span style="display:inline-block; width:9px; height:9px; border-radius:50%; background:#dc2626; margin-right:3px;"></span>Cancelada</span>
+</div>
+<div id="sfCalendarioMes" class="hidden" style="margin-bottom:0.8rem;">
+<div style="display:flex; gap:0.5rem; margin-bottom:0.6rem;">
+<button id="sfCalBtnMes" onclick="sfCalCambiarModo('mes')" style="flex:1; padding:0.45rem; border-radius:8px; border:1px solid #cbd5e1; background:#0d9488; color:white; font-weight:800; font-size:0.8rem; cursor:pointer;">Mes</button>
+<button id="sfCalBtnSemana" onclick="sfCalCambiarModo('semana')" style="flex:1; padding:0.45rem; border-radius:8px; border:1px solid #cbd5e1; background:white; color:#0d9488; font-weight:800; font-size:0.8rem; cursor:pointer;">Semana</button>
+</div>
+<div id="sfCalContenido"></div>
+</div>
 <button class="btn btn-warning" onclick="document.getElementById('agendaSearchDate').valueAsDate = new Date(); renderAgendaList();" style="width:100%; color:white;"><i class="fa-solid fa-calendar-day"></i> Ver Citas de Hoy</button>
 </div>
 <div class="card" style="border-top-color: #f59e0b; margin-bottom:0; display:flex; flex-direction:column;">
@@ -1887,6 +1905,11 @@ AVISO PRÓX. CITA (Recordatorio local):
 <option value="Extracción / Exodoncia">Extracción / Exodoncia</option>
 <option value="Urgencia">Urgencia</option>
 <option value="Otro">Otro</option>
+</select>
+<select class="input-select" id="waEstado" onchange="if(db.curr){ db.pats[db.curr].nextApptEstado = this.value; saveDB(); try{renderAgendaList();}catch(e){} try{sfRenderCalendarioMes();}catch(e){} try{sfRenderCalendarioSemana();}catch(e){} }" style="min-width:150px; background:white; border-color:#fcd34d; font-weight:700;" title="Estado de confirmación de la cita">
+<option value="pendiente">🟡 Pendiente</option>
+<option value="confirmada">🟢 Confirmada</option>
+<option value="cancelada">🔴 Cancelada</option>
 </select>
 </div>
 <div style="display: flex; gap: 0.5rem; flex-wrap:wrap; align-items:center;">
@@ -5997,6 +6020,15 @@ db = {
     }
 
     // ===== ASISTENTE DE NUEVA CITA (buscar/crear paciente → día/hora/motivo → compartir) =====
+    function sfNCGuardarTelYEnviar() {
+        const id = window._sfNCPacienteId; if(!id || !db.pats[id]) return;
+        const tel = ($('sfNCTelInput').value || '').replace(/\D/g,'');
+        if(tel.length < 10) { alert('Escribe un teléfono válido (10 dígitos).'); return; }
+        db.pats[id].phone = tel;
+        saveDB();
+        $('sfNCSinTelBox').classList.add('hidden');
+        sfEnviarWACitaAgendada(id);
+    }
     function sfNuevaCitaAbrir() {
         window._sfNCPacienteId = null;
         $('sfNCPaso1').classList.remove('hidden');
@@ -6093,15 +6125,20 @@ db = {
         const fecha = $('sfNCFecha').value, hora = $('sfNCHora').value;
         if(!fecha) { alert('Falta la fecha de la cita.'); return; }
         const p = db.pats[id];
-        p.nextAppt = fecha; p.nextApptTime = hora || '10:00'; p.nextApptTipo = $('sfNCMotivo').value || '';
+        p.nextAppt = fecha; p.nextApptTime = hora || '10:00'; p.nextApptTipo = $('sfNCMotivo').value || ''; p.nextApptEstado = 'pendiente';
         saveDB();
         try { renderAgendaList(); } catch(e){}
         try { sfRenderCalendarioMes(); } catch(e){}
+        try { sfRenderCalendarioSemana(); } catch(e){}
         const dp = fecha.split('-'), dObj = new Date(dp[0],dp[1]-1,dp[2]);
         const dStr = dObj.toLocaleDateString('es-MX', {weekday:'long', day:'numeric', month:'long'});
         $('sfNCResumen').innerHTML = `<b>${p.name}</b><br>${dStr} a las ${p.nextApptTime}${p.nextApptTipo?' · '+p.nextApptTipo:''}`;
         $('sfNCBtnCalendar').onclick = () => abrirAgendaNuevaCita(id);
-        $('sfNCBtnWA').onclick = () => { if(!p.phone) { alert('Este paciente no tiene teléfono registrado. Agrégalo en su perfil para poder enviarle WhatsApp.'); return; } sfEnviarWACitaAgendada(id); };
+        $('sfNCSinTelBox').classList.add('hidden');
+        $('sfNCBtnWA').onclick = () => {
+            if(!p.phone) { $('sfNCTelInput').value=''; $('sfNCSinTelBox').classList.remove('hidden'); setTimeout(()=>$('sfNCTelInput').focus(),50); return; }
+            sfEnviarWACitaAgendada(id);
+        };
         $('sfNCPaso2').classList.add('hidden');
         $('sfNCPaso3').classList.remove('hidden');
     }
@@ -6479,16 +6516,28 @@ db = {
     }
 
     // ===== CALENDARIO VISUAL DEL MES (dentro de la plataforma, con los datos locales) =====
+    function sfColorEstado(estado) {
+        return estado === 'confirmada' ? '#059669' : (estado === 'cancelada' ? '#dc2626' : '#f59e0b');
+    }
     function sfToggleCalendarioMes() {
         const cont = $('sfCalendarioMes'); if(!cont) return;
         const abrir = cont.classList.contains('hidden');
         cont.classList.toggle('hidden');
-        $('sfCalToggleBtn').innerHTML = abrir ? '<i class="fa-solid fa-calendar-days"></i> Ocultar calendario' : '<i class="fa-solid fa-calendar-days"></i> Ver calendario del mes';
+        $('sfCalToggleBtn').innerHTML = abrir ? '<i class="fa-solid fa-calendar-days"></i> Ocultar calendario' : '<i class="fa-solid fa-calendar-days"></i> Ver calendario';
         if(abrir) {
             const hoy = new Date();
             if(window._sfCalAnio === undefined) { window._sfCalAnio = hoy.getFullYear(); window._sfCalMes = hoy.getMonth(); }
-            sfRenderCalendarioMes();
+            if(!window._sfCalModo) window._sfCalModo = 'mes';
+            if(window._sfCalSemanaInicio === undefined) { const d=new Date(hoy); d.setDate(d.getDate()-d.getDay()); window._sfCalSemanaInicio = d; }
+            sfCalCambiarModo(window._sfCalModo);
         }
+    }
+    function sfCalCambiarModo(modo) {
+        window._sfCalModo = modo;
+        const btnM = $('sfCalBtnMes'), btnS = $('sfCalBtnSemana');
+        if(btnM) { btnM.style.background = modo==='mes' ? '#0d9488' : 'white'; btnM.style.color = modo==='mes' ? 'white' : '#0d9488'; }
+        if(btnS) { btnS.style.background = modo==='semana' ? '#0d9488' : 'white'; btnS.style.color = modo==='semana' ? 'white' : '#0d9488'; }
+        if(modo === 'semana') sfRenderCalendarioSemana(); else sfRenderCalendarioMes();
     }
     function sfCalNav(delta) {
         window._sfCalMes += delta;
@@ -6496,37 +6545,88 @@ db = {
         if(window._sfCalMes > 11) { window._sfCalMes = 0; window._sfCalAnio++; }
         sfRenderCalendarioMes();
     }
+    function sfCalNavSemana(delta) {
+        const d = new Date(window._sfCalSemanaInicio);
+        d.setDate(d.getDate() + delta*7);
+        window._sfCalSemanaInicio = d;
+        sfRenderCalendarioSemana();
+    }
+    // Junta las citas de un rango, agrupadas por fecha ISO, respetando el filtro de consultorio.
+    function sfCitasPorDia(desdeISO, hastaISO) {
+        const mapa = {};
+        Object.values(db.pats).forEach(p => {
+            if(!p.nextAppt || (sfFiltroConsultorio && p.consultorioId !== sfFiltroConsultorio)) return;
+            if(p.nextAppt < desdeISO || p.nextAppt > hastaISO) return;
+            if(!mapa[p.nextAppt]) mapa[p.nextAppt] = [];
+            mapa[p.nextAppt].push(p);
+        });
+        Object.keys(mapa).forEach(k => mapa[k].sort((a,b) => (a.nextApptTime||'99').localeCompare(b.nextApptTime||'99')));
+        return mapa;
+    }
+    function sfChipCita(p) {
+        const fmtH = t => { if(!t) return ''; let [hh,mm]=t.split(':'); let H=parseInt(hh), ap=H>=12?'PM':'AM'; H=H%12||12; return H+':'+mm+' '+ap; };
+        const c = sfColorEstado(p.nextApptEstado);
+        return `<div onclick="event.stopPropagation(); sfCalSeleccionarDia('${p.nextAppt}')" title="${p.name} — ${fmtH(p.nextApptTime)}" style="background:white; border-left:3px solid ${c}; border-radius:4px; padding:2px 5px; margin-bottom:2px; font-size:0.66rem; line-height:1.3; cursor:pointer; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; box-shadow:0 1px 2px rgba(0,0,0,0.08);"><b style="color:${c};">${fmtH(p.nextApptTime)}</b> ${p.name}</div>`;
+    }
     function sfRenderCalendarioMes() {
-        const cont = $('sfCalendarioMes'); if(!cont) return;
+        const cont = $('sfCalContenido'); if(!cont) return;
         const anio = window._sfCalAnio, mes = window._sfCalMes;
         const hoy = new Date(); const hoyISO = hoy.getFullYear()+'-'+String(hoy.getMonth()+1).padStart(2,'0')+'-'+String(hoy.getDate()).padStart(2,'0');
         const seleccionada = $('agendaSearchDate') ? $('agendaSearchDate').value : '';
-        // Conteo de pacientes por día en este mes
-        const conteo = {};
-        Object.values(db.pats).forEach(p => {
-            if(!p.nextAppt || (sfFiltroConsultorio && p.consultorioId !== sfFiltroConsultorio)) return;
-            const [ay,am] = p.nextAppt.split('-');
-            if(parseInt(ay,10) === anio && parseInt(am,10) === mes+1) conteo[p.nextAppt] = (conteo[p.nextAppt]||0) + 1;
-        });
         const primerDia = new Date(anio, mes, 1).getDay();
         const diasEnMes = new Date(anio, mes+1, 0).getDate();
+        const desdeISO = anio+'-'+String(mes+1).padStart(2,'0')+'-01';
+        const hastaISO = anio+'-'+String(mes+1).padStart(2,'0')+'-'+String(diasEnMes).padStart(2,'0');
+        const porDia = sfCitasPorDia(desdeISO, hastaISO);
         const nombreMes = new Date(anio, mes, 1).toLocaleDateString('es-MX', {month:'long', year:'numeric'});
         let h = `<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.6rem;">
             <button onclick="sfCalNav(-1)" style="background:none; border:none; color:#0d9488; font-size:1.1rem; cursor:pointer; padding:0.3rem 0.6rem;"><i class="fa-solid fa-chevron-left"></i></button>
             <span style="font-weight:800; color:#0f172a; text-transform:capitalize; font-size:0.95rem;">${nombreMes}</span>
             <button onclick="sfCalNav(1)" style="background:none; border:none; color:#0d9488; font-size:1.1rem; cursor:pointer; padding:0.3rem 0.6rem;"><i class="fa-solid fa-chevron-right"></i></button>
         </div>
-        <div style="display:grid; grid-template-columns:repeat(7,1fr); gap:2px; font-size:0.68rem; font-weight:800; color:#94a3b8; text-align:center; margin-bottom:2px;">
+        <div style="display:grid; grid-template-columns:repeat(7,1fr); gap:2px; font-size:0.66rem; font-weight:800; color:#94a3b8; text-align:center; margin-bottom:2px;">
             <div>D</div><div>L</div><div>M</div><div>M</div><div>J</div><div>V</div><div>S</div>
         </div>
         <div style="display:grid; grid-template-columns:repeat(7,1fr); gap:2px;">`;
         for(let i=0; i<primerDia; i++) h += '<div></div>';
         for(let d=1; d<=diasEnMes; d++) {
             const iso = anio+'-'+String(mes+1).padStart(2,'0')+'-'+String(d).padStart(2,'0');
-            const n = conteo[iso] || 0;
+            const citas = porDia[iso] || [];
             const esHoy = iso === hoyISO, esSel = iso === seleccionada;
-            h += `<button onclick="sfCalSeleccionarDia('${iso}')" style="aspect-ratio:1; border-radius:8px; border:${esSel?'2px solid #0d9488':(esHoy?'2px solid #fbbf24':'1px solid #e2e8f0')}; background:${n>0?'#ccfbf1':'white'}; color:#0f172a; font-size:0.75rem; font-weight:${esHoy?'800':'600'}; cursor:pointer; position:relative; padding:0;">${d}${n>0?`<div style="position:absolute; bottom:2px; left:50%; transform:translateX(-50%); width:5px; height:5px; border-radius:50%; background:#0d9488;"></div>`:''}</button>`;
+            const chips = citas.slice(0,2).map(sfChipCita).join('') + (citas.length>2 ? `<div style="font-size:0.62rem; color:#94a3b8; font-weight:700;">+${citas.length-2} más</div>` : '');
+            h += `<div onclick="sfCalSeleccionarDia('${iso}')" style="min-height:64px; border-radius:6px; border:${esSel?'2px solid #0d9488':(esHoy?'2px solid #fbbf24':'1px solid #e2e8f0')}; background:${citas.length?'#f8fafc':'white'}; padding:2px; cursor:pointer; overflow:hidden;">
+                <div style="font-size:0.68rem; font-weight:${esHoy?'800':'600'}; color:#0f172a; text-align:right; padding:1px 2px;">${d}</div>
+                ${chips}
+            </div>`;
         }
+        h += '</div>';
+        cont.innerHTML = h;
+    }
+    function sfRenderCalendarioSemana() {
+        const cont = $('sfCalContenido'); if(!cont) return;
+        const inicio = new Date(window._sfCalSemanaInicio);
+        const dias = []; for(let i=0;i<7;i++){ const d=new Date(inicio); d.setDate(d.getDate()+i); dias.push(d); }
+        const iso = d => d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+        const hoy = new Date(); const hoyISO = iso(hoy);
+        const seleccionada = $('agendaSearchDate') ? $('agendaSearchDate').value : '';
+        const porDia = sfCitasPorDia(iso(dias[0]), iso(dias[6]));
+        const rango = dias[0].toLocaleDateString('es-MX',{day:'numeric',month:'short'}) + ' – ' + dias[6].toLocaleDateString('es-MX',{day:'numeric',month:'short'});
+        const DIAS = ['D','L','M','M','J','V','S'];
+        let h = `<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.6rem;">
+            <button onclick="sfCalNavSemana(-1)" style="background:none; border:none; color:#0d9488; font-size:1.1rem; cursor:pointer; padding:0.3rem 0.6rem;"><i class="fa-solid fa-chevron-left"></i></button>
+            <span style="font-weight:800; color:#0f172a; font-size:0.9rem;">${rango}</span>
+            <button onclick="sfCalNavSemana(1)" style="background:none; border:none; color:#0d9488; font-size:1.1rem; cursor:pointer; padding:0.3rem 0.6rem;"><i class="fa-solid fa-chevron-right"></i></button>
+        </div>
+        <div style="display:grid; grid-template-columns:repeat(7,1fr); gap:3px;">`;
+        dias.forEach((d,i) => {
+            const diso = iso(d);
+            const citas = porDia[diso] || [];
+            const esHoy = diso === hoyISO, esSel = diso === seleccionada;
+            h += `<div onclick="sfCalSeleccionarDia('${diso}')" style="min-height:110px; border-radius:6px; border:${esSel?'2px solid #0d9488':(esHoy?'2px solid #fbbf24':'1px solid #e2e8f0')}; background:white; padding:3px; cursor:pointer;">
+                <div style="text-align:center; margin-bottom:2px;"><div style="font-size:0.6rem; color:#94a3b8; font-weight:800;">${DIAS[i]}</div><div style="font-size:0.78rem; font-weight:${esHoy?'800':'600'}; color:#0f172a;">${d.getDate()}</div></div>
+                ${citas.map(sfChipCita).join('')}
+            </div>`;
+        });
         h += '</div>';
         cont.innerHTML = h;
     }
@@ -6534,7 +6634,21 @@ db = {
         document.querySelectorAll('.sf-agenda-rapida-btn').forEach(b => b.classList.remove('active-range'));
         $('agendaSearchDate').value = iso;
         renderAgendaList();
-        sfRenderCalendarioMes();
+    }
+    // Toca el punto de color para ciclar: pendiente → confirmada → cancelada → pendiente
+    function sfCicloEstado(id, event) {
+        if(event) event.stopPropagation();
+        const p = db.pats[id]; if(!p) return;
+        const orden = ['pendiente','confirmada','cancelada'];
+        const i = orden.indexOf(p.nextApptEstado || 'pendiente');
+        p.nextApptEstado = orden[(i+1) % orden.length];
+        saveDB();
+        try{
+            if(window._sfAgendaRangoActivo) sfRenderAgendaRango(window._sfAgendaRangoActivo.desde, window._sfAgendaRangoActivo.hasta);
+            else renderAgendaList();
+        }catch(e){}
+        try{ sfRenderCalendarioMes(); }catch(e){}
+        try{ sfRenderCalendarioSemana(); }catch(e){}
     }
     function renderAgendaList() {
         const d = $('agendaSearchDate').value; if(!d) return; let h = '';
@@ -6545,8 +6659,11 @@ db = {
         Object.values(db.pats).forEach(p => { if(p.nextAppt === d && (!sfFiltroConsultorio || p.consultorioId === sfFiltroConsultorio)) lista.push(p); });
         lista.sort((a,b)=>{ const ha=a.nextApptTime||'99', hb=b.nextApptTime||'99'; return ha.localeCompare(hb); });
         lista.forEach(p => {
-                h += `<div style="background:#f8fafc; padding:1.1rem 1.2rem; border:1px solid #e2e8f0; border-radius:8px; margin-bottom:0.8rem; box-shadow:var(--shadow-sm);">
-                    <div style="margin-bottom:0.7rem;"><h4 style="margin:0 0 0.4rem 0; color:#0f172a; font-size:1.05rem;">${p.nextApptTime?`<span style="background:#1f5b9e; color:white; font-size:0.78rem; padding:2px 8px; border-radius:6px; margin-right:8px;">${fmtH(p.nextApptTime)}</span>`:''}${p.name}${p.nextApptTipo?` <span style="background:#fef3c7; color:#92400e; font-size:0.72rem; padding:2px 7px; border-radius:6px; font-weight:700;">${p.nextApptTipo}</span>`:''}</h4><span style="font-size:0.85rem; color:#64748b; font-weight:600;"><i class="fa-solid fa-phone"></i> ${p.phone || 'Sin teléfono'}</span></div>
+                h += `<div style="background:#f8fafc; padding:1.1rem 1.2rem; border:1px solid #e2e8f0; border-left:4px solid ${sfColorEstado(p.nextApptEstado)}; border-radius:8px; margin-bottom:0.8rem; box-shadow:var(--shadow-sm);">
+                    <div style="margin-bottom:0.7rem; display:flex; align-items:flex-start; gap:0.6rem;">
+                    <span onclick="sfCicloEstado('${p.id}', event)" title="Toca para cambiar el estado (pendiente/confirmada/cancelada)" style="width:16px; height:16px; border-radius:50%; background:${sfColorEstado(p.nextApptEstado)}; flex-shrink:0; margin-top:4px; cursor:pointer; border:2px solid white; box-shadow:0 0 0 1px #cbd5e1;"></span>
+                    <div><h4 style="margin:0 0 0.4rem 0; color:#0f172a; font-size:1.05rem;">${p.nextApptTime?`<span style="background:#1f5b9e; color:white; font-size:0.78rem; padding:2px 8px; border-radius:6px; margin-right:8px;">${fmtH(p.nextApptTime)}</span>`:''}${p.name}${p.nextApptTipo?` <span style="background:#fef3c7; color:#92400e; font-size:0.72rem; padding:2px 7px; border-radius:6px; font-weight:700;">${p.nextApptTipo}</span>`:''}</h4><span style="font-size:0.85rem; color:#64748b; font-weight:600;"><i class="fa-solid fa-phone"></i> ${p.phone || 'Sin teléfono'}</span></div>
+                    </div>
                     <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
                     <button class="btn" style="padding:0.6rem 0.9rem; background:#0d9488; color:white; font-size:0.82rem;" onclick="abrirAgendaNuevaCita('${p.id}')" title="Agregar a mi calendario de Google"><i class="fa-solid fa-calendar-check"></i></button>
                     <button class="btn" style="padding:0.6rem 0.9rem; background:#1f5b9e; color:white; font-size:0.82rem;" onclick="sfEnviarWACita('${p.id}')" title="Enviar recordatorio de cita"><i class="fa-solid fa-bell"></i> Recordar Cita</button>
@@ -6593,8 +6710,8 @@ db = {
                 const dStr = dObj.toLocaleDateString('es-MX', {weekday:'long', day:'numeric', month:'long'});
                 h += `<div style="font-weight:800; color:#b45309; font-size:0.78rem; text-transform:uppercase; margin:0.8rem 0 0.4rem; padding-bottom:0.25rem; border-bottom:1px solid #fde68a;">${dStr}</div>`;
             }
-            h += `<div style="display:flex; justify-content:space-between; align-items:center; background:#f8fafc; padding:0.85rem 1rem; border:1px solid #e2e8f0; border-radius:8px; margin-bottom:0.5rem;">
-                <div><span style="margin:0; color:#0f172a; font-size:0.92rem; font-weight:700;">${p.nextApptTime?`<span style="background:#1f5b9e; color:white; font-size:0.7rem; padding:2px 7px; border-radius:6px; margin-right:6px;">${fmtH(p.nextApptTime)}</span>`:''}${p.name}${p.nextApptTipo?` <span style="background:#fef3c7; color:#92400e; font-size:0.68rem; padding:2px 6px; border-radius:6px; font-weight:700;">${p.nextApptTipo}</span>`:''}</span></div>
+            h += `<div style="display:flex; justify-content:space-between; align-items:center; background:#f8fafc; padding:0.85rem 1rem; border:1px solid #e2e8f0; border-left:4px solid ${sfColorEstado(p.nextApptEstado)}; border-radius:8px; margin-bottom:0.5rem;">
+                <div style="display:flex; align-items:center; gap:0.5rem;"><span onclick="sfCicloEstado('${p.id}', event)" title="Toca para cambiar el estado" style="width:12px; height:12px; border-radius:50%; background:${sfColorEstado(p.nextApptEstado)}; flex-shrink:0; cursor:pointer; border:2px solid white; box-shadow:0 0 0 1px #cbd5e1;"></span><span style="margin:0; color:#0f172a; font-size:0.92rem; font-weight:700;">${p.nextApptTime?`<span style="background:#1f5b9e; color:white; font-size:0.7rem; padding:2px 7px; border-radius:6px; margin-right:6px;">${fmtH(p.nextApptTime)}</span>`:''}${p.name}${p.nextApptTipo?` <span style="background:#fef3c7; color:#92400e; font-size:0.68rem; padding:2px 6px; border-radius:6px; font-weight:700;">${p.nextApptTipo}</span>`:''}</span></div>
                 <div style="display:flex; gap:0.35rem;">
                 <button class="btn" style="padding:0.4rem 0.6rem; font-size:0.75rem; background:#0d9488; color:white;" onclick="abrirAgendaNuevaCita('${p.id}')" title="Agregar a mi calendario de Google"><i class="fa-solid fa-calendar-check"></i></button>
                 <button class="btn" style="padding:0.4rem 0.6rem; font-size:0.75rem; background:#1f5b9e; color:white;" onclick="sfEnviarWACita('${p.id}')" title="Enviar recordatorio de cita"><i class="fa-solid fa-bell"></i></button>
@@ -19795,7 +19912,7 @@ function saveDB() {
 // saveDB actualizado localStorage.setItem('sf_db_v10', JSON.stringify(db)); checkTopAlert(); if(typeof gisInited !== 'undefined' && gisInited && tokenClient && typeof gapi !== 'undefined' && gapi.client && gapi.client.getToken() !== null) uploadToDrive(false); }
     
     function copiarRutaLocal(r) { if(!r) return; navigator.clipboard.writeText(r).then(()=>alert("Ruta local copiada al portapapeles.")); }
-    function autoLoadWaDate() { const p = db.curr ? db.pats[db.curr] : null; if($('waTipo')) $('waTipo').value = (p && p.nextApptTipo) || ''; if(p && p.nextAppt){ $('waDate').value = p.nextAppt; $('waTime').value = p.nextApptTime || "16:00"; return; } let d = new Date(); d.setDate(d.getDate() + 30); $('waDate').value = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; $('waTime').value = "16:00"; }
+    function autoLoadWaDate() { const p = db.curr ? db.pats[db.curr] : null; if($('waTipo')) $('waTipo').value = (p && p.nextApptTipo) || ''; if($('waEstado')) $('waEstado').value = (p && p.nextApptEstado) || 'pendiente'; if(p && p.nextAppt){ $('waDate').value = p.nextAppt; $('waTime').value = p.nextApptTime || "16:00"; return; } let d = new Date(); d.setDate(d.getDate() + 30); $('waDate').value = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; $('waTime').value = "16:00"; }
     function setAlertLabel(d) { const t = sfHoyISO(), l = $('lblAlertTitle'); if (!d || d === t) { l.innerHTML = "<i class='fa-solid fa-thumbtack'></i> AVISO PRÓX. CITA:"; l.style.color = "var(--warning-text)"; $('pAlert').style.color = "var(--text)"; $('pAlert').style.borderColor = "#fde047"; } else { l.innerHTML = "<i class='fa-solid fa-triangle-exclamation'></i> AVISO PARA HOY:"; l.style.color = "var(--danger-text)"; $('pAlert').style.color = "var(--danger-text)"; $('pAlert').style.borderColor = "#fca5a5"; } }
     // Nombre corto para mensajes: usa el apodo/como-le-gusta-que-le-digan si existe,
     // si no, el primer nombre de pila.
@@ -19842,18 +19959,19 @@ function saveDB() {
         window.open(`https://wa.me/52${p.phone.replace(/\D/g,'')}?text=${encodeURIComponent(m)}`, '_blank');
         return true;
     }
-    function sendApptWA() { if(!db.curr) return; let p = db.pats[db.curr]; if(!p.phone) return; let d=$('waDate').value, t=$('waTime').value; if(!d||!t) return; p.nextAppt = d; p.nextApptTime = t; const tipo = ($('waTipo') && $('waTipo').value) || ''; p.nextApptTipo = tipo; saveDB(); renderAgendaList(); sfEnviarWACitaAgendada(db.curr); }
+    function sendApptWA() { if(!db.curr) return; let p = db.pats[db.curr]; if(!p.phone) return; let d=$('waDate').value, t=$('waTime').value; if(!d||!t) return; p.nextAppt = d; p.nextApptTime = t; const tipo = ($('waTipo') && $('waTipo').value) || ''; p.nextApptTipo = tipo; p.nextApptEstado = ($('waEstado') && $('waEstado').value) || 'pendiente'; saveDB(); renderAgendaList(); sfEnviarWACitaAgendada(db.curr); }
     // Cancela/quita la cita agendada de un paciente (no borra al paciente, solo su próxima cita).
     function sfEliminarCita(id) {
         const p = db.pats[id]; if(!p) return;
         if(!confirm('¿Quitar la cita de "' + p.name + '" (' + (p.nextAppt||'') + (p.nextApptTime?' '+p.nextApptTime:'') + ')?\n\nEsto no elimina al paciente, solo su próxima cita.')) return;
-        delete p.nextAppt; delete p.nextApptTime; delete p.nextApptTipo;
+        delete p.nextAppt; delete p.nextApptTime; delete p.nextApptTipo; delete p.nextApptEstado;
         saveDB();
         try{
             if(window._sfAgendaRangoActivo) sfRenderAgendaRango(window._sfAgendaRangoActivo.desde, window._sfAgendaRangoActivo.hasta);
             else renderAgendaList();
         }catch(e){}
         try{ sfRenderCalendarioMes(); }catch(e){}
+        try{ sfRenderCalendarioSemana(); }catch(e){}
         try{ sfMCActualizarAgenda(); }catch(e){}
         if(typeof daniSpeak === 'function') daniSpeak('🗑️ Cita eliminada.', 4000, 'info');
     }
