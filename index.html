@@ -598,7 +598,7 @@ window._pdfReady=true;
         <h2 style="margin: 0 !important; font-size: 1.5rem !important; color: white !important;">SmileFlow</h2>
         <a href="https://www.dentilike.com.mx" target="_blank" style="color: #bae6fd; font-size: 0.75rem; text-decoration: none; font-weight: 600; cursor: pointer; transition: color 0.2s;" onmouseover="this.style.color='white'" onmouseout="this.style.color='#bae6fd'">www.dentilike.com.mx</a>
         <a href="mailto:soporte@dentilike.com.mx" style="color: #bae6fd; font-size: 0.75rem; text-decoration: none; font-weight: 600; cursor: pointer; transition: color 0.2s;" onmouseover="this.style.color='white'" onmouseout="this.style.color='#bae6fd'">soporte@dentilike.com.mx</a>
-<span style="color:#7dd3fc; font-size:0.62rem; opacity:0.8; margin-top:2px;">© 2026 Dentilike · Todos los derechos reservados · <b id="sfVersion">v180</b></span>
+<span style="color:#7dd3fc; font-size:0.62rem; opacity:0.8; margin-top:2px;">© 2026 Dentilike · Todos los derechos reservados · <b id="sfVersion">v181</b></span>
     </div></div>
 <!-- Doctor en sesion: informativo, lleva a Configuracion para cambiarlo -->
 <div id="sideDocBox" onclick="openSection('s-admin-id', document.querySelector('.nav-item[onclick*=&quot;s-admin-id&quot;]'))" title="Doctor en sesion. Toca para cambiarlo o editar el perfil." style="margin:0 12px 10px; padding:0.7rem 0.85rem; background:rgba(255,255,255,0.07); border:1px solid rgba(125,211,252,0.28); border-left:3px solid #5DC1BF; border-radius:10px; cursor:pointer; display:flex; align-items:center; gap:0.6rem;">
@@ -19454,12 +19454,74 @@ Reglas: español de México; terminología dental correcta; máximo 6 líneas; u
         window._sfKeepAliveId = setInterval(() => {
             let t=null; try{ t=gapi.client.getToken(); }catch(e){}
             if(!t) return; // ya no hay sesión activa; no insistir en segundo plano
-            sfSolicitarTokenGoogle('').then(ok => { if(ok) updateGlobalSyncStatus('online'); });
+            if(localStorage.getItem('sf_auth_session')) {
+                sfPedirTokenServidor().then(ok => { if(ok) updateGlobalSyncStatus('online'); });
+            } else {
+                sfSolicitarTokenGoogle('').then(ok => { if(ok) updateGlobalSyncStatus('online'); });
+            }
         }, 45 * 60 * 1000);
     }
     function sfDetenerSesionViva() { if(window._sfKeepAliveId) { clearInterval(window._sfKeepAliveId); window._sfKeepAliveId = null; } }
+
+    // ===== SERVIDOR PROPIO (smileflow-auth) — reconexión silenciosa de verdad =====
+    // A diferencia del flujo de Google en el navegador, este NUNCA muestra ninguna
+    // ventana: es una simple petición al servidor, que guarda el token de refresco.
+    // Por eso SÍ es seguro reintentarlo solo, sin el riesgo de doble-login de antes.
+    const SF_AUTH_SERVER = 'https://smileflow-auth.dentilike.workers.dev';
+
+    // Se llama una vez al arrancar la app: si veníamos de aceptar el permiso en
+    // Google, la URL trae ?sfSession=... — lo guardamos y limpiamos la URL.
+    function sfDetectarSessionURL() {
+        try {
+            const params = new URLSearchParams(window.location.search);
+            const session = params.get('sfSession');
+            if(!session) return;
+            localStorage.setItem('sf_auth_session', session);
+            params.delete('sfSession');
+            const nuevaURL = window.location.pathname + (params.toString() ? '?' + params.toString() : '') + window.location.hash;
+            window.history.replaceState({}, '', nuevaURL);
+        } catch(e) { console.warn('sfDetectarSessionURL:', e); }
+    }
+    // Pide un token de acceso fresco al servidor propio usando la sesión guardada.
+    // true = listo, ya quedó cargado en gapi. false = no se pudo (revisa
+    // window._sfAuthServidorInaccesible para distinguir "sin sesión/revocado" de
+    // "el servidor no respondió", que son casos distintos para quien la llama).
+    async function sfPedirTokenServidor() {
+        window._sfAuthServidorInaccesible = false;
+        const session = localStorage.getItem('sf_auth_session');
+        if(!session) return false;
+        try {
+            const res = await fetch(SF_AUTH_SERVER + '/auth/token?session=' + encodeURIComponent(session));
+            if(!res.ok) {
+                if(res.status === 401) localStorage.removeItem('sf_auth_session'); // sesión inválida o revocada: no insistir más
+                return false;
+            }
+            const data = await res.json();
+            if(!data.access_token) return false;
+            gapi.client.setToken({ access_token: data.access_token });
+            return true;
+        } catch(e) {
+            window._sfAuthServidorInaccesible = true; // el servidor no respondió (sin internet, caído, etc.)
+            return false;
+        }
+    }
+    // Primera conexión: manda al doctor a la pantalla de Google vía nuestro
+    // servidor propio (no un popup — navegación de página completa, más confiable
+    // en celular). Al aceptar, Google regresa aquí mismo con la sesión ya lista.
+    function sfConectarConServidor() {
+        const returnTo = window.location.origin + window.location.pathname;
+        window.location.href = SF_AUTH_SERVER + '/auth/start?returnTo=' + encodeURIComponent(returnTo);
+    }
+    // Revoca el acceso también en el servidor propio (borra el token de refresco guardado ahí).
+    async function sfRevocarEnServidor() {
+        const session = localStorage.getItem('sf_auth_session');
+        localStorage.removeItem('sf_auth_session');
+        if(!session) return;
+        try { await fetch(SF_AUTH_SERVER + '/auth/revoke?session=' + encodeURIComponent(session)); } catch(e) {}
+    }
     
     const CLIENT_ID = localStorage.getItem('sf_gclient') || '798639911007-sv5lg6p0qbmfkqj35uvdi8s8dmhfp8jg.apps.googleusercontent.com'; const SCOPES = 'https://www.googleapis.com/auth/drive.file'; let tokenClient; let gisInited = false; let driveFileId = localStorage.getItem('sf_drive_file_id') || null;
+    sfDetectarSessionURL();
     function sfGapiInit() { try { gapi.load('client', async () => { try { await gapi.client.init({ discoveryDocs: ['https://www.googleapis.com/discovery/v1/apis/drive/v3/rest'] }); } catch(e){} finally { checkReady(); } }); } catch(e) { console.warn('gapiInit:', e); } }
     function sfGisInit() { try { tokenClient = google.accounts.oauth2.initTokenClient({ client_id: CLIENT_ID, scope: SCOPES, callback: '', error_callback: (e) => { console.warn('GIS:', e); if(window._sfTokenResolve) window._sfTokenResolve(false); } }); gisInited = true; checkReady(); } catch(e) { console.warn('gisInit:', e); } }
     // Conectar con el stub del <head>: si Google ya cargó (banderas activas), inicializar AHORA
@@ -19490,14 +19552,20 @@ Reglas: español de México; terminología dental correcta; máximo 6 líneas; u
         });
     }
     function checkReady() { if(!gisInited) return; let t=null; try{t=gapi.client.getToken();}catch(e){} if(t===null) { if($('btnAuthAdmin')) $('btnAuthAdmin').style.display='block';
-        // Nota: antes se intentaba reconectar "en silencio" 1.5s después de abrir la app.
-        // En celular, ese intento "silencioso" con frecuencia SÍ mostraba la pantalla completa
-        // de elegir cuenta (Chrome/Android no siempre mantiene sesión disponible para reconexión
-        // invisible) — eso producía dos ciclos de inicio de sesión seguidos: el automático y
-        // luego el que el doctor disparaba manualmente. Se quitó a propósito: ahora solo se pide
-        // login cuando el doctor toca "Conectar" o "Sincronizar", garantizando un único ciclo.
-        // En su lugar, solo se muestra un recordatorio (sin abrir nada de Google solo) si ya
-        // había conectado la nube antes, para que no se le olvide tocar "Conectar" una vez al día.
+        // Si ya conectamos antes con el servidor propio, reconecta sola en silencio
+        // DE VERDAD — esto es una petición al servidor, nunca abre ninguna ventana
+        // de Google, así que no tiene el riesgo de doble-login que sí tenía el
+        // intento silencioso viejo (por eso ese se quitó y este sí se puede dejar).
+        if(localStorage.getItem('sf_auth_session') && !window._sfAutoTried) {
+            window._sfAutoTried = true;
+            sfPedirTokenServidor().then(ok => {
+                if(ok) { showConnectedUI(); checkDriveFile(); }
+                else if($('btnAuthAdmin')) $('btnAuthAdmin').style.display='block';
+            });
+            return;
+        }
+        // Si nunca ha conectado con el servidor propio (o esa reconexión falló), solo
+        // se muestra un recordatorio si ya había conectado antes por el método viejo.
         if(localStorage.getItem('sf_drive_file_id') && !window._sfRecordatorioNube) {
             window._sfRecordatorioNube = true;
             setTimeout(() => { if(typeof daniSpeak === 'function') daniSpeak('☁️ Aún no conectas tu nube de hoy.', 10000, 'info', 'cloud'); }, 1800);
@@ -19530,14 +19598,42 @@ Reglas: español de México; terminología dental correcta; máximo 6 líneas; u
         return new Promise(async (resolve) => {
             let t=null; try{ t=gapi.client.getToken(); }catch(e){}
             if(t && t.access_token) return resolve(true);
+            // Primero el servidor propio (silencioso de verdad, sin ventanas)
+            if(await sfPedirTokenServidor()) return resolve(true);
+            // Si el servidor no tiene sesión guardada (nunca se conectó por ahí),
+            // cae al método viejo como respaldo.
             if(!tokenClient) return resolve(false);
             resolve(await sfSolicitarTokenGoogle(''));
         });
     }
 
     async function handleAuthClick() {
+        // Ya hay un token válido en memoria — nada que hacer.
+        let t=null; try{t=gapi.client.getToken();}catch(e){}
+        if(t && t.access_token) { await checkDriveFile(); return; }
+
+        // Si ya conectamos antes con el servidor propio, solo pedimos un token
+        // fresco — nunca abre ninguna ventana de Google, es instantáneo.
+        if(localStorage.getItem('sf_auth_session')) {
+            const ok = await sfPedirTokenServidor();
+            if(ok) { showConnectedUI(); await checkDriveFile(); return; }
+            if(window._sfAuthServidorInaccesible) {
+                // El servidor no respondió (sin internet, caído, etc.) — seguimos
+                // con el método clásico de respaldo más abajo, no con el redirect.
+            } else {
+                // La sesión guardada ya no sirve (revocada) — hay que conectar de nuevo.
+                sfConectarConServidor();
+                return;
+            }
+        } else {
+            // Primera vez que se conecta: manda al doctor al servidor propio.
+            // Esto reemplaza el popup clásico como método principal.
+            sfConectarConServidor();
+            return;
+        }
+
+        // ===== Respaldo clásico (solo si el servidor propio no respondió) =====
         if(!tokenClient) {
-            // Sin alert() bloqueante: reintento silencioso en segundo plano
             if(typeof daniSpeak === 'function') daniSpeak('⏳ Preparando los servicios de Google, un momento...', 5000, 'info');
             const ok = await reintentarModulosGoogle();
             if(!ok) {
@@ -19546,19 +19642,14 @@ Reglas: español de México; terminología dental correcta; máximo 6 líneas; u
                 return;
             }
         }
-        // Si ya hay una reconexión silenciosa en curso, espera ESA misma respuesta primero.
         if(window._sfTokenEnVuelo) {
             const okSilencioso = await window._sfTokenEnVuelo;
             if(okSilencioso) { await checkDriveFile(); return; }
         }
-        let t=null; try{t=gapi.client.getToken();}catch(e){}
-        // 'select_account' pide elegir cuenta pero deja que Google se salte la pantalla
-        // extra de confirmación si el permiso ya fue otorgado antes — 'consent' lo forzaba
-        // siempre, aunque ya hubiera acceso concedido.
-        const ok = await sfSolicitarTokenGoogle(t===null ? 'select_account' : '');
-        if(ok) await checkDriveFile();
+        const ok2 = await sfSolicitarTokenGoogle(t===null ? 'select_account' : '');
+        if(ok2) await checkDriveFile();
     }
-    function handleSignoutClick() { try{const t=gapi.client.getToken(); if(t!==null){google.accounts.oauth2.revoke(t.access_token); gapi.client.setToken('');}}catch(e){} sfDetenerSesionViva(); if($('btnAuthAdmin')) $('btnAuthAdmin').style.display='block'; if($('btnSyncNow')) $('btnSyncNow').style.display='none'; if($('btnSignout')) $('btnSignout').style.display='none'; updateGlobalSyncStatus('offline'); alert("Desconectado."); }
+    function handleSignoutClick() { try{const t=gapi.client.getToken(); if(t!==null){google.accounts.oauth2.revoke(t.access_token); gapi.client.setToken('');}}catch(e){} sfDetenerSesionViva(); sfRevocarEnServidor(); if($('btnAuthAdmin')) $('btnAuthAdmin').style.display='block'; if($('btnSyncNow')) $('btnSyncNow').style.display='none'; if($('btnSignout')) $('btnSignout').style.display='none'; updateGlobalSyncStatus('offline'); alert("Desconectado."); }
     
     function sfEsErrorDeAuth(e) {
         try {
