@@ -600,7 +600,7 @@ window._pdfReady=true;
         <h2 style="margin: 0 !important; font-size: 1.5rem !important; color: white !important;">SmileFlow</h2>
         <a href="https://www.dentilike.com.mx" target="_blank" style="color: #bae6fd; font-size: 0.75rem; text-decoration: none; font-weight: 600; cursor: pointer; transition: color 0.2s;" onmouseover="this.style.color='white'" onmouseout="this.style.color='#bae6fd'">www.dentilike.com.mx</a>
         <a href="mailto:soporte@dentilike.com.mx" style="color: #bae6fd; font-size: 0.75rem; text-decoration: none; font-weight: 600; cursor: pointer; transition: color 0.2s;" onmouseover="this.style.color='white'" onmouseout="this.style.color='#bae6fd'">soporte@dentilike.com.mx</a>
-<span style="color:#7dd3fc; font-size:0.62rem; opacity:0.8; margin-top:2px;">© 2026 Dentilike · Todos los derechos reservados · <b id="sfVersion">v185</b></span>
+<span style="color:#7dd3fc; font-size:0.62rem; opacity:0.8; margin-top:2px;">© 2026 Dentilike · Todos los derechos reservados · <b id="sfVersion">v187</b></span>
     </div></div>
 <!-- Doctor en sesion: informativo, lleva a Configuracion para cambiarlo -->
 <div id="sideDocBox" onclick="openSection('s-admin-id', document.querySelector('.nav-item[onclick*=&quot;s-admin-id&quot;]'))" title="Doctor en sesion. Toca para cambiarlo o editar el perfil." style="margin:0 12px 10px; padding:0.7rem 0.85rem; background:rgba(255,255,255,0.07); border:1px solid rgba(125,211,252,0.28); border-left:3px solid #5DC1BF; border-radius:10px; cursor:pointer; display:flex; align-items:center; gap:0.6rem;">
@@ -2287,8 +2287,18 @@ AVISO PRÓX. CITA (Recordatorio local):
 <!-- 3. Tarjeta -->
 <div style="margin-bottom:1.3rem;">
 <div style="font-weight:800; color:#7c3aed; font-size:0.95rem; margin-bottom:0.6rem; padding-bottom:0.4rem; border-bottom:2px solid #ddd6fe;"><span style="background:#7c3aed; color:white; width:24px; height:24px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; font-size:0.8rem; margin-right:6px;">3</span> Meses con tarjeta</div>
+<label style="display:flex; align-items:center; gap:0.6rem; margin-bottom:0.5rem; background:#faf5ff; border:1px solid #ddd6fe; border-radius:8px; padding:0.55rem 0.8rem; cursor:pointer; font-size:0.85rem;">
+<input type="checkbox" id="spTarjetaActiva" checked onchange="spToggleTarjeta(); spRefresh();" style="width:18px; height:18px; accent-color:#7c3aed;"/>
+<span>Calcular meses con tarjeta (MSI)</span>
+</label>
+<label style="display:flex; align-items:center; gap:0.6rem; margin-bottom:0.8rem; background:#faf5ff; border:1px solid #ddd6fe; border-radius:8px; padding:0.55rem 0.8rem; cursor:pointer; font-size:0.85rem;">
+<input type="checkbox" id="spTarjetaEnPDF" style="width:18px; height:18px; accent-color:#7c3aed;"/>
+<span>Incluir esta opción en la cotización impresa (PDF)</span>
+</label>
+<div id="spTarjetaDetalle">
 <div class="input-group" style="margin:0 0 0.6rem;"><label>¿Quién absorbe la comisión bancaria?</label><select id="spTarjetaQuien" class="input-field" onchange="spRefresh()" style="margin:0;"><option value="consultorio">El consultorio (el paciente ve MSI limpios; tú recibes menos)</option><option value="paciente">El paciente (se suma al total; tú recibes completo)</option></select></div>
 <div id="spComisiones" style="display:grid; grid-template-columns:repeat(3,1fr); gap:0.5rem;"></div>
+</div>
 </div>
 
 <!-- Avanzadas -->
@@ -6318,6 +6328,37 @@ db = {
         } catch(e){ console.warn('abrir paciente', e); }
     }
 
+    // Corrige/elimina un ingreso de HOY directo desde el resumen "Ingresos de hoy",
+    // sin necesidad de navegar primero al expediente de ese paciente. Cambia el
+    // paciente activo por un instante, hace el borrado real (mismas funciones de
+    // siempre), y regresa a como estabas antes.
+    function sfCorregirIngresoKPI(pid, fuente, idx) {
+        if(!db.pats[pid]) return;
+        const pacienteAnterior = db.curr;
+        const nombreItem = fuente === 'abono' ? 'este abono' : 'este tratamiento cobrado aparte';
+        if(!confirm('¿Eliminar ' + nombreItem + ' de "' + db.pats[pid].name + '"? Esto lo quita de Ingresos de hoy.')) return;
+        db.curr = pid;
+        if(fuente === 'abono') {
+            const p = db.pats[pid];
+            if(p.abonos && p.abonos[idx]) {
+                const quitado = p.abonos[idx];
+                p.abonos.splice(idx, 1);
+                try { if(quitado && quitado.id) db.log = (db.log||[]).filter(r => r.ref !== quitado.id); } catch(e){}
+            }
+        } else {
+            const p = db.pats[pid];
+            if(p.tratamientosExtra && p.tratamientosExtra[idx]) {
+                const t = p.tratamientosExtra[idx];
+                p.tratamientosExtra.splice(idx, 1);
+                db.log = (db.log||[]).filter(r => r.ref !== t.id);
+            }
+        }
+        saveDB();
+        db.curr = pacienteAnterior; // regresa al paciente que tenías abierto, si tenías uno
+        try { renderInicio(); } catch(e){}
+        try { sfDetalleKPI('ingresos'); } catch(e){} // refresca la misma lista abierta
+        if(typeof daniSpeak === 'function') daniSpeak('🗑️ Ingreso corregido.', 3500, 'info');
+    }
     function sfDetalleKPI(tipo){
         try {
             const hoy = sfHoyISO();
@@ -6357,13 +6398,13 @@ db = {
                 } else if(tipo === 'ingresos'){
                     const hoyI = sfHoyISO();
                     const _fISO = txt => { const mm = String(txt||'').match(/^(\d{2})\/(\d{2})\/(\d{4})/); return mm ? (mm[3]+'-'+mm[2]+'-'+mm[1]) : String(txt||'').substring(0,10); };
-                    (p.abonos || []).forEach(a => {
+                    (p.abonos || []).forEach((a, idx) => {
                         if(_fISO(a.fecha) !== hoyI) return;
-                        filas.push({ id:pid, n:p.name, d: dinero(parseFloat(a.monto)||0) + (a.concepto ? ' · ' + a.concepto : ''), orden: -(parseFloat(a.monto)||0) });
+                        filas.push({ id:pid, n:p.name, d: dinero(parseFloat(a.monto)||0) + (a.concepto ? ' · ' + a.concepto : ''), orden: -(parseFloat(a.monto)||0), fuente:'abono', idx });
                     });
-                    (p.tratamientosExtra || []).forEach(t => {
+                    (p.tratamientosExtra || []).forEach((t, idx) => {
                         if(_fISO(t.fecha) !== hoyI) return;
-                        filas.push({ id:pid, n:p.name, d: dinero(parseFloat(t.costo)||0) + ' · ' + (t.concepto||'Tratamiento') + ' (aparte)', orden: -(parseFloat(t.costo)||0) });
+                        filas.push({ id:pid, n:p.name, d: dinero(parseFloat(t.costo)||0) + ' · ' + (t.concepto||'Tratamiento') + ' (aparte)', orden: -(parseFloat(t.costo)||0), fuente:'extra', idx });
                     });
                 } else if(tipo === 'adeudo'){
                     const cc = sfCuenta(p);
@@ -6397,10 +6438,13 @@ db = {
             let h = '<p style="color:#64748b; font-size:0.86rem; margin:0 0 0.9rem;">' + filas.length + ' resultado(s). Toca un paciente para abrir su expediente.</p>';
             filas.forEach(f => {
                 const col = f.alerta ? '#dc2626' : cfg.c;
+                const btnBorrar = (tipo === 'ingresos' && f.fuente)
+                    ? '<button onclick="event.stopPropagation(); sfCorregirIngresoKPI(\'' + f.id + '\',\'' + f.fuente + '\',' + f.idx + ')" title="Corregir/eliminar este ingreso" style="border:none; background:#fee2e2; color:#b91c1c; border-radius:8px; width:34px; height:34px; flex-shrink:0; cursor:pointer;"><i class="fa-solid fa-trash-can"></i></button>'
+                    : '';
                 h += '<div onclick="sfAbrirPacienteDesdeKPI(\'' + f.id + '\')" style="display:flex; justify-content:space-between; align-items:center; gap:0.8rem; border:1px solid var(--border); border-left:4px solid ' + col + '; border-radius:10px; padding:0.7rem 0.9rem; margin-bottom:0.55rem; cursor:pointer;">'
                    + '<div><div style="font-weight:800; color:var(--text,#0f172a);">' + (f.n || 'Sin nombre') + '</div>'
                    + '<div style="font-size:0.83rem; color:' + (f.alerta ? '#dc2626' : '#64748b') + '; margin-top:2px;">' + (f.alerta ? '⚠️ VENCIDO · ' : '') + (f.d || '') + '</div></div>'
-                   + '<i class="fa-solid fa-chevron-right" style="color:#cbd5e1;"></i></div>';
+                   + '<div style="display:flex; align-items:center; gap:0.5rem;">' + btnBorrar + '<i class="fa-solid fa-chevron-right" style="color:#cbd5e1;"></i></div></div>';
             });
             body.innerHTML = h;
         } catch(e){ console.warn('detalle KPI', e); }
@@ -14220,6 +14264,10 @@ ${patientText}`;
         }, 1200);
     }
 
+    function spToggleTarjeta() {
+        const activo = $('spTarjetaActiva') && $('spTarjetaActiva').checked;
+        if($('spTarjetaDetalle')) $('spTarjetaDetalle').style.display = activo ? 'block' : 'none';
+    }
     function spCalc() {
         const subtotal = spTrats.reduce((s,t)=> s + (parseFloat(t.costo)||0)*(parseInt(t.cantidad)||1), 0);
         const ivaOn = $('spIVA') && $('spIVA').checked;
@@ -14290,14 +14338,14 @@ ${patientText}`;
                 ${c.materiales>0?`<span style="color:${c.enganche>=c.materiales?'#059669':'#dc2626'};">Materiales ${c.enganche>=c.materiales?'cubiertos ✓':'sin cubrir ✗'}</span>`:''}
             </div>
             <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">${cards}</div>
-            <div style="margin-top:0.8rem; padding-top:0.8rem; border-top:1px dashed #cbd5e1;">
+            ${($('spTarjetaActiva') && $('spTarjetaActiva').checked) ? `<div style="margin-top:0.8rem; padding-top:0.8rem; border-top:1px dashed #cbd5e1;">
                 <div style="font-size:0.78rem; font-weight:700; color:#7c3aed; margin-bottom:0.4rem;"><i class="fa-solid fa-credit-card"></i> Meses con tarjeta (${c.quien==='consultorio'?'consultorio absorbe comisión':'paciente cubre comisión'})</div>
                 <div style="display:flex; gap:0.4rem; flex-wrap:wrap; font-size:0.75rem;">
                     ${spPlazos().map(P=>`<div style="background:#faf5ff; border:1px solid #ddd6fe; border-radius:8px; padding:0.35rem 0.6rem;">
                         <b>${P} MSI:</b> ${spFmt(c.tarjeta[P].mensual)}/mes${c.quien==='consultorio'?` <span style="color:#dc2626;">(recibes ${spFmt(c.tarjeta[P].neto)})</span>`:''}
                     </div>`).join('')}
                 </div>
-            </div>
+            </div>` : ''}
             ${c.citaActiva?`<div style="margin-top:0.8rem; background:#ecfdf5; border:1px solid #a7f3d0; border-radius:8px; padding:0.6rem 0.8rem; font-size:0.78rem; color:#047857;"><i class="fa-solid fa-circle-info"></i> La mensualidad difiere el tratamiento. <b>Al terminar de pagarlo, las citas de control regresan a ${spFmt(c.citaMonto)} cada una.</b></div>`:''}`;
     }
 
@@ -14320,6 +14368,8 @@ ${patientText}`;
             descContado: parseFloat($('spDescContado')?$('spDescContado').value:0)||0,
             iva: !!($('spIVA')&&$('spIVA').checked),
             tarjetaQuien: $('spTarjetaQuien')?$('spTarjetaQuien').value:'consultorio',
+            tarjetaActiva: $('spTarjetaActiva')?$('spTarjetaActiva').checked:true,
+            tarjetaEnPDF: $('spTarjetaEnPDF')?$('spTarjetaEnPDF').checked:false,
             comisiones: spPlazos().reduce((o,P)=>{o[P]=spComGet(P); return o;},{}),
             plazos: spPlazos().slice(),
             moneda: spCurCfg().cur, rateCOP: spCurCfg().rateCOP, rateUSD: spCurCfg().rateUSD,
@@ -14341,6 +14391,9 @@ ${patientText}`;
         if($('spDescContado')) $('spDescContado').value = cot.descContado||0;
         if($('spIVA')) $('spIVA').checked = !!cot.iva;
         if($('spTarjetaQuien')) $('spTarjetaQuien').value = cot.tarjetaQuien||'consultorio';
+        if($('spTarjetaActiva')) $('spTarjetaActiva').checked = cot.tarjetaActiva!==false;
+        if($('spTarjetaEnPDF')) $('spTarjetaEnPDF').checked = cot.tarjetaEnPDF||false;
+        spToggleTarjeta();
         if(!db.cfg) db.cfg={};
         if(cot.plazos && cot.plazos.length) db.cfg.spPlazos = cot.plazos.slice();
         if(cot.comisiones){ if(!db.cfg.spComisiones) db.cfg.spComisiones={}; Object.assign(db.cfg.spComisiones, cot.comisiones); }
@@ -14498,6 +14551,28 @@ ${patientText}`;
     }
 
     // ---------- PDF ----------
+    // Bloque de "meses con tarjeta" con montos reales para el PDF — antes esta
+    // sección nunca se imprimía, solo vivía como vista previa en pantalla.
+    function spTarjetaPDFBlock(c, azul) {
+        const activa = $('spTarjetaActiva') && $('spTarjetaActiva').checked;
+        const enPDF = $('spTarjetaEnPDF') && $('spTarjetaEnPDF').checked;
+        if(!activa) return { text:'', margin:[0,0,0,0] };
+        if(!enPDF) return { text:'💳 También disponible a meses con tarjeta ('+(c.quien==='consultorio'?'sin recargo para ti':'con comisión aplicada')+')', fontSize:8.5, color:'#7c3aed', alignment:'center', margin:[0,10,0,0] };
+        const chips = spPlazos().map(P => ({
+            width:'*',
+            stack:[
+                {text:P+' MSI', fontSize:8, bold:true, alignment:'center', color:'#7c3aed'},
+                {text:spFmt(c.tarjeta[P].mensual), fontSize:11, bold:true, alignment:'center', color:'#0f172a'},
+                {text:'al mes', fontSize:6.5, alignment:'center', color:'#94a3b8'},
+                c.quien==='consultorio' ? {text:'(recibes '+spFmt(c.tarjeta[P].neto)+')', fontSize:6.5, alignment:'center', color:'#dc2626'} : {text:'', fontSize:6.5}
+            ],
+            margin:[2,4,2,4]
+        }));
+        return { stack:[
+            { text:'💳 Opción a meses con tarjeta ('+(c.quien==='consultorio'?'sin recargo para el paciente':'comisión bancaria incluida')+')', fontSize:9, bold:true, color:'#7c3aed', alignment:'center', margin:[0,10,0,4] },
+            { columns: chips, columnGap:4 }
+        ], margin:[0,0,0,4] };
+    }
     function spPDF(){
         if(!db.curr) return alert('Selecciona un paciente primero.');
         if(typeof ensurePdfMake==='function' && !ensurePdfMake()) return;
@@ -14566,7 +14641,7 @@ ${patientText}`;
             { text:'Elige tu plan de pagos', fontSize:11, bold:true, color:azul, alignment:'center', margin:[0,0,0,2] },
             c.citaActiva?{text:'(incluye tus citas de control mensuales)', fontSize:7.5, italics:true, color:'#94a3b8', alignment:'center', margin:[0,0,0,4]}:{text:'',margin:[0,0,0,4]},
             { columns: planCols, columnGap:6 },
-            { text:'💳 También disponible a meses con tarjeta ('+(c.quien==='consultorio'?'sin recargo para ti':'con comisión aplicada')+')', fontSize:8.5, color:'#7c3aed', alignment:'center', margin:[0,10,0,0] }
+            spTarjetaPDFBlock(c, azul)
         ];
 
         if(activeD.name){
@@ -14614,7 +14689,7 @@ ${patientText}`;
                 { text:'O de contado: '+spFmt(c.contado)+(c.descContado>0?(' (ahorras '+spFmt(c.total-c.contado)+')'):''), fontSize:11, alignment:'center', color:'#059669', margin:[0,0,0,4] },
                 c.citaActiva?(()=>{ const meP=spMasElegido(); const totalD=spDispVal(c.planes[meP].mensual); const consultaD=spDispVal(c.citaMonto); const aparD=totalD-consultaD; return { text:[{text:'Tu pago mensual ('+meP+' meses): ',bold:true}, spFmtVal(consultaD)+' de consulta + '+spFmtVal(aparD)+' de aparatología (brackets) = ', {text:spFmtVal(totalD)+'/mes',bold:true}], fontSize:10, alignment:'center', color:'#1f5b9e', margin:[0,4,0,4] }; })():{},
                 c.citaActiva?{ table:{widths:['*'], body:[[ {text:[{text:'⚠️ IMPORTANTE: ',bold:true}, 'El plan de pagos cubre únicamente tu aparatología (brackets). Al liquidarla, tus citas de control continúan en '+spFmt(c.citaMonto)+' cada una hasta finalizar tu tratamiento.'], fontSize:9, color:'#b91c1c', fillColor:'#fef2f2', margin:[8,6,8,6], alignment:'center'} ]]}, layout:'noBorders', margin:[30,0,30,6] }:{},
-                { text:'💳 También disponible a meses con tarjeta', fontSize:10, alignment:'center', color:'#7c3aed', margin:[0,2,0,0] },
+                spTarjetaPDFBlock(c),
                 { text:'Precios sujetos a valoración. No incluye tratamientos adicionales (extracciones, cirugías, etc.), que se cotizan por separado.', fontSize:7.5, alignment:'center', color:'#94a3b8', margin:[0,14,0,0] },
                 (cfg.address||cfg.cli)?{ text:(cfg.cli||'')+(cfg.address?('  ·  '+cfg.address):''), fontSize:8, alignment:'center', color:'#94a3b8', margin:[0,20,0,0] }:{}
             ],
