@@ -600,7 +600,7 @@ window._pdfReady=true;
         <h2 style="margin: 0 !important; font-size: 1.5rem !important; color: white !important;">SmileFlow</h2>
         <a href="https://www.dentilike.com.mx" target="_blank" style="color: #bae6fd; font-size: 0.75rem; text-decoration: none; font-weight: 600; cursor: pointer; transition: color 0.2s;" onmouseover="this.style.color='white'" onmouseout="this.style.color='#bae6fd'">www.dentilike.com.mx</a>
         <a href="mailto:soporte@dentilike.com.mx" style="color: #bae6fd; font-size: 0.75rem; text-decoration: none; font-weight: 600; cursor: pointer; transition: color 0.2s;" onmouseover="this.style.color='white'" onmouseout="this.style.color='#bae6fd'">soporte@dentilike.com.mx</a>
-<span style="color:#7dd3fc; font-size:0.62rem; opacity:0.8; margin-top:2px;">© 2026 Dentilike · Todos los derechos reservados · <b id="sfVersion">v188</b></span>
+<span style="color:#7dd3fc; font-size:0.62rem; opacity:0.8; margin-top:2px;">© 2026 Dentilike · Todos los derechos reservados · <b id="sfVersion">v189</b></span>
     </div></div>
 <!-- Doctor en sesion: informativo, lleva a Configuracion para cambiarlo -->
 <div id="sideDocBox" onclick="openSection('s-admin-id', document.querySelector('.nav-item[onclick*=&quot;s-admin-id&quot;]'))" title="Doctor en sesion. Toca para cambiarlo o editar el perfil." style="margin:0 12px 10px; padding:0.7rem 0.85rem; background:rgba(255,255,255,0.07); border:1px solid rgba(125,211,252,0.28); border-left:3px solid #5DC1BF; border-radius:10px; cursor:pointer; display:flex; align-items:center; gap:0.6rem;">
@@ -2287,17 +2287,22 @@ AVISO PRÓX. CITA (Recordatorio local):
 <!-- 3. Tarjeta -->
 <div style="margin-bottom:1.3rem;">
 <div style="font-weight:800; color:#7c3aed; font-size:0.95rem; margin-bottom:0.6rem; padding-bottom:0.4rem; border-bottom:2px solid #ddd6fe;"><span style="background:#7c3aed; color:white; width:24px; height:24px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; font-size:0.8rem; margin-right:6px;">3</span> Meses con tarjeta</div>
-<label style="display:flex; align-items:center; gap:0.6rem; margin-bottom:0.5rem; background:#faf5ff; border:1px solid #ddd6fe; border-radius:8px; padding:0.55rem 0.8rem; cursor:pointer; font-size:0.85rem;">
+<label style="display:flex; align-items:center; gap:0.6rem; margin-bottom:0.6rem; background:#faf5ff; border:1px solid #ddd6fe; border-radius:8px; padding:0.55rem 0.8rem; cursor:pointer; font-size:0.85rem;">
 <input type="checkbox" id="spTarjetaActiva" checked onchange="spToggleTarjeta(); spRefresh();" style="width:18px; height:18px; accent-color:#7c3aed;"/>
-<span>Calcular meses con tarjeta (MSI)</span>
+<span>Ofrecer meses con tarjeta (MSI)</span>
 </label>
-<label style="display:flex; align-items:center; gap:0.6rem; margin-bottom:0.8rem; background:#faf5ff; border:1px solid #ddd6fe; border-radius:8px; padding:0.55rem 0.8rem; cursor:pointer; font-size:0.85rem;">
+<div id="spTarjetaDetalle">
+<div class="input-group" style="margin:0 0 0.7rem;"><label>¿Quién absorbe la comisión bancaria?</label><select id="spTarjetaQuien" class="input-field" onchange="spRefresh()" style="margin:0;"><option value="consultorio">El consultorio (el paciente ve MSI limpios; tú recibes menos)</option><option value="paciente">El paciente (se suma al total; tú recibes completo)</option></select></div>
+<!-- Resultado en vivo: la misma fila de recuadros grandes, justo aquí -->
+<div id="spTarjetaCards" style="display:flex; gap:0.5rem; flex-wrap:wrap; margin-bottom:0.8rem;"></div>
+<details style="margin-bottom:0.8rem;">
+<summary style="cursor:pointer; font-size:0.8rem; color:#7c3aed; font-weight:700;">Ajustar % de comisión por plazo (opcional)</summary>
+<div id="spComisiones" style="display:grid; grid-template-columns:repeat(3,1fr); gap:0.5rem; margin-top:0.5rem;"></div>
+</details>
+<label style="display:flex; align-items:center; gap:0.6rem; background:#faf5ff; border:1px solid #ddd6fe; border-radius:8px; padding:0.55rem 0.8rem; cursor:pointer; font-size:0.85rem;">
 <input type="checkbox" id="spTarjetaEnPDF" style="width:18px; height:18px; accent-color:#7c3aed;"/>
 <span>Incluir esta opción en la cotización impresa (PDF)</span>
 </label>
-<div id="spTarjetaDetalle">
-<div class="input-group" style="margin:0 0 0.6rem;"><label>¿Quién absorbe la comisión bancaria?</label><select id="spTarjetaQuien" class="input-field" onchange="spRefresh()" style="margin:0;"><option value="consultorio">El consultorio (el paciente ve MSI limpios; tú recibes menos)</option><option value="paciente">El paciente (se suma al total; tú recibes completo)</option></select></div>
-<div id="spComisiones" style="display:grid; grid-template-columns:repeat(3,1fr); gap:0.5rem;"></div>
 </div>
 </div>
 
@@ -14347,11 +14352,8 @@ ${patientText}`;
                 ${c.materiales>0?`<span style="color:${c.enganche>=c.materiales?'#059669':'#dc2626'};">Materiales ${c.enganche>=c.materiales?'cubiertos ✓':'sin cubrir ✗'}</span>`:''}
             </div>
             <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">${cards}</div>
-            ${($('spTarjetaActiva') && $('spTarjetaActiva').checked) ? `<div style="margin-top:0.8rem; padding-top:0.8rem; border-top:1px dashed #cbd5e1;">
-                <div style="font-size:0.78rem; font-weight:700; color:#7c3aed; margin-bottom:0.4rem;"><i class="fa-solid fa-credit-card"></i> Meses con tarjeta (${c.quien==='consultorio'?'consultorio absorbe comisión':'paciente cubre comisión'})</div>
-                <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">${cardsTarjeta}</div>
-            </div>` : ''}
             ${c.citaActiva?`<div style="margin-top:0.8rem; background:#ecfdf5; border:1px solid #a7f3d0; border-radius:8px; padding:0.6rem 0.8rem; font-size:0.78rem; color:#047857;"><i class="fa-solid fa-circle-info"></i> La mensualidad difiere el tratamiento. <b>Al terminar de pagarlo, las citas de control regresan a ${spFmt(c.citaMonto)} cada una.</b></div>`:''}`;
+        if($('spTarjetaCards')) $('spTarjetaCards').innerHTML = ($('spTarjetaActiva') && $('spTarjetaActiva').checked) ? cardsTarjeta : '';
     }
 
     function spToggleAvanzadas(){ const b=$('spAvanzadas'); if(b) b.style.display = b.style.display==='none'?'block':'none'; }
