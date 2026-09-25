@@ -600,7 +600,7 @@ window._pdfReady=true;
         <h2 style="margin: 0 !important; font-size: 1.5rem !important; color: white !important;">SmileFlow</h2>
         <a href="https://www.dentilike.com.mx" target="_blank" style="color: #bae6fd; font-size: 0.75rem; text-decoration: none; font-weight: 600; cursor: pointer; transition: color 0.2s;" onmouseover="this.style.color='white'" onmouseout="this.style.color='#bae6fd'">www.dentilike.com.mx</a>
         <a href="mailto:soporte@dentilike.com.mx" style="color: #bae6fd; font-size: 0.75rem; text-decoration: none; font-weight: 600; cursor: pointer; transition: color 0.2s;" onmouseover="this.style.color='white'" onmouseout="this.style.color='#bae6fd'">soporte@dentilike.com.mx</a>
-<span style="color:#7dd3fc; font-size:0.62rem; opacity:0.8; margin-top:2px;">© 2026 Dentilike · Todos los derechos reservados · <b id="sfVersion">v187</b></span>
+<span style="color:#7dd3fc; font-size:0.62rem; opacity:0.8; margin-top:2px;">© 2026 Dentilike · Todos los derechos reservados · <b id="sfVersion">v188</b></span>
     </div></div>
 <!-- Doctor en sesion: informativo, lleva a Configuracion para cambiarlo -->
 <div id="sideDocBox" onclick="openSection('s-admin-id', document.querySelector('.nav-item[onclick*=&quot;s-admin-id&quot;]'))" title="Doctor en sesion. Toca para cambiarlo o editar el perfil." style="margin:0 12px 10px; padding:0.7rem 0.85rem; background:rgba(255,255,255,0.07); border:1px solid rgba(125,211,252,0.28); border-left:3px solid #5DC1BF; border-radius:10px; cursor:pointer; display:flex; align-items:center; gap:0.6rem;">
@@ -14327,6 +14327,15 @@ ${patientText}`;
                 <div style="font-size:0.62rem; color:#94a3b8;">al mes</div>
             </div>`;
         }).join('');
+        const cardsTarjeta = spPlazos().map(P=>{
+            const t = c.tarjeta[P];
+            return `<div style="flex:1; min-width:110px; background:#faf5ff; border:2px solid #ddd6fe; border-radius:12px; padding:0.7rem; text-align:center; position:relative;">
+                <div style="font-size:0.72rem; color:#7c3aed; font-weight:700;">${P} MSI</div>
+                <div style="font-size:1.15rem; font-weight:900; color:#0f172a;">${spFmt(t.mensual)}</div>
+                <div style="font-size:0.62rem; color:#94a3b8;">al mes</div>
+                ${c.quien==='consultorio'?`<div style="font-size:0.62rem; color:#dc2626; margin-top:2px;">(recibes ${spFmt(t.neto)})</div>`:''}
+            </div>`;
+        }).join('');
         cont.innerHTML = `
             <div style="display:flex; justify-content:space-between; flex-wrap:wrap; gap:0.5rem; font-size:0.85rem; margin-bottom:0.8rem;">
                 <span>Subtotal: <b>${spFmt(c.subtotal)}</b></span>
@@ -14340,11 +14349,7 @@ ${patientText}`;
             <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">${cards}</div>
             ${($('spTarjetaActiva') && $('spTarjetaActiva').checked) ? `<div style="margin-top:0.8rem; padding-top:0.8rem; border-top:1px dashed #cbd5e1;">
                 <div style="font-size:0.78rem; font-weight:700; color:#7c3aed; margin-bottom:0.4rem;"><i class="fa-solid fa-credit-card"></i> Meses con tarjeta (${c.quien==='consultorio'?'consultorio absorbe comisión':'paciente cubre comisión'})</div>
-                <div style="display:flex; gap:0.4rem; flex-wrap:wrap; font-size:0.75rem;">
-                    ${spPlazos().map(P=>`<div style="background:#faf5ff; border:1px solid #ddd6fe; border-radius:8px; padding:0.35rem 0.6rem;">
-                        <b>${P} MSI:</b> ${spFmt(c.tarjeta[P].mensual)}/mes${c.quien==='consultorio'?` <span style="color:#dc2626;">(recibes ${spFmt(c.tarjeta[P].neto)})</span>`:''}
-                    </div>`).join('')}
-                </div>
+                <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">${cardsTarjeta}</div>
             </div>` : ''}
             ${c.citaActiva?`<div style="margin-top:0.8rem; background:#ecfdf5; border:1px solid #a7f3d0; border-radius:8px; padding:0.6rem 0.8rem; font-size:0.78rem; color:#047857;"><i class="fa-solid fa-circle-info"></i> La mensualidad difiere el tratamiento. <b>Al terminar de pagarlo, las citas de control regresan a ${spFmt(c.citaMonto)} cada una.</b></div>`:''}`;
     }
